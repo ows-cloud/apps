@@ -1,0 +1,21 @@
+<odoo>
+  <data>
+
+      <!-- product.uom.categ form -->
+
+      <record model="ir.ui.view" id="view_uom_category_form">
+          <field name="name">uom.category.form</field>
+          <field name="model">uom.category</field>
+          <field name="inherit_id" ref="uom.product_uom_categ_form_view"/>
+          <field name="priority" eval="21"/>
+          <field name="arch" type="xml">
+              <data>
+                  <field name="name" position="after">
+                      <field name="is_weight" groups="base.group_no_one"/>
+                  </field>
+              </data>
+          </field>
+      </record>
+
+  </data>
+</odoo>

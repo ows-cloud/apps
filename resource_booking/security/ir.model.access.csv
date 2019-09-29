@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_booking_booking_group_booking_user,booking.booking,model_booking_booking,group_booking_user,1,1,1,1
+access_booking_time_group_booking_user,booking.time,model_booking_time,group_booking_user,1,0,0,0
+access_booking_time_group_booking_manager,booking.time,model_booking_time,group_booking_manager,1,1,1,1

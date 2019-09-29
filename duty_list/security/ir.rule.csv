@@ -1,0 +1,5 @@
+id,name,model_id:id,groups:id,domain_force,perm_read,perm_write,perm_create,perm_unlink
+duty_availability_rule,#company duty.availability,duty_list.model_duty_availability,,"['&',  '|',('company_id','child_of',[user.company_id.id]),('company_id','parent_of',[user.company_id.id]) ,  ('company_id','in',[c.id for c in user.company_ids]) ]",True,True,True,True
+duty_list_rule,#company duty.list,duty_list.model_duty_list,,"['&',  '|',('company_id','child_of',[user.company_id.id]),('company_id','parent_of',[user.company_id.id]) ,  ('company_id','in',[c.id for c in user.company_ids]) ]",True,True,True,True
+duty_list_line_rule,#company duty.list.line,duty_list.model_duty_list_line,,"['&',  '|',('company_id','child_of',[user.company_id.id]),('company_id','parent_of',[user.company_id.id]) ,  ('company_id','in',[c.id for c in user.company_ids]) ]",True,True,True,True
+duty_role_rule,#company duty.role,duty_list.model_duty_role,,"['&',  '|',('company_id','child_of',[user.company_id.id]),('company_id','parent_of',[user.company_id.id]) ,  ('company_id','in',[c.id for c in user.company_ids]) ]",True,True,True,True

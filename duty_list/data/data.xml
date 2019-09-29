@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- mail.template -->
+
+    <record id="mail_template_duty_availability" model="mail.template">
+        <field name="name">When are you available?</field>
+        <field name="subject">When are you available?</field>
+        <field name="email_to">${object.user_id.email | safe}</field>
+        <field name="body_html" type="xml">
+            <p>Dear ${object.user_id.name},</p>
+            <p>When are you available for duties? Please click the link below to answer:<br/>
+                <a href="${ctx['url_except_id']}${object.id}">${ctx['url_except_id']}${object.id}</a></p>
+            <p>Kind regards,<br/>${object.company_id.name}</p>
+        </field>
+        <field name="model_id" ref="duty_list.model_duty_availability"/>
+        <field name="auto_delete" eval="True"/>
+    </record>
+    
+</odoo>

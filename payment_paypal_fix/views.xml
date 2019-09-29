@@ -1,0 +1,16 @@
+<odoo>
+  <data>
+
+        <record id="acquirer_form_paypal" model="ir.ui.view">
+            <field name="name">acquirer.form.paypal</field>
+            <field name="model">payment.acquirer</field>
+            <field name="inherit_id" ref="payment.acquirer_form"/>
+            <field name="arch" type="xml">
+                <field name="paypal_seller_account" position="after">
+                    <field name="paypal_pdt_token"/>
+                </field>
+            </field>
+        </record>
+
+  </data>
+</odoo>

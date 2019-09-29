@@ -1,0 +1,72 @@
+<odoo>
+    <data>
+
+        <!-- hr.contract -->
+
+        <record model="ir.ui.view" id="view_hr_contract_form">
+            <field name="name">hr.contract.form.hr_professional</field>
+            <field name="model">hr.contract</field>
+            <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page name="fields" string="Salary Rules">
+                        <field name="qty_rate_amount_ids">
+                            <tree editable="bottom">
+                                <field name="salary_rule_id" domain="[('qty_rate_amount_from','=','hr.contract')]"/>
+                                <field name="quantity"/>
+                                <field name="rate"/>
+                                <field name="amount"/>
+                                <field name="total"/>
+                                <field name="model" groups="base.group_no_one"/>
+                                <field name="res_id" groups="base.group_no_one"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+        <!-- hr.payslip -->
+
+        <record model="ir.ui.view" id="view_hr_payslip_form">
+            <field name="name">hr.payslip.form.hr_professional</field>
+            <field name="model">hr.payslip</field>
+            <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='input_line_ids']" position="after">
+                    <separator string="Salary Rules"/>
+                    <field name="qty_rate_amount_ids">
+                        <tree editable="bottom">
+                            <field name="salary_rule_id" domain="[('qty_rate_amount_from','=','hr.payslip')]"/>
+                            <field name="quantity"/>
+                            <field name="rate"/>
+                            <field name="amount"/>
+                            <field name="total"/>
+                            <field name="model" groups="base.group_no_one"/>
+                            <field name="res_id" groups="base.group_no_one"/>
+                        </tree>
+                    </field>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- hr.salary.rule -->
+
+        <record model="ir.ui.view" id="view_hr_salary_rule_form">
+            <field name="name">hr.salary.rule.form.hr_professional</field>
+            <field name="model">hr.salary.rule</field>
+            <field name="inherit_id" ref="hr_payroll.hr_salary_rule_form"/>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <data>
+                    <field name="condition_select" position="after">
+                        <field name="qty_rate_amount_from" attrs="{'invisible':[('condition_select', '!=', 'python')]}"/>
+                    </field>
+                </data>
+            </field>
+        </record>
+
+    </data>
+</odoo>
