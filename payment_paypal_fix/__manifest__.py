@@ -7,7 +7,7 @@
 
     'author': 'AppsToGROW',
     'category': 'Uncategorized',
-    'auto_install': True,
+    'auto_install': False,
     'data': [
         'views.xml',
     ],
