@@ -37,7 +37,7 @@ class EventSurveyController(http.Controller):
         EventTicket = request.env['event.event.ticket']
 
         order = request.website.sale_get_order()
-        input = Input.sudo().search([('order_id', '=', order.id)])
+        input = Input.with_env(self.env(su=True)).search([('order_id', '=', order.id)])
         attendees = []
 
         for count, user_input in enumerate(input, start=1):
@@ -60,7 +60,8 @@ class EventSurveyController(http.Controller):
 
             # Prepare products, order by survey label sequence (order by doesn't make so much sense when multiple questions have products)
             user_input_lines = user_input.user_input_line_ids.filtered(lambda x: x.value_suggested.product_id)
-            product_sequence_price = [[l.value_suggested.sudo().product_id, l.value_suggested.sequence, l.value_suggested.sudo().product_id.list_price] for l in user_input_lines]
+            env = self.env(su=True)
+            product_sequence_price = [[l.value_suggested.with_env(env).product_id, l.value_suggested.sequence, l.value_suggested.with_env(env).product_id.list_price] for l in user_input_lines]
             product_sequence_price.sort(key=lambda p: p[1])
 
             total_price = ticket.price + sum([p[2] for p in product_sequence_price])
@@ -93,6 +94,7 @@ class EventSurveyController(http.Controller):
     @http.route(['''/event/<model("event.event"):event>/registration_survey_list/confirm'''], type='http', auth="public", website=True)
     def registration_survey_list_confirm(self, event, **post):
 
+        env = self.env(su=True)
         order = request.website.sale_get_order()
         OrderLine = request.env['sale.order.line']
         Registration = request.env['event.registration']
@@ -101,20 +103,20 @@ class EventSurveyController(http.Controller):
         action = event.registration_validation_action_id
         user = event.company_id.user_tech_id
         if action and action.state == 'code' and action.website_published:
-            error_msg = action.with_context(active_id=order.id, active_model='sale.order').sudo(user).run()
+            error_msg = action.with_context(active_id=order.id, active_model='sale.order').with_user(user).run()
             if error_msg:
                 return request.redirect("/event/%s/registration_survey_list/%s" % (slugify(event), error_msg))
 
         # delete previously registered attendees on this sales order, and event-related products in the shopping cart
-        Registration.sudo().search([('sale_order_id','=',order.id)]).unlink()
+        Registration.with_env(env).search([('sale_order_id','=',order.id)]).unlink()
         tickets = event.event_ticket_ids
         labels = request.env['survey.label'].search([]).filtered(lambda l: l.question_id.page_id.survey_id.event_id == event and l.product_id)
         product_ids = [t.product_id.id for t in tickets] + [l.product_id.id for l in labels]
-        OrderLine.sudo().search([('order_id','=',order.id), ('product_id','in',product_ids)]).unlink()
+        OrderLine.with_env(env).search([('order_id','=',order.id), ('product_id','in',product_ids)]).unlink()
 
         # event partner > public partner (to skip address)
         if order.partner_id == event.registration_partner_id:
-            order.partner_id = request.website.user_id.sudo().partner_id.id
+            order.partner_id = request.website.user_id.with_env(env).partner_id.id
 
         # get attendees
         attendees = self._get_attendees(event, **post)
@@ -132,7 +134,7 @@ class EventSurveyController(http.Controller):
         user_input = request.env['survey.user_input'].search(domain)
         if user_input:
             user_input.ensure_one()
-            if user_input.sudo().order_id.state == 'draft':
+            if user_input.with_env(self.env(su=True)).order_id.state == 'draft':
                 user_input.state = 'new'
                 return request.redirect('/survey/fill/%s/%s' % (survey.id, token))
             else:
@@ -143,8 +145,8 @@ class EventSurveyController(http.Controller):
         domain = [('token','=',token), ('survey_id','=',survey.id)]
         user_input = request.env['survey.user_input'].search(domain)
         for input in user_input:
-            if input.sudo().order_id.state == 'draft':
-                input.sudo().unlink()
+            if input.with_env(self.env(su=True)).order_id.state == 'draft':
+                input.with_env(self.env(su=True)).unlink()
 
         return request.redirect("/event/%s/registration_survey_list" % slugify(survey.event_id))
 
@@ -170,7 +172,7 @@ class WebsiteEventSaleController2(WebsiteEventSaleController):
 
         registrations = self._process_registration_details(post)
         for registration in registrations:
-            ticket = request.env['event.event.ticket'].sudo().browse(int(registration['ticket_id']))
+            ticket = request.env['event.event.ticket'].with_env(self.env(su=True)).browse(int(registration['ticket_id']))
             cart_values = order.with_context(event_ticket_id=ticket.id, fixed_price=True)._cart_update(product_id=ticket.product_id.id, add_qty=1, registration_data=[registration])
             attendee_ids |= set(cart_values.get('attendee_ids', []))
 
@@ -194,7 +196,7 @@ class WebsiteEventSaleController2(WebsiteEventSaleController):
         # free tickets -> order with amount = 0: auto-confirm, no checkout
         if not order.amount_total:
             order.action_confirm()  # tde notsure: email sending ?
-            attendees = request.env['event.registration'].browse(list(attendee_ids)).sudo()
+            attendees = request.env['event.registration'].browse(list(attendee_ids)).with_env(self.env(su=True))
             # clean context and session, then redirect to the confirmation page
             request.website.sale_reset()
             return request.render("website_event.registration_complete", {
@@ -212,9 +214,9 @@ class WebsiteSaleController2(WebsiteSaleController):
         # If event registration with public user, and the event has registration_partner_id with country:
         sale_order_id = request.session.get('sale_order_id')
         if sale_order_id:
-            registration = request.env['event.registration'].sudo().search([('sale_order_id','=',sale_order_id)], limit=1)
+            registration = request.env['event.registration'].with_env(self.env(su=True)).search([('sale_order_id','=',sale_order_id)], limit=1)
             if registration:
-                sale_order = request.env['sale.order'].sudo().search([('id','=',sale_order_id)])
+                sale_order = request.env['sale.order'].with_env(self.env(su=True)).search([('id','=',sale_order_id)])
                 if sale_order and sale_order.partner_id.id == request.website.partner_id.id:
                     partner = registration.event_id.registration_partner_id
                     if partner and partner.country_id:

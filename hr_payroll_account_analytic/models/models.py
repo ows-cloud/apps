@@ -6,7 +6,6 @@ from datetime import datetime
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
 
-    @api.multi
     def test_payslip_accounting(self, context):
         self.ensure_one()
         account_moves = self.slip_ids.test_payslip_accounting(context=context, hr_payslip_run_name=self.name)
@@ -18,7 +17,6 @@ class HrPayslipRun(models.Model):
             "domain": [["id", "in", [move.id for move in account_moves]]],
         }
 
-    @api.multi
     def confirm_payslip_accounting(self, context):
         self.ensure_one()
         account_moves = self.slip_ids.confirm_payslip_accounting(context=context, hr_payslip_run_name=self.name)
@@ -35,7 +33,6 @@ class HrPayslipRun(models.Model):
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
-    @api.multi
     def test_payslip_accounting(self, context, hr_payslip_run_name=None):
         _logger.debug('hr_payslip_run_name = ' + str(hr_payslip_run_name))
         '''
@@ -220,7 +217,6 @@ class HrPayslip(models.Model):
 
         return account_moves
 
-    @api.multi
     def confirm_payslip_accounting(self, context, hr_payslip_run_name=None):
         account_moves = self.test_payslip_accounting(context, hr_payslip_run_name)
         for move in account_moves:
@@ -237,7 +233,6 @@ class HrPayslip(models.Model):
     # - (2x) 'analytic_account_id': line.salary_rule_id.analytic_account_id.id,
     # + (2x) 'analytic_account_id': line.salary_rule_id.analytic_account_id.id or contract_analytic_account_id,
     # + return self.write({'state': 'done'})
-    @api.multi
     def action_payslip_done(self):
         precision = self.env['decimal.precision'].precision_get('Payroll')
 

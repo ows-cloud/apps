@@ -3,7 +3,7 @@
         <record model="ir.ui.view" id="view_hr_payslip_line_search">
             <field name="name">hr.payslip.line.search.hr_new_fields</field>
             <field name="model">hr.payslip.line</field>
-            <field name="inherit_id" ref="hr_payroll.view_hr_payslip_line_filter"/>
+            <field name="inherit_id" ref="payroll.view_hr_payslip_line_filter"/>
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">
                 <search position="inside">

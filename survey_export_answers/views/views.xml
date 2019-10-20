@@ -10,8 +10,8 @@
             <field name="inherit_id" ref="survey.survey_form"/>
     		<field name="priority" eval="20"/>
     		<field name="arch" type="xml">
-				<field name="stage_id" position="before">
-                    <button name="export_answers" string="Export Answers" type="object" attrs="{'invisible': [('tot_start_survey', '=', 0)]}"/>
+				<field name="state" position="before">
+                    <button name="export_answers" string="Export Answers" type="object" attrs="{'invisible': ['|', ('state', '=', 'draft'), ('id', '>', 0)]}"/>
 				</field>
     		</field>
 		</record>

@@ -15,11 +15,10 @@ class AccountAnalyticAccount(models.Model):
 
     user_id = fields.Many2one('res.users', string='Manager', ondelete='restrict')
     
-    
+'''    
 class AccountInvoiceLine(models.Model):
     _inherit = "account.invoice.line"
 
-    # - @api.one
     # - def _compute_price(self):
     # + def _compute_price(s):
     # +     for self in s:
@@ -52,3 +51,4 @@ class AccountInvoiceLine(models.Model):
     price_subtotal_signed = fields.Monetary(compute='_compute_price')
 
     company_id = fields.Many2one(related='', default=lambda self: self.env.user.company_id)
+'''

@@ -74,7 +74,6 @@ class SurveyUserInput(models.Model):
     state = fields.Selection(selection_add=[('new_event_registration', 'New Event Registration')])
     
     # Was used when the event registration came BEFORE the survey.
-    #@api.one
     #def _compute_fill_url(self):
     #    self.fill_url = "/survey/fill/%s/%s" % (slugify(self.survey_id), self.token)
     #    return self.fill_url
@@ -83,8 +82,7 @@ class SurveyUserInput(models.Model):
     # used by event.registration survey_user_input_print_url
     # used by controller
     answers_url = fields.Char('Answers URL', compute='_compute_answers_url')
-    
-    @api.one
+
     def _compute_answers_url(self):
         self.answers_url = "/survey/print/%s/%s" % (slugify(self.survey_id), self.token)
 

@@ -32,7 +32,6 @@ class HrRuleQtyRateAmount(models.Model):
         for rec in self:
             rec.total = rec.quantity * rec.rate / 100 * rec.amount
 
-    @api.multi
     def write(self, values):
         '''
         SOURCE: base_field_value
@@ -98,7 +97,6 @@ class HrSalaryRule(models.Model):
     # compute_rule() should have access to self.id
     # + localdict['rule'] = self
     # TODO should add some checks on the type of result (should be float)
-    @api.multi
     def compute_rule(self, localdict):
         '''
         :param localdict: dictionary containing the environement in which to compute the rule
@@ -128,7 +126,6 @@ class HrSalaryRule(models.Model):
 
     # satisfy_condition() should have access to self.id
     # + localdict['rule'] = self
-    @api.multi
     def satisfy_condition(self, localdict):
         '''
         @param contract_id: id of hr.contract to be tested

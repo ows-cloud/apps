@@ -9,6 +9,6 @@
     'category': 'Uncategorized',
     'depends': ['account'],
     'license': 'AGPL-3',
-    'version': '12.0.1.0.0',
+    'version': '13.0.1.0.0',
     'website': 'http://www.appstogrow.org',
 }

@@ -48,9 +48,9 @@ class SurveySurvey(models.Model):
 
         # Fetch previous answers
         if page:
-            previous_answers = UserInputLine.sudo().search([('user_input_id.token', '=', token), ('page_id', '=', page.id)])
+            previous_answers = UserInputLine.with_env(self.env(su=True)).search([('user_input_id.token', '=', token), ('page_id', '=', page.id)])
         else:
-            previous_answers = UserInputLine.sudo().search([('user_input_id.token', '=', token)])
+            previous_answers = UserInputLine.with_env(self.env(su=True)).search([('user_input_id.token', '=', token)])
 
         # Return non empty answers in a JSON compatible format
         for answer in previous_answers:

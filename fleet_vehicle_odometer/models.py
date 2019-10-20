@@ -68,7 +68,6 @@ class fleet_vehicle_odometer(models.Model):
         if above:
             above.distance = above.value - values['value']
 
-    @api.multi
     def unlink(self):
         for record in self:
 
@@ -86,7 +85,6 @@ class fleet_vehicle_odometer(models.Model):
         elif above:
             above.distance = None
 
-    @api.multi
     def write(self, values):
 
         recompute_distance = False

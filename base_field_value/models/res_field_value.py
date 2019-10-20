@@ -89,7 +89,7 @@ class ResField(models.Model):
     
     @api.model
     def _get_apps(self):
-        apps = self.env['ir.module.module'].sudo().search([('application','=',True),('state','=','installed')], order='shortdesc')
+        apps = self.env['ir.module.module'].with_env(self.env(su=True)).search([('application','=',True),('state','=','installed')], order='shortdesc')
         return [(app.name, app.shortdesc) for app in apps] if apps else [('','')]
 
     @api.model
@@ -110,7 +110,6 @@ class ResField(models.Model):
                 date_format = self.env['res.lang'].search([('code','=',self.env.user.lang)]).ensure_one().date_format
             self.default_value = _validate(self.default_value, self.data_type, date_format)
 
-    @api.multi
     def copy(self, default=None):
         if default is None:
             default = {}
@@ -198,8 +197,7 @@ class ResFieldValue(models.Model):
             if self.field_id.data_type == 'date':
                 date_format = self.env['res.lang'].search([('code','=',self.env.user.lang)]).ensure_one().date_format
             self.value = _validate(self.value, self.field_id.data_type, date_format)
-            
-    @api.multi
+
     def write(self, values):
         '''
         For models where field_value_ids = fields.One2many('res.field.value', 'res_id'):

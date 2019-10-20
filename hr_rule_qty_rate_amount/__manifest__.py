@@ -11,8 +11,8 @@
         'security/ir.model.access.csv',
         'views/views.xml',
     ],
-    'depends': ['hr_payroll'],
+    'depends': ['payroll'],
     'license': 'AGPL-3',
-    'version': '12.0.1.0.0',
+    'version': '13.0.1.0.0',
     'website': 'http://www.appstogrow.org',
 }
