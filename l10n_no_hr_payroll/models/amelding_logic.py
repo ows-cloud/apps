@@ -11,11 +11,6 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
-#from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
-DATE_FORMAT = "%Y-%m-%d"
-TIME_FORMAT = "%H:%M:%S"
-DATETIME_FORMAT = "%s %s" % (DATE_FORMAT, TIME_FORMAT)
-
 '''
 a = amelding_v2_1
 af = Arbeidsforhold
@@ -110,7 +105,7 @@ class AmeldingLogikk:
         
     def Leveranse(self):
         lev = a.Leveranse()
-        lev.leveringstidspunkt = datetime.strptime(self._get(self.amelding_record, 'leveringstidspunkt'), DATETIME_FORMAT).strftime('%Y-%m-%dT%H:%M:%S') #required
+        lev.leveringstidspunkt = self.amelding_record.leveringstidspunkt
         lev.kalendermaaned = self._get(self.amelding_record, 'kalendermaaned') #'2018-01' #required
         lev.kildesystem = "Odoo" #string #required
         #self._set(lev, 'erstatterMeldingsId', str(self._get(self.amelding_record, 'erstatterMeldingsId'))) #optional
