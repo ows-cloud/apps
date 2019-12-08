@@ -20,3 +20,13 @@ class IrConfigParameter(models.Model):
             return prefix + str(self.env.user.company_id.website_id.domain) + suffix
         else:
             return super(IrConfigParameter, self).get_param(key, default)
+
+class Website(models.Model):
+    _inherit = 'website'
+
+    def read(self, fields=None, load='_classic_read'):
+        dicts = super(Website, self).read(fields, load)
+        for d in dicts:
+            if d.get('domain'):
+                d['domain'] += self.get_param('web.base.url.suffix') or ''
+        return dicts
