@@ -16,6 +16,7 @@ class IrConfigParameter(models.Model):
     def get_param(self, key, default=False):
         if key == 'web.base.url' and self.env.user.company_id.website_id:
             prefix = self.get_param('web.base.url.prefix') or 'http://'
-            return prefix + str(self.env.user.company_id.website_id.domain)
+            suffix = self.get_param('web.base.url.suffix') or ''
+            return prefix + str(self.env.user.company_id.website_id.domain) + suffix
         else:
             return super(IrConfigParameter, self).get_param(key, default)
