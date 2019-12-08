@@ -28,5 +28,5 @@ class Website(models.Model):
         dicts = super(Website, self).read(fields, load)
         for d in dicts:
             if d.get('domain'):
-                d['domain'] += self.get_param('web.base.url.suffix') or ''
+                d['domain'] += self.env['ir.config_parameter'].get_param('web.base.url.suffix') or ''
         return dicts
