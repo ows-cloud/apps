@@ -2,6 +2,8 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.tools import float_compare, float_is_zero
 from datetime import datetime
+import logging
+_logger = logging.getLogger(__name__)
 
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
@@ -64,12 +66,12 @@ class HrPayslip(models.Model):
                 else:
                     self.env['account.move'].browse(slip.move_id.id).unlink()
             date = slip.date or slip.date_to
-            year_month = datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m')
+            year_month = date.strftime('%Y-%m')
             appended = False
             for group in grouped_payslips:
                 if group['journal_id'] == slip.journal_id.id and group['month'] == year_month:
                     group['payslips'].append(slip.id)
-                    group['date_to'] = max(group['date_to'], slip.date)
+                    group['date_to'] = max(group['date_to'], slip.date or slip.date_to)
                     appended = True
             if not appended:
                 grouped_payslips.append({
