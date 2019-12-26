@@ -271,7 +271,7 @@ class DutyList(models.Model):
         return res
 
     def action_mass_mailing_availability(self):
-        url_except_id = 'https://' + self.company_id.website_id.domain + '/web#view_type=form&model=duty.availability&id='
+        url_except_id = 'https://www.example.com/web#view_type=form&model=duty.availability&id='
         view = self.env.ref('mail.email_compose_message_wizard_form')
         mail_template = self.env.ref('duty_list.mail_template_duty_availability')
 

@@ -9,7 +9,6 @@
     'category': 'Hidden/Dependency',
     'depends': [
         'mass_mailing',
-        'website_new_fields', # Company.website_id
     ],
     'data': [
         'data/data.xml',
