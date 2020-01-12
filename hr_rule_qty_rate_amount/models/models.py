@@ -54,10 +54,6 @@ class HrRuleQtyRateAmount(models.Model):
             values.pop('res_id')
         return super(HrRuleQtyRateAmount, self).write(values)
 
-    _sql_constraints = [
-        ('object_rule_uniq', 'unique (model, res_id, salary_rule_id)', "Salary Rules can be only once per object!"),
-    ]
-
 
 class HrSalaryRule(models.Model):
     _inherit = 'hr.salary.rule'
