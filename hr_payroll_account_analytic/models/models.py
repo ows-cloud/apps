@@ -1,6 +1,6 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from odoo.tools import float_compare, float_is_zero
+from odoo.tools import float_compare, float_is_zero, float_round
 from datetime import datetime
 import logging
 _logger = logging.getLogger(__name__)
@@ -113,6 +113,7 @@ class HrPayslip(models.Model):
                         continue
 
                     def _add(new_amount, new_account, new_partner_id=False):
+                        new_amount = float_round(new_amount, precision_digits=precision)
                         if new_account.user_type_id.include_initial_balance:
                             new_analytic_account_id = None
                         else:
