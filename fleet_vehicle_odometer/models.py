@@ -1,7 +1,9 @@
+from datetime import datetime
+import logging
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
-import logging
 _logger = logging.getLogger(__name__)
 
 
@@ -55,6 +57,11 @@ class fleet_vehicle_odometer(models.Model):
                             order='value desc', limit=1)
         above = self.search([('vehicle_id', '=', values['vehicle_id']), ('value', '>', values['value']), ('id', '!=', record_id)],
                             order='value', limit=1)
+
+        try:
+            values['date'] = datetime.strptime(values['date'], '%Y-%m-%d').date()
+        except:
+            pass
 
         if below and below.date > values['date']:
             raise UserError("Date should not be lower than %s." % str(below.date))
