@@ -10,7 +10,7 @@
     'data': [
         'document_templates.xml',
     ],
-    'depends': ['base'],
+    'depends': ['web'],
     'license': 'AGPL-3',
     'version': '12.0.1.0.0',
     'website': 'http://www.appstogrow.org',
