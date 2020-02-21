@@ -36,13 +36,13 @@ class HrPayslipLine(models.Model):
         for line in payslip_lines:
             employee_id = line.employee_id.id
             rule_id = line.salary_rule_id.id
-            year = int(line.slip_id.date_to[:4])
+            year = line.slip_id.date_to.year
             if rule_id == loennsart_fp_i_fjor_id:
                 year -= 1
 
             if not employee_id in d:
                 d[employee_id]['name'] = line.employee_id.name
-                d[employee_id]['birthyear'] = int(line.employee_id.birthday[:4])
+                d[employee_id]['birthyear'] = line.employee_id.birthday.year
                 d[employee_id]['year'] = {}
             if not year in d[employee_id]['year']:
                 d[employee_id]['year'][year] = {'basis': 0, 'rate': 0, 'vacation_money': 0, 'paid': 0}
