@@ -1,12 +1,7 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
-from .tabelltrekk2019 import tabelltrekk2019
-
-# 2018: url to download from Skatteetaten
-# 2019: tabelltrekk2019.py (new environment with no direct access to the internet)
-# Useful to download from url:
-# from urllib.request import urlopen
-# from io import StringIO
+from .tabelltrekk2020 import tabelltrekk2020 as tabelltrekk20xx
+YEAR = 2020
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -22,39 +17,23 @@ class Tabelltrekk(models.Model):
     trekk = fields.Integer('Trekk')
     
     def l10n_no_import_tax_deduction(self):
-        filename = "tabelltrekk2019.txt"
-        years = [
-            {
-                'year': 2019,
-                'url': 'https://www.skatteetaten.no/contentassets/135c4f9318684c5ab87704641a4ab078/trekktabeller_2019.zip',
-            },
-        ]
-
-        for year_dict in years:
-            url = year_dict['url']
-            year_exists = self.search([('year','=',year_dict['year'])], limit=1)
-            if not year_exists:
-                #response = urlopen(url)
-                #compressedFile = StringIO()
-                #compressedFile.write(response.read())
-                #compressedFile.seek(0)
-                #decompressedFile = gzip.GzipFile(fileobj=compressedFile, mode='rb')
-                #lines = decompressedFile.read().splitlines()
-                lines = tabelltrekk2019.splitlines()
-                count = 0
-                sql = sql_base = "INSERT INTO l10n_no_hr_payroll_tabelltrekk (year, tabellnummer, trekkperiode, tabelltype, trekkgrunnlag, trekk) VALUES "
-                for line in lines:
-                    sql += """
-                        (%s, %s, %s, %s, %s, %s),""" % (year_dict['year'], line[:4], line[4], line[5], line[6:][:5], line[11:][:5]) 
-                        # execute sql[:-1] without the last comma
-                    count += 1
-                    if count >= 1000:
-                        self.env.cr.execute(sql[:-1]) 
-                        count = 0
-                        sql = sql_base
-                if sql != sql_base:
+        year_exists = self.search([('year','=',YEAR)], limit=1)
+        if not year_exists:
+            lines = tabelltrekk20xx.splitlines()
+            count = 0
+            sql = sql_base = "INSERT INTO l10n_no_hr_payroll_tabelltrekk (year, tabellnummer, trekkperiode, tabelltype, trekkgrunnlag, trekk) VALUES "
+            for line in lines:
+                sql += """
+                    (%s, %s, %s, %s, %s, %s),""" % (YEAR, line[:4], line[4], line[5], line[6:][:5], line[11:][:5])
+                    # execute sql[:-1] without the last comma
+                count += 1
+                if count >= 1000:
                     self.env.cr.execute(sql[:-1])
-        self.invalidate_cache()
+                    count = 0
+                    sql = sql_base
+            if sql != sql_base:
+                self.env.cr.execute(sql[:-1])
+            self.invalidate_cache()
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'

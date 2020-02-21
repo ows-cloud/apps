@@ -84,6 +84,15 @@
             <field name="code">env['hr.payslip.line'].l10n_no_feriepenger()</field>
         </record>
 
+        <!-- l10n_no_hr_payroll.tabelltrekk -->
+
+        <record model="ir.actions.server" id="action_l10n_no_import_tax_deduction">
+            <field name="name">Importer trekktabeller</field>
+            <field name="model_id" ref="model_l10n_no_hr_payroll_tabelltrekk"/>
+            <field name="state">code</field>
+            <field name="code">model.l10n_no_import_tax_deduction()</field>
+        </record>
+
         <!-- menu -->
 
         <menuitem id="menu_hr_payroll_norway" name="Norge" sequence="20" parent="hr_payroll.menu_hr_payroll_root"/>
@@ -103,6 +112,12 @@
                   sequence="22"
                   parent="menu_hr_payroll_norway"
                   action="action_l10n_no_feriepenger"/>
+        <menuitem id="menu_l10n_no_import_tax_deduction"
+                  name="Importer trekktabeler"
+                  sequence="100"
+                  parent="menu_hr_payroll_norway"
+                  groups="base.group_system"
+                  action="action_l10n_no_import_tax_deduction"/>
 
     </data>
 </odoo>

@@ -1,5 +1,6 @@
-from odoo import api, fields, models
-
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError
+from odoo.tools.safe_eval import safe_eval
 
 class HrContract(models.Model):
     _inherit = 'hr.contract'
@@ -53,10 +54,6 @@ class HrRuleQtyRateAmount(models.Model):
             values.pop('res_id')
         return super(HrRuleQtyRateAmount, self).write(values)
 
-    _sql_constraints = [
-        ('object_rule_uniq', 'unique (model, res_id, salary_rule_id)', "Salary Rules can be only once per object!"),
-    ]
-
 
 class HrSalaryRule(models.Model):
     _inherit = 'hr.salary.rule'
@@ -99,12 +96,12 @@ class HrSalaryRule(models.Model):
     # + localdict['rule'] = self
     # TODO should add some checks on the type of result (should be float)
     @api.multi
-    def compute_rule(self, localdict):
-        '''
+    def _compute_rule(self, localdict):
+        """
         :param localdict: dictionary containing the environement in which to compute the rule
         :return: returns a tuple build as the base/amount computed, the quantity and the rate
         :rtype: (float, float, float)
-        '''
+        """
         self.ensure_one()
         if self.amount_select == 'fix':
             try:
@@ -129,11 +126,11 @@ class HrSalaryRule(models.Model):
     # satisfy_condition() should have access to self.id
     # + localdict['rule'] = self
     @api.multi
-    def satisfy_condition(self, localdict):
-        '''
+    def _satisfy_condition(self, localdict):
+        """
         @param contract_id: id of hr.contract to be tested
         @return: returns True if the given rule match the condition for the given contract. Return False otherwise.
-        '''
+        """
         self.ensure_one()
 
         if self.condition_select == 'none':

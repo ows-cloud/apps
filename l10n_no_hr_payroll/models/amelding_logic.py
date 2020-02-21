@@ -38,8 +38,9 @@ for element in sequence:
 '''
 
 def _debug(input):
-    _logger.debug(str(input))
-    print(str(input))
+    #_logger.debug(str(input))
+    #print(str(input))
+    pass
 
 def not_None(variable):
     if variable is None:
