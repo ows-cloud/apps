@@ -208,7 +208,7 @@ class AmeldingLogikk:
         im.identifiserendeInformasjon.foedselsdato = self._get(employee, 'birthday') #DATE_FORMAT #required
         #im.identifiserendeInformasjon.ansattnummer = '123' #replace #optional
         # arbeidsforhold
-        for contract in self._get(employee, 'contract_ids'):
+        for contract in self._get(employee, 'contract_ids').sorted('date_start'):
             af = self.Arbeidsforhold(contract)
             im.arbeidsforhold.append(af) #optional
 
@@ -285,9 +285,9 @@ class AmeldingLogikk:
         
     def Arbeidsforhold(self, contract):
         af = a.Arbeidsforhold()
-        if not contract.sequence:
-            contract.sequence = contract.env['ir.sequence'].next_by_code('l10n_no_hr_payroll.arbeidsforhold')
-        af.arbeidsforholdId = str(contract.sequence) #string #optional
+        if not contract.l10n_no_arbeidsforhold:
+            contract.l10n_no_arbeidsforhold = contract.env['ir.sequence'].next_by_code('l10n_no_hr_payroll.arbeidsforhold')
+        af.arbeidsforholdId = contract.l10n_no_arbeidsforhold #string #optional
         af.typeArbeidsforhold = self._get(contract, 'l10n_no_Arbeidsforholdtype') #string #required
         self._set(af, 'startdato', self._get(contract, 'date_start')) #date #optional
         self._set(af, 'sluttdato', self._get(contract, 'date_end')) #date #optional
@@ -302,7 +302,7 @@ class AmeldingLogikk:
         self._set(af, 'loennstrinn', self._get(contract, 'l10n_no_loennstrinn')) #string #optional
         #af.fartoey = self.Fartoey() #optional
         # permisjon
-        for leave in self._get(contract, 'leave_ids'):
+        for leave in self._get(contract, 'leave_ids').sorted('date_from'):
             p = self.Permisjon(leave)
             af.permisjon.append(p)
         self._set(af, 'sisteDatoForStillingsprosentendring', self._get(contract, 'l10n_no_sisteDatoForStillingsprosentendring')) #date #optional
@@ -320,9 +320,9 @@ class AmeldingLogikk:
          p.startdato = leave.date_from.strftime('%Y-%m-%d')
          p.sluttdato = leave.date_to.strftime('%Y-%m-%d')
          p.permisjonsprosent = leave.percent
-         if not leave.sequence:
-             leave.sequence = leave.env['ir.sequence'].next_by_code('l10n_no_hr_payroll.permisjon')
-         p.permisjonId = str(leave.sequence)
+         if not leave.l10n_no_permisjon:
+             leave.l10n_no_permisjon = leave.env['ir.sequence'].next_by_code('l10n_no_hr_payroll.permisjon')
+         p.permisjonId = leave.l10n_no_permisjon
          p.beskrivelse = self._get(leave.holiday_status_id, 'l10n_no_PermisjonsOgPermitteringsBeskrivelse')
          return p
 

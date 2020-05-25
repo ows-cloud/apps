@@ -6,4 +6,4 @@ class HrLeave(models.Model):
 
     contract_id = fields.Many2one('hr.contract', string='Contract')
     percent = fields.Float(help="For example, enter 50.0 to apply a percentage of 50%")
-    sequence = fields.Integer(help="A-melding: PermisjonId")
+    l10n_no_permisjon = fields.Char(help="A-melding: PermisjonId")

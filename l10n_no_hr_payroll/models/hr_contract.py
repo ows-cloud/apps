@@ -5,7 +5,7 @@ class HrContract(models.Model):
     _inherit = 'hr.contract'
 
     leave_ids = fields.One2many('hr.leave', 'contract_id', string='Leaves')
-    sequence = fields.Integer(help="A-melding: ArbeidsforholdId")
+    l10n_no_arbeidsforhold = fields.Char(help="A-melding: ArbeidsforholdId")
 
     def l10n_no_action_new_leave(self):
         self.ensure_one()
