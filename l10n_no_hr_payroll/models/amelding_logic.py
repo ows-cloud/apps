@@ -285,7 +285,9 @@ class AmeldingLogikk:
         
     def Arbeidsforhold(self, contract):
         af = a.Arbeidsforhold()
-        #af.arbeidsforholdId = 'string' #replace #string #optional
+        if not contract.sequence:
+            contract.sequence = contract.env['ir.sequence'].next_by_code('l10n_no_hr_payroll.arbeidsforhold_id')
+        af.arbeidsforholdId = str(contract.sequence) #string #optional
         af.typeArbeidsforhold = self._get(contract, 'l10n_no_Arbeidsforholdtype') #string #required
         self._set(af, 'startdato', self._get(contract, 'date_start')) #date #optional
         self._set(af, 'sluttdato', self._get(contract, 'date_end')) #date #optional
