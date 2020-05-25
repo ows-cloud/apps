@@ -286,7 +286,7 @@ class AmeldingLogikk:
     def Arbeidsforhold(self, contract):
         af = a.Arbeidsforhold()
         if not contract.sequence:
-            contract.sequence = contract.env['ir.sequence'].next_by_code('l10n_no_hr_payroll.arbeidsforhold_id')
+            contract.sequence = contract.env['ir.sequence'].next_by_code('l10n_no_hr_payroll.arbeidsforhold')
         af.arbeidsforholdId = str(contract.sequence) #string #optional
         af.typeArbeidsforhold = self._get(contract, 'l10n_no_Arbeidsforholdtype') #string #required
         self._set(af, 'startdato', self._get(contract, 'date_start')) #date #optional
@@ -321,7 +321,7 @@ class AmeldingLogikk:
          p.sluttdato = leave.date_to.strftime('%Y-%m-%d')
          p.permisjonsprosent = leave.percent
          if not leave.sequence:
-             leave.sequence = leave.env['ir.sequence'].next_by_code('l10n_no_hr_payroll.permisjon_id')
+             leave.sequence = leave.env['ir.sequence'].next_by_code('l10n_no_hr_payroll.permisjon')
          p.permisjonId = str(leave.sequence)
          p.beskrivelse = self._get(leave.holiday_status_id, 'l10n_no_PermisjonsOgPermitteringsBeskrivelse')
          return p
