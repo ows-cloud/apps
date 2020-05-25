@@ -52,6 +52,23 @@ class HrJob(models.Model):
                                       domain=[('model', '=', 'hr.job')], context={'default_model': 'hr.job'}, copy=True)
 
 
+class HrLeaveType(models.Model):
+    _inherit = 'hr.leave.type'
+
+    @api.model
+    def _compute_default_field_value_ids(self):
+        result = []
+        records = self.env['res.field'].search([('model', '=', 'hr.leave.type'), ('auto_create', '=', True),
+                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.user.company_id.country_id.id)])
+        for record in records:
+            result.append((0, 0, {'model': 'hr.leave.type', 'company_id': self.env.user.company_id.id,
+                                  'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
+        return result
+
+    field_value_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
+                                      domain=[('model', '=', 'hr.leave.type')], context={'default_model': 'hr.leave.type'}, copy=True)
+
+
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 

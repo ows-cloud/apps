@@ -14,6 +14,7 @@
         'base_field_value',
         'hr',
         'hr_contract',
+        'hr_holidays',
         'hr_payroll',
     ],
     'license': 'AGPL-3',

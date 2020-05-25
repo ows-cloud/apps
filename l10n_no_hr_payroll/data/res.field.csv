@@ -12,6 +12,7 @@
 "l10n_no_hr_payroll.res_field_l10n_no_BeregningskodeForArbeidsgiveravgift","l10n_no_BeregningskodeForArbeidsgiveravgift","Naeringskode","selection","False","hr","base.no","res.company",""
 "l10n_no_hr_payroll.res_field_l10n_no_virksomhet","l10n_no_virksomhet","Virksomhetsnummer","string","False","hr","base.no","res.company",""
 "l10n_no_hr_payroll.res_field_l10n_no_Spraak","l10n_no_Spraak","Spraak","selection","False","hr","base.no","res.company",""
+"l10n_no_hr_payroll.res_field_l10n_no_PermisjonsOgPermitteringsBeskrivelse","l10n_no_PermisjonsOgPermitteringsBeskrivelse","PermisjonsOgPermitteringsBeskrivelse","selection","False","hr","base.no","hr.leave.type",""
 "l10n_no_hr_payroll.res_field_l10n_no_trekktabell","l10n_no_trekktabell","Trekktabell","string","False","hr","base.no","hr.employee",""
 "l10n_no_hr_payroll.res_field_l10n_no_trekkprosent","l10n_no_trekkprosent","Trekkprosent","string","False","hr","base.no","hr.employee",""
 "l10n_no_hr_payroll.res_field_l10n_no_fribeloep","l10n_no_fribeloep","Fribeloep","string","False","hr","base.no","hr.employee",""

@@ -65,7 +65,17 @@ class AmeldingLogikk:
         #self.salary_rules = self._get_records('hr.salary.rule', [], self.company) # hr.payslip.line.salary_rule_id
         self.countries = self._get_records('res.country', [], self.company)
         self.jobs = self._get_records('hr.job', [('company_id','=',company_id)], self.company)
-        models = ['hr.contract','hr.employee','hr.job','hr.payslip','hr.payslip.line','hr.salary.rule','res.company']
+
+        models = [
+            'hr.contract',
+            'hr.employee',
+            'hr.job',
+            'hr.leave.type',
+            'hr.payslip',
+            'hr.payslip.line',
+            'hr.salary.rule',
+            'res.company',
+        ]
         self.field_values = self._get_records('res.field.value', [('company_id', '=', company_id),('model','in',models)], self.company)
         self.field_selection_values = self._get_records('res.field.selection_value', [], self.company) # security rule: 1_or_company_id
 
@@ -290,9 +300,9 @@ class AmeldingLogikk:
         self._set(af, 'loennstrinn', self._get(contract, 'l10n_no_loennstrinn')) #string #optional
         #af.fartoey = self.Fartoey() #optional
         # permisjon
-        #for id in [1]: #replace
-        #    p = self.Permisjon()
-        #    af.permisjon.append(p)
+        for leave in self._get(contract, 'leave_ids'):
+            p = self.Permisjon(leave)
+            af.permisjon.append(p)
         self._set(af, 'sisteDatoForStillingsprosentendring', self._get(contract, 'l10n_no_sisteDatoForStillingsprosentendring')) #date #optional
         return af
         
@@ -303,15 +313,17 @@ class AmeldingLogikk:
     #     fartoey.fartsomraade = 'string' #replace
     #     return fartoey
     #
-    # def Permisjon(self):
-    #     p = a.Permisjon()
-    #     p.startdato = '2018-01-01' #replace
-    #     p.sluttdato = '2018-01-01' #replace
-    #     p.permisjonsprosent = 50.5 #replace
-    #     p.permisjonId = 'string' #replace
-    #     p.beskrivelse = 'string' #replace
-    #     return p
-    #
+    def Permisjon(self, leave):
+         p = a.Permisjon()
+         p.startdato = leave.date_from.strftime('%Y-%m-%d')
+         p.sluttdato = leave.date_to.strftime('%Y-%m-%d')
+         p.permisjonsprosent = leave.percent
+         if not leave.sequence:
+             leave.sequence = leave.env['ir.sequence'].next_by_code('l10n_no_hr_payroll.permisjon_id')
+         p.permisjonId = str(leave.sequence)
+         p.beskrivelse = self._get(leave.holiday_status_id, 'l10n_no_PermisjonsOgPermitteringsBeskrivelse')
+         return p
+
     # def Fradrag(self):
     #     fra = a.Fradrag()
     #     fra.beskrivelse = 'string' #replace
@@ -656,9 +668,9 @@ class AmeldingLogikk:
             # else:
             #     return None
 
-            for r in self.field_values:
-                if r.field_id.id == 219: # r.id == 72
-                    code = r.field_code
+            #for r in self.field_values:
+            #    if r.field_id.id == 219:
+            #        code = r.field_code
             # DOES THIS IMPROVE THE PERFORMANCE?
             rec = [r for r in self.field_values
                        if r.model == record._name
