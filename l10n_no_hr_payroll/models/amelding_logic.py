@@ -335,7 +335,8 @@ class AmeldingLogikk:
     def Forskuddstrekk(self, line, rule):
         ft = a.Forskuddstrekk()
         self._set(ft, 'beskrivelse', self._get(rule, 'l10n_no_Forskuddstrekkbeskrivelse')) #selection #string #optional
-        ft.beloep = self._get(line, 'total') #integer #required
+        factor = -1 if line.slip_id.credit_note else 1
+        ft.beloep = factor * self._get(line, 'total') #integer #required
         self.je['sumForskuddstrekk'] += -ft.beloep
         return ft
         
@@ -345,7 +346,8 @@ class AmeldingLogikk:
         #inn.startdatoOpptjeningsperiode = '2018-01-01' #replace #date #optional
         #inn.sluttdatoOpptjeningsperiode = '2018-01-01' #replace #date #optional
         inn.fordel = self._get(rule, 'l10n_no_Fordel') #selection #string #required
-        inn.beloep = self._get(line, 'total') #float #required
+        factor = -1 if line.slip_id.credit_note else 1
+        inn.beloep = factor * self._get(line, 'total') #float #required
 
         beregnAga = self._get(rule, 'l10n_no_BeregnAga')
         if beregnAga:
