@@ -77,6 +77,8 @@
                             <field name="erstatterMeldingsId"/>
                             <field name="leveringstidspunkt"/>
                             <field name="company_id"/>
+                            <field name="amelding_filename" invisible="1"/>
+                            <field name="amelding_xml" filename="amelding_filename"/>
                             <field name="amelding" widget="ace" options="{'mode': 'xml'}"/>
                         </group>
                     </group>

@@ -2,6 +2,7 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from datetime import datetime
 from . import amelding_logic
+import base64
 import pyxb
 import logging
 _logger = logging.getLogger(__name__)
@@ -11,6 +12,16 @@ pyxb.RequireValidWhenGenerating(True)
 class Amelding(models.Model):
     _name = 'l10n_no_hr_payroll.amelding'
 
+    @api.depends('meldingsId', 'kalendermaaned')
+    def _compute_amelding_filename(self):
+        self.ensure_one()
+        name = 'A-melding for {kalendermaaned} - id {meldingsId}.xml'.format(kalendermaaned=self.kalendermaaned, meldingsId=self.meldingsId)
+        self.amelding_filename = name
+
+    @api.depends('amelding')
+    def _compute_amelding_xml(self):
+        self.amelding_xml = base64.b64encode(bytes(self.amelding, 'utf-8'))
+
     company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.user.company_id)
     meldingsId = fields.Integer(readonly=True)
     erstatterMeldingsId = fields.Integer(readonly=True)
@@ -18,7 +29,9 @@ class Amelding(models.Model):
     leveringstidspunkt = fields.Datetime(readonly=True)
     state = fields.Selection([('new','New'),('done','Done')], default='new')
     amelding = fields.Text(readonly=True)
-    
+    amelding_filename = fields.Char(compute=_compute_amelding_filename)
+    amelding_xml = fields.Binary(compute=_compute_amelding_xml, string="A-melding xml test")
+
     def set_state_done(self):
         self.write({'state': 'done'})
         return True
