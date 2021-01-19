@@ -35,3 +35,6 @@
 "l10n_no_hr_payroll.res_field_l10n_no_fp_prosent_senior","l10n_no_fp_prosent_senior","Feriepenger prosent over 60 år","float","False","hr","base.no","res.company",""
 "l10n_no_hr_payroll.res_field_l10n_no_loennsart_fp_i_aar","l10n_no_loennsart_fp_i_aar","Lønnsart feriepenger i år","reference","False","hr","base.no","res.company",""
 "l10n_no_hr_payroll.res_field_l10n_no_loennsart_fp_i_fjor","l10n_no_loennsart_fp_i_fjor","Lønnsart feriepenger i fjor","reference","False","hr","base.no","res.company",""
+"l10n_no_hr_payroll.res_field_l10n_no_pensjonsinnretning","l10n_no_pensjonsinnretning","Pensjonsinnretning org.nr.","string","False","hr","base.no","res.company",""
+"l10n_no_hr_payroll.res_field_l10n_no_AarsakTilSluttdato","l10n_no_AarsakTilSluttdato","Årsak til sluttdato","selection","False","hr","base.no","hr.contract",""
+"l10n_no_hr_payroll.res_field_l10n_no_FormForAnsettelse","l10n_no_FormForAnsettelse","Form for ansettelse","selection","False","hr","base.no","hr.contract",""

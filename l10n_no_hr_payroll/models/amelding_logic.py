@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from . import amelding_v2_1 as a
+from . import amelding_v2_2 as a
 from .amelding_testdata import testdata
 from collections import defaultdict
 from datetime import datetime
@@ -12,7 +12,7 @@ _logger = logging.getLogger(__name__)
 
 
 '''
-a = amelding_v2_1
+a = amelding_v2_2
 af = Arbeidsforhold
 aga = Arbeidsgiveravgift
 agag = Arbeidsgiveravgiftsgrunnlag
@@ -84,6 +84,7 @@ class AmeldingLogikk:
             'sumForskuddstrekk': 0,
             'sumArbeidsgiveravgift': 0,
             'sumFinansskattLoenn': 0,
+            'sumUtleggstrekk': 0,
             'sumForskuddstrekkForenklet': 0,
             'sumArbeidsgiveravgiftForenklet': 0,
         }
@@ -145,6 +146,7 @@ class AmeldingLogikk:
         #    bif = self.BetalingsinformasjonForForenkletOrdning()
         #    je.betalingsinformasjonForForenkletOrdning.append(bif) #optional
         #je.annenBagatellmessigStoette = 1000.5 #replace #optional
+        je.pensjonsinnretning.append(self._get(self.company, 'l10n_no_pensjonsinnretning'))
         return je
         
     # def Betalingsinformasjon(self, bi, sumForskuddstrekk=None, sumArbeidsgiveravgift=None, sumFinansskattLoenn=None, **kwargs):
@@ -163,6 +165,8 @@ class AmeldingLogikk:
             bi.sumArbeidsgiveravgift = int(self.je['sumArbeidsgiveravgift']) #integer #optional
         if self.je['sumFinansskattLoenn']:
             bi.sumFinansskattLoenn = int(self.je['sumFinansskattLoenn']) #integer #optional
+        if self.je['sumUtleggstrekk']:
+            bi.sumUtleggstrekk = int(self.je['sumUtleggstrekk']) #integer #optional
         return bi
 
         
@@ -246,6 +250,10 @@ class AmeldingLogikk:
         # for id in []: #replace
         #     opphold = self.OppholdPaaSvalbardJanMayenOgBilandene()
         #     im.oppholdPaaSvalbardJanMayenOgBilandene.append(opphold) #optional
+        # # utleggstrekk
+        # for id in []: #replace
+        #     trekk = self.Utleggstrekk()
+        #     im.utleggstrekk.append(trekk) #optional
 
         return im
         
@@ -306,6 +314,8 @@ class AmeldingLogikk:
             p = self.Permisjon(leave)
             af.permisjon.append(p)
         self._set(af, 'sisteDatoForStillingsprosentendring', self._get(contract, 'l10n_no_sisteDatoForStillingsprosentendring')) #date #optional
+        self._set(af, 'aarsakTilSluttdato', self._get(contract, 'l10n_no_AarsakTilSluttdato'))  # string #optional
+        self._set(af, 'formForAnsettelse', self._get(contract, 'l10n_no_FormForAnsettelse'))  # string #optional
         return af
         
     # def Fartoey(self):
@@ -540,6 +550,12 @@ class AmeldingLogikk:
     #     opphold.sluttdato = '2018-01-01' #replace
     #     opphold.beskrivelse = 'string' #replace
     #     return opphold
+    #
+    # def Utleggstrekk(self):
+    #     trekk = a.Utleggstrekk()
+    #     trekk.beskrivelse = 'string' #replace
+    #     trekk.beloep = 'integer' #replace
+    #     return trekk
         
     def Arbeidsgiveravgift(self):
         aga = a.Arbeidsgiveravgift()
