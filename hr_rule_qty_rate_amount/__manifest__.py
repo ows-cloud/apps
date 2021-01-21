@@ -11,8 +11,9 @@
         'security/ir.model.access.csv',
         'views/views.xml',
     ],
-    'depends': ['hr_payroll'],
+    'depends': ['hr_payroll', 'analytic'],
     'license': 'AGPL-3',
     'version': '12.0.1.0.0',
     'website': 'http://www.appstogrow.org',
+    'description': '''See the core changes in hr_payroll: https://github.com/apps2grow/odoo/commit/97fdeef09223338c5e3cf5c93149b7ca17219b62''',
 }

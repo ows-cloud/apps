@@ -1,66 +1,16 @@
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tools.safe_eval import safe_eval
-
-class HrContract(models.Model):
-    _inherit = 'hr.contract'
-
-    qty_rate_amount_ids = fields.One2many('hr.rule.qty_rate_amount', 'res_id', string='Recurring Salary',
-                                          domain=[('model', '=', 'hr.contract')], context={'default_model': 'hr.contract'}, copy=True)
-
-
-class HrPayslip(models.Model):
-    _inherit = 'hr.payslip'
-
-    qty_rate_amount_ids = fields.One2many('hr.rule.qty_rate_amount', 'res_id', string='Quantity Rate Amount',
-                                          domain=[('model', '=', 'hr.payslip')], context={'default_model': 'hr.payslip'}, copy=True)
-
-
-class HrRuleQtyRateAmount(models.Model):
-    _name = 'hr.rule.qty_rate_amount'
-
-    salary_rule_id = fields.Many2one('hr.salary.rule', string="Salary Rule", ondelete='restrict')
-    quantity = fields.Float(default=1.0)
-    rate = fields.Float("Rate (%)", default=100.0)
-    amount = fields.Float()
-    total = fields.Float(compute='_compute_total')
-    model = fields.Char(required=True, readonly=True, index=True)
-    res_id = fields.Integer(required=True, readonly=True, index=True, ondelete='''Should NOT be 'cascade', see the write method''')
-    company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.user.company_id)
-
-    @api.depends('quantity', 'rate', 'amount')
-    def _compute_total(self):
-        for rec in self:
-            rec.total = rec.quantity * rec.rate / 100 * rec.amount
-
-    @api.multi
-    def write(self, values):
-        '''
-        SOURCE: base_field_value
-        For models where field_value_ids = fields.One2many('res.field.value', 'res_id'):
-        The model assumes that res.field.value 'res_id' has a Many2one relationship to the model.
-        When the model imports a new record (with csv/xml),
-        it will enforce that the new record.id does not exist in res.field.value 'res_id',
-        or give a ParseError if 'res_id' has no attribute 'ondelete'.
-        See https://github.com/odoo/odoo/blob/10.0/odoo/fields.py#L2246
-                    if inverse_field.ondelete == 'cascade':
-                        comodel.search(domain).unlink()
-                    else:
-                        comodel.search(domain).write({inverse: False})
-        res.field.value has records relating to many models, and the 'res_id' should not be changed!
-        '''
-
-        if 'res_id' in values and values['res_id'] == False:
-            values.pop('res_id')
-        return super(HrRuleQtyRateAmount, self).write(values)
 
 
 class HrSalaryRule(models.Model):
     _inherit = 'hr.salary.rule'
 
-    qty_rate_amount_from = fields.Selection([('hr.contract', 'Contract'), ('hr.payslip', 'Payslip')], string="Salary Rule input from")
-
-    condition_python = fields.Text(default='''
+    analytic_account_id = fields.Many2one('account.analytic.account', 'Analytic Account')
+    qty_rate_amount_from = fields.Selection([('hr.contract', 'Contract'), ('hr.payslip', 'Payslip')],
+                                            string="Salary Rule input from")
+    condition_python = fields.Text(string='Python Condition', required=True,
+        default='''
                     # Available variables:
                     #----------------------
                     # payslip: object containing the payslips
@@ -74,9 +24,10 @@ class HrSalaryRule(models.Model):
 
                     # Note: returned value have to be set in the variable 'result'
 
-                    result = rules.NET > categories.NET * 0.10''')
-
-    amount_python_compute = fields.Text(default='''
+                    result = rules.NET > categories.NET * 0.10''',
+        help='Applied this rule for calculation if condition is true. You can specify condition like basic > 1000.')
+    amount_python_compute = fields.Text(string='Python Code',
+        default='''
                     # Available variables:
                     #----------------------
                     # payslip: object containing the payslips
@@ -92,39 +43,43 @@ class HrSalaryRule(models.Model):
 
                     result = contract.wage * 0.10''')
 
-    # compute_rule() should have access to self.id
-    # + localdict['rule'] = self
-    # TODO should add some checks on the type of result (should be float)
+    #TODO should add some checks on the type of result (should be float)
     @api.multi
     def _compute_rule(self, localdict):
         """
         :param localdict: dictionary containing the environement in which to compute the rule
         :return: returns a tuple build as the base/amount computed, the quantity and the rate
-        :rtype: (float, float, float)
+        :rtype: [(amount float, quantity float, rate float, analytic_account_id integer/False)]
         """
         self.ensure_one()
         if self.amount_select == 'fix':
             try:
-                return self.amount_fix, float(safe_eval(self.quantity, localdict)), 100.0
+                return [(self.amount_fix, float(safe_eval(self.quantity, localdict)), 100.0, False)]
             except:
                 raise UserError(_('Wrong quantity defined for salary rule %s (%s).') % (self.name, self.code))
         elif self.amount_select == 'percentage':
             try:
-                return (float(safe_eval(self.amount_percentage_base, localdict)),
-                        float(safe_eval(self.quantity, localdict)),
-                        self.amount_percentage)
+                return [(float(safe_eval(self.amount_percentage_base, localdict)),
+                         float(safe_eval(self.quantity, localdict)),
+                         self.amount_percentage,
+                         False)]
             except:
                 raise UserError(_('Wrong percentage base or quantity defined for salary rule %s (%s).') % (self.name, self.code))
         else:
             try:
                 localdict['rule'] = self
                 safe_eval(self.amount_python_compute, localdict, mode='exec', nocopy=True)
-                return float(localdict['result']), 'result_qty' in localdict and localdict['result_qty'] or 1.0, 'result_rate' in localdict and localdict['result_rate'] or 100.0
+                if localdict['result_list']:
+                    return localdict['result_list']
+                else:
+                    return [(float(localdict['result']), \
+                        'result_qty' in localdict and localdict['result_qty'] or 1.0, \
+                        'result_rate' in localdict and localdict['result_rate'] or 100.0, \
+                        'result_analytic' in localdict and localdict['result_analytic'] or False
+                    )]
             except:
                 raise UserError(_('Wrong python code defined for salary rule %s (%s).') % (self.name, self.code))
 
-    # satisfy_condition() should have access to self.id
-    # + localdict['rule'] = self
     @api.multi
     def _satisfy_condition(self, localdict):
         """

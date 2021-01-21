@@ -14,6 +14,7 @@
                         <field name="qty_rate_amount_ids">
                             <tree editable="bottom">
                                 <field name="salary_rule_id" domain="[('qty_rate_amount_from','=','hr.contract')]"/>
+                                <field name="analytic_account_id"/>
                                 <field name="quantity"/>
                                 <field name="rate"/>
                                 <field name="amount"/>
@@ -40,6 +41,7 @@
                     <field name="qty_rate_amount_ids">
                         <tree editable="bottom">
                             <field name="salary_rule_id" domain="[('qty_rate_amount_from','=','hr.payslip')]"/>
+                            <field name="analytic_account_id"/>
                             <field name="quantity"/>
                             <field name="rate"/>
                             <field name="amount"/>
@@ -48,6 +50,12 @@
                             <field name="res_id" groups="base.group_no_one"/>
                         </tree>
                     </field>
+                </xpath>
+                <xpath expr="//field[@name='line_ids']/tree/field[@name='category_id']" position="after">
+                    <field name="analytic_account_id"/>
+                </xpath>
+                <xpath expr="//field[@name='line_ids']/form/group/field[@name='category_id']" position="after">
+                    <field name="analytic_account_id"/>
                 </xpath>
             </field>
         </record>
