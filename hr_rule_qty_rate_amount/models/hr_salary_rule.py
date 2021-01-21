@@ -24,7 +24,10 @@ class HrSalaryRule(models.Model):
 
                     # Note: returned value have to be set in the variable 'result'
 
-                    result = rules.NET > categories.NET * 0.10''',
+record = payslip.qty_rate_amount_ids
+if record:
+  record = record.filtered(lambda x: x.salary_rule_id.id == rule.id)
+result = bool(record)''',
         help='Applied this rule for calculation if condition is true. You can specify condition like basic > 1000.')
     amount_python_compute = fields.Text(string='Python Code',
         default='''
@@ -41,7 +44,11 @@ class HrSalaryRule(models.Model):
 
                     # Note: returned value have to be set in the variable 'result'
 
-                    result = contract.wage * 0.10''')
+result_list = []
+records = payslip.qty_rate_amount_ids.filtered(lambda x: x.salary_rule_id.id == rule.id)
+for record in records:
+  result = 0 if result_qty == 0.0 or result_rate == 0.0 else record.amount
+  result_list.append((result, record.quantity, record.rate, record.analytic_account_id.id))''')
 
     #TODO should add some checks on the type of result (should be float)
     @api.multi
