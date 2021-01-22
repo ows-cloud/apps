@@ -117,7 +117,7 @@ class HrPayslip(models.Model):
                         if new_account.user_type_id.include_initial_balance:
                             new_analytic_account_id = None
                         else:
-                            new_analytic_account_id = line.salary_rule_id.analytic_account_id.id or contract_analytic_account_id
+                            new_analytic_account_id = line.analytic_account_id.id or line.salary_rule_id.analytic_account_id.id or contract_analytic_account_id
                         new = {
                             'name': name,
                             'partner_id': new_partner_id,
