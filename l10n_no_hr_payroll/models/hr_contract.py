@@ -7,6 +7,13 @@ class HrContract(models.Model):
     leave_ids = fields.One2many('hr.leave', 'contract_id', string='Leaves')
     l10n_no_arbeidsforhold = fields.Char(help="A-melding: ArbeidsforholdId")
 
+    def copy(self, default=None):
+        default = dict(default or {})
+        if self.l10n_no_arbeidsforhold:
+            default['l10n_no_arbeidsforhold'] = self.env['ir.sequence'].next_by_code(
+                'l10n_no_hr_payroll.arbeidsforhold')
+        return super(HrContract, self).copy(default)
+
     def l10n_no_action_new_leave(self):
         self.ensure_one()
         return {
