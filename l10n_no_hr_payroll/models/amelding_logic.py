@@ -213,6 +213,8 @@ class AmeldingLogikk:
         #im.identifiserendeInformasjon.ansattnummer = '123' #replace #optional
         # arbeidsforhold
         for contract in self._get(employee, 'contract_ids').sorted('date_start'):
+            if contract.state in ('close', 'cancel'):
+                continue
             af = self.Arbeidsforhold(contract)
             im.arbeidsforhold.append(af) #optional
 

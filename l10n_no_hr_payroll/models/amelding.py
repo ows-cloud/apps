@@ -30,7 +30,7 @@ class Amelding(models.Model):
     state = fields.Selection([('new','New'),('done','Done')], default='new')
     amelding = fields.Text(readonly=True)
     amelding_filename = fields.Char(compute=_compute_amelding_filename)
-    amelding_xml = fields.Binary(compute=_compute_amelding_xml, string="A-melding xml test")
+    amelding_xml = fields.Binary(compute=_compute_amelding_xml, string="A-melding xml")
 
     def set_state_done(self):
         self.write({'state': 'done'})
