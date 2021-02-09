@@ -8,7 +8,7 @@ from odoo.exceptions import UserError
 from odoo.addons.spec_driven_model.models import spec_models
 
 
-
+# TODO The wizard should download the SAF-T XML file directly. Then this class may be deleted.
 class Saft(models.Model):
     _name = 'l10n_no_account_saft.xml'
 
@@ -62,11 +62,34 @@ class SpecMixinSaft(models.AbstractModel):
     _inherit = 'spec.mixin'
     _name = 'spec.mixin.saft'
 
+    saft_company_id = fields.Many2one(
+        comodel_name='res.company',
+        string='Company',
+        compute='_compute_saft_company_id',
+        default=lambda self: self.env.ref('base.main_company').id,
+    )
+
+    def _compute_saft_company_id(self):
+        for item in self:
+            item.company_id = self.env.ref('base.main_company').id
+
+    saft_currency_id = fields.Many2one(
+        comodel_name='res.currency',
+        string='Currency',
+        compute='_compute_saft_currency_id',
+        default=lambda self: self.saft_company_id.currency_id.id,
+    )
+
+    def _compute_saft_currency_id(self):
+        for item in self:
+            item.currency_id = self.saft_company_id.currency_id.id
+
 
 # saft.1.generalledgeraccounts ?
 # class Account(spec_models.StackedModel):
-#     _name = 'l10n_no_account_saft.account'
+#     _name = 'account.account'
 #     _inherit = ["account.account", "saft.1.account"]
+#     _inherit = ["saft.1.account"]
 #     _stacked = 'saft.1.account'
 #     _spec_module = 'odoo.addons.l10n_no_account_saft.models.saft_1_10_lib'
 
