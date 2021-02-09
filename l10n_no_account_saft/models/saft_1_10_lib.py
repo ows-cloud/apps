@@ -154,32 +154,32 @@ class Account(models.AbstractModel):
     saft1_AccountCreationDate = fields.Date(
         string="Date of when the general ledger account was created",
         xsd_type="date")
-    saft1_OpeningDebitBalance = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_OpeningDebitBalance = fields.Float(
+        currency_field="currency_id",
         choice='4',
         string="OpeningDebitBalance",
         xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="Debit balance at the start date of the selection period in"
         "\nthe header's default currency.")
-    saft1_OpeningCreditBalance = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_OpeningCreditBalance = fields.Float(
+        currency_field="currency_id",
         choice='4',
         string="OpeningCreditBalance",
         xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="Credit balance at the start date of the selection period in"
         "\nthe header's default currency.")
-    saft1_ClosingDebitBalance = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_ClosingDebitBalance = fields.Float(
+        currency_field="currency_id",
         choice='5',
         string="ClosingDebitBalance",
         xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="Debit balance at the end date of the selection period in the"
         "\nheader's default currency.")
-    saft1_ClosingCreditBalance = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_ClosingCreditBalance = fields.Float(
+        currency_field="currency_id",
         choice='5',
         string="ClosingCreditBalance",
         xsd_required=True,
@@ -252,8 +252,8 @@ class AmountStructure(models.AbstractModel):
     _generateds_type = 'AmountStructure'
     _concrete_rec_name = 'saft1_Amount'
 
-    saft1_Amount = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_Amount = fields.Float(
+        currency_field="currency_id",
         string="Amount in the header’s default currency",
         xsd_required=True,
         xsd_type="SAFmonetaryType")
@@ -262,14 +262,14 @@ class AmountStructure(models.AbstractModel):
         xsd_type="ISOCurrencyCode",
         help="Three-letter currency code according to ISO 4217 standard."
         "\nRequired if CurrencyAmount is used.")
-    saft1_CurrencyAmount = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_CurrencyAmount = fields.Float(
+        currency_field="currency_id",
         string="Amount in foreign currency.",
         xsd_type="SAFmonetaryType",
         help="Amount in foreign currency."
         "\nRequired if CurrencyCode is used.")
-    saft1_ExchangeRate = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_ExchangeRate = fields.Float(
+        currency_field="currency_id",
         string="The exchange rate used.",
         xsd_type="SAFexchangerateType",
         help="The exchange rate used."
@@ -465,23 +465,23 @@ class AssetTransactionValuation(models.AbstractModel):
         xsd_type="SAFshorttextType",
         help="Describes the purpose for the reporting: f.i. commercial, tax"
         "\nin country 1, tax in country 2, etc.")
-    saft1_AcquisitionAndProductionCostsOnTransaction = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_AcquisitionAndProductionCostsOnTransaction = fields.Float(
+        currency_field="currency_id",
         string="AcquisitionAndProductionCostsOnTransaction",
         xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="Costs of acquisition and/or production of related asset"
         "\ntransaction in the header's default currency at date"
         "\nof transaction.")
-    saft1_BookValueOnTransaction = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_BookValueOnTransaction = fields.Float(
+        currency_field="currency_id",
         string="BookValueOnTransaction",
         xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="Bookvalue of related asset transaction in the header's"
         "\ndefault currency at date of transaction.")
-    saft1_AssetTransactionAmount = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_AssetTransactionAmount = fields.Float(
+        currency_field="currency_id",
         string="AssetTransactionAmount",
         xsd_required=True,
         xsd_type="SAFmonetaryType",
@@ -902,29 +902,29 @@ class Customer(models.AbstractModel):
         "\nthe account code/number into where this sub"
         "\naccount/accounts receivable is consolidated in the"
         "\nbalance sheet.")
-    saft1_OpeningDebitBalance = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_OpeningDebitBalance = fields.Float(
+        currency_field="currency_id",
         choice='6',
         string="OpeningDebitBalance",
         xsd_type="SAFmonetaryType",
         help="Debit balance at the start date of the selection period in"
         "\nthe header's default currency.")
-    saft1_OpeningCreditBalance = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_OpeningCreditBalance = fields.Float(
+        currency_field="currency_id",
         choice='6',
         string="OpeningCreditBalance",
         xsd_type="SAFmonetaryType",
         help="Credit balance at the start date of the selection period in"
         "\nthe header's default currency.")
-    saft1_ClosingDebitBalance = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_ClosingDebitBalance = fields.Float(
+        currency_field="currency_id",
         choice='7',
         string="ClosingDebitBalance",
         xsd_type="SAFmonetaryType",
         help="Debit balance at the end date of the selection period in the"
         "\nheader's default currency.")
-    saft1_ClosingCreditBalance = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_ClosingCreditBalance = fields.Float(
+        currency_field="currency_id",
         choice='7',
         string="ClosingCreditBalance",
         xsd_type="SAFmonetaryType",
@@ -1034,13 +1034,13 @@ class DocumentTotals(models.AbstractModel):
         help="Control totals tax payable information. Per TaxType/TaxCode"
         "\nthe TaxBase and TaxAmount are summarised."
     )
-    saft1_NetTotal = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_NetTotal = fields.Float(
+        currency_field="currency_id",
         string="NetTotal",
         xsd_type="SAFmonetaryType",
         help="Total amount excluding tax in the header's default currency.")
-    saft1_GrossTotal = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_GrossTotal = fields.Float(
+        currency_field="currency_id",
         string="GrossTotal", xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="Total amount including tax in the header's default currency.")
@@ -1060,17 +1060,17 @@ class DocumentTotals10(models.AbstractModel):
         help="Control totals tax payable information. Per TaxType/TaxCode"
         "\nthe TaxBase and TaxAmount are summarised."
     )
-    saft1_ShippingCostsAmountTotal = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_ShippingCostsAmountTotal = fields.Float(
+        currency_field="currency_id",
         string="Control total amount freight charges",
         xsd_type="SAFmonetaryType")
-    saft1_NetTotal = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_NetTotal = fields.Float(
+        currency_field="currency_id",
         string="Control total sales value excluding tax and shippingcosts",
         xsd_required=True,
         xsd_type="SAFmonetaryType")
-    saft1_GrossTotal = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_GrossTotal = fields.Float(
+        currency_field="currency_id",
         string="Control total amount including tax and shippingcosts",
         xsd_required=True,
         xsd_type="SAFmonetaryType")
@@ -1091,8 +1091,8 @@ class ExtraordinaryDepreciationForPeriod(models.AbstractModel):
         xsd_type="SAFmiddle1textType",
         help="Method of extraordinary depreciation during the"
         "\nSelectionperiod.")
-    saft1_ExtraordinaryDepreciationForPeriod = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_ExtraordinaryDepreciationForPeriod = fields.Float(
+        currency_field="currency_id",
         string="ExtraordinaryDepreciationForPeriod",
         xsd_required=True,
         xsd_type="SAFmonetaryType",
@@ -1148,14 +1148,14 @@ class GeneralLedgerEntries(models.AbstractModel):
         help="Number of entries. This is the total number of Transaction"
         "\nentries (accounting documents/vouchers) from all"
         "\nJournals included in the audit file.")
-    saft1_TotalDebit = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TotalDebit = fields.Float(
+        currency_field="currency_id",
         string="TotalDebit", xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="The total of all debit amounts in the header's default"
         "\ncurrency.")
-    saft1_TotalCredit = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TotalCredit = fields.Float(
+        currency_field="currency_id",
         string="TotalCredit", xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="The total of all credit amounts in the header's default"
@@ -1480,8 +1480,8 @@ class Line(models.AbstractModel):
     saft1_DueDate = fields.Date(
         string="The due date.",
         xsd_type="date")
-    saft1_Quantity = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_Quantity = fields.Float(
+        currency_field="currency_id",
         string="Quantity.",
         xsd_type="SAFquantityType")
     saft1_CrossReference = fields.Char(
@@ -1606,8 +1606,8 @@ class Line4(models.AbstractModel):
         xsd_type="SAFmiddle2textType",
         help="Stock batch, lot, serial identification. Not used when there"
         "\nis exactly 1 PhysicalStock entry per ProductCode")
-    saft1_Quantity = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_Quantity = fields.Float(
+        currency_field="currency_id",
         string="Quantity of goods",
         xsd_required=True,
         xsd_type="SAFquantityType")
@@ -1615,12 +1615,12 @@ class Line4(models.AbstractModel):
         string="Quantity unit of measure e.g",
         xsd_type="SAFcodeType",
         help="Quantity unit of measure e.g. pack of 12")
-    saft1_UOMToUOMPhysicalStockConversionFactor = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_UOMToUOMPhysicalStockConversionFactor = fields.Float(
+        currency_field="currency_id",
         string="Conversion factor of the UOM to UOM Physical Stock",
         xsd_type="decimal")
-    saft1_BookValue = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_BookValue = fields.Float(
+        currency_field="currency_id",
         string="BookValue",
         xsd_type="SAFmonetaryType",
         help="Value of the transaction line as registrerd in the general"
@@ -1693,23 +1693,23 @@ class Line7(models.AbstractModel):
         string="Delivery",
         help="Information about the date or timeframe of the delivery of"
         "\nthe goods or services.")
-    saft1_Quantity = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_Quantity = fields.Float(
+        currency_field="currency_id",
         string="Quantity of goods and services supplied",
         xsd_type="SAFquantityType")
     saft1_InvoiceUOM = fields.Char(
         string="Quantity unit of measure e.g",
         xsd_type="SAFcodeType",
         help="Quantity unit of measure e.g. pack of 12")
-    saft1_UOMToUOMBaseConversionFactor = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_UOMToUOMBaseConversionFactor = fields.Float(
+        currency_field="currency_id",
         string="Conversion factor of the InvoiceUOM to UOM Base",
         xsd_type="decimal",
         help="Conversion factor of the InvoiceUOM to UOM Base. Only needed"
         "\nwhen InvoiceUOM is reported and is different from the"
         "\nUOM Base.")
-    saft1_UnitPrice = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_UnitPrice = fields.Float(
+        currency_field="currency_id",
         string="UnitPrice", xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="Unit price for the unit/group of units per UOM in the"
@@ -1815,13 +1815,13 @@ class MovementOfGoods(models.AbstractModel):
         string="Number of movementlines in selected period",
         xsd_required=True,
         xsd_type="nonNegativeInteger")
-    saft1_TotalQuantityReceived = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TotalQuantityReceived = fields.Float(
+        currency_field="currency_id",
         string="Quantity of goods received",
         xsd_required=True,
         xsd_type="SAFquantityType")
-    saft1_TotalQuantityIssued = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TotalQuantityIssued = fields.Float(
+        currency_field="currency_id",
         string="Quantity of goods issued in selected period",
         xsd_required=True,
         xsd_type="SAFquantityType")
@@ -1989,8 +1989,8 @@ class PaymentTerms(models.AbstractModel):
         xsd_type="nonNegativeInteger",
         help="Number of days from the invoice date the cash discount can be"
         "\ndeducted.")
-    saft1_CashDiscountRate = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_CashDiscountRate = fields.Float(
+        currency_field="currency_id",
         string="Rate for calculating cash discount.",
         xsd_type="CashDiscountRateType")
     saft1_FreeBillingMonth = fields.Boolean(
@@ -2072,14 +2072,14 @@ class Payments(models.AbstractModel):
         string="Number of entries",
         xsd_required=True,
         xsd_type="nonNegativeInteger")
-    saft1_TotalDebit = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TotalDebit = fields.Float(
+        currency_field="currency_id",
         string="TotalDebit", xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="The total of all debit amounts in the header's default"
         "\ncurrency")
-    saft1_TotalCredit = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TotalCredit = fields.Float(
+        currency_field="currency_id",
         string="TotalCredit", xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="The total of all credit amounts in the header's default"
@@ -2187,33 +2187,33 @@ class PhysicalStockEntry(models.AbstractModel):
     saft1_UOMPhysicalStock = fields.Char(
         string="Unit of Measurement for this Physical Stock position",
         xsd_type="SAFcodeType")
-    saft1_UOMToUOMBaseConversionFactor = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_UOMToUOMBaseConversionFactor = fields.Float(
+        currency_field="currency_id",
         string="Conversion factor of the UOM to UOM Base",
         xsd_type="decimal")
-    saft1_UnitPrice = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_UnitPrice = fields.Float(
+        currency_field="currency_id",
         string="UnitPrice",
         xsd_type="SAFmonetaryType",
         help="Base Unit price for this stock account in the header's"
         "\ndefault currency.")
-    saft1_OpeningStockQuantity = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_OpeningStockQuantity = fields.Float(
+        currency_field="currency_id",
         string="In UOM Physical Stock for selection period",
         xsd_required=True,
         xsd_type="SAFquantityType")
-    saft1_OpeningStockValue = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_OpeningStockValue = fields.Float(
+        currency_field="currency_id",
         string="In the header's currency code for selection period",
         xsd_type="SAFmonetaryType",
         help="In the header's currency code for selection period")
-    saft1_ClosingStockQuantity = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_ClosingStockQuantity = fields.Float(
+        currency_field="currency_id",
         string="ClosingStockQuantity",
         xsd_required=True,
         xsd_type="SAFquantityType")
-    saft1_ClosingStockValue = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_ClosingStockValue = fields.Float(
+        currency_field="currency_id",
         string="ClosingStockValue",
         xsd_type="SAFmonetaryType",
         help="Closing stock value in the header's default currency for"
@@ -2285,8 +2285,8 @@ class Product(models.AbstractModel):
         xsd_type="SAFcodeType",
         help="A Standard Unit of Measure applicable for this product, f.i."
         "\nKilo, Metres, Litres (Predescribed TABLE is possible)")
-    saft1_UOMToUOMBaseConversionFactor = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_UOMToUOMBaseConversionFactor = fields.Float(
+        currency_field="currency_id",
         string="Conversion factor of the UOM to UOM Base",
         xsd_type="decimal")
     saft1_Tax = fields.One2many(
@@ -2322,14 +2322,14 @@ class PurchaseInvoices(models.AbstractModel):
         string="Number of entries",
         xsd_required=True,
         xsd_type="nonNegativeInteger")
-    saft1_TotalDebit = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TotalDebit = fields.Float(
+        currency_field="currency_id",
         string="TotalDebit", xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="The total of all debit amounts in the header's default"
         "\ncurrency")
-    saft1_TotalCredit = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TotalCredit = fields.Float(
+        currency_field="currency_id",
         string="TotalCredit", xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="The total of all credit amounts in the header's default"
@@ -2365,14 +2365,14 @@ class SalesInvoices(models.AbstractModel):
         string="Number of entries",
         xsd_required=True,
         xsd_type="nonNegativeInteger")
-    saft1_TotalDebit = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TotalDebit = fields.Float(
+        currency_field="currency_id",
         string="TotalDebit", xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="The total of all debit amounts in the header's default"
         "\ncurrency")
-    saft1_TotalCredit = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TotalCredit = fields.Float(
+        currency_field="currency_id",
         string="TotalCredit", xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="The total of all credit amounts in the header's default"
@@ -2686,29 +2686,29 @@ class Supplier(models.AbstractModel):
         "\nthe account code/number into where this sub"
         "\naccount/accounts payable is consolidated in the"
         "\nbalance sheet.")
-    saft1_OpeningDebitBalance = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_OpeningDebitBalance = fields.Float(
+        currency_field="currency_id",
         choice='8',
         string="OpeningDebitBalance",
         xsd_type="SAFmonetaryType",
         help="Debit balance at the start date of the selection period in"
         "\nthe header's default currency.")
-    saft1_OpeningCreditBalance = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_OpeningCreditBalance = fields.Float(
+        currency_field="currency_id",
         choice='8',
         string="OpeningCreditBalance",
         xsd_type="SAFmonetaryType",
         help="Credit balance at the start date of the selection period in"
         "\nthe header's default currency.")
-    saft1_ClosingDebitBalance = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_ClosingDebitBalance = fields.Float(
+        currency_field="currency_id",
         choice='9',
         string="ClosingDebitBalance",
         xsd_type="SAFmonetaryType",
         help="Debit balance at the end date of the selection period in the"
         "\nheader's default currency.")
-    saft1_ClosingCreditBalance = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_ClosingCreditBalance = fields.Float(
+        currency_field="currency_id",
         choice='9',
         string="ClosingCreditBalance",
         xsd_type="SAFmonetaryType",
@@ -2807,8 +2807,8 @@ class TaxCodeDetails(models.AbstractModel):
     saft1_Description = fields.Char(
         string="Description of the Tax Code.",
         xsd_type="SAFlongtextType")
-    saft1_TaxPercentage = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TaxPercentage = fields.Float(
+        currency_field="currency_id",
         choice='10',
         string="Tax percentage.",
         xsd_type="decimal")
@@ -2831,8 +2831,8 @@ class TaxCodeDetails(models.AbstractModel):
     saft1_Compensation = fields.Boolean(
         string="Indicates if the Tax Code is used for compensation",
         xsd_type="boolean")
-    saft1_BaseRate = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_BaseRate = fields.Float(
+        currency_field="currency_id",
         string="Base rates used for the tax code",
         xsd_required=True,
         xsd_type="BaseRateType",
@@ -2912,12 +2912,12 @@ class TaxInformationStructure(models.AbstractModel):
     saft1_TaxCode = fields.Char(
         string="Tax Code for lookup in tables.",
         xsd_type="SAFcodeType")
-    saft1_TaxPercentage = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TaxPercentage = fields.Float(
+        currency_field="currency_id",
         string="Tax percentage.",
         xsd_type="decimal")
-    saft1_TaxBase = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_TaxBase = fields.Float(
+        currency_field="currency_id",
         string="The base on which the tax is calculated",
         xsd_type="decimal",
         help="The base on which the tax is calculated. This can be an"
@@ -3206,59 +3206,59 @@ class Valuation(models.AbstractModel):
         xsd_type="SAFshorttextType",
         help="This describes the classification of the asset for (tax)"
         "\nreporting purposes.")
-    saft1_AcquisitionAndProductionCostsBegin = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_AcquisitionAndProductionCostsBegin = fields.Float(
+        currency_field="currency_id",
         string="AcquisitionAndProductionCostsBegin",
         xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="Total costs of acquisition and/or production of the asset at"
         "\nSelectionStartDate in the header's default currency.")
-    saft1_AcquisitionAndProductionCostsEnd = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_AcquisitionAndProductionCostsEnd = fields.Float(
+        currency_field="currency_id",
         string="AcquisitionAndProductionCostsEnd",
         xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="Total costs of acquisition and/or production of the asset at"
         "\nSelectionEndDate in the header's default currency.")
-    saft1_InvestmentSupport = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_InvestmentSupport = fields.Float(
+        currency_field="currency_id",
         string="InvestmentSupport",
         xsd_type="SAFmonetaryType",
         help="Total amount of investment support for this asset in the"
         "\nheader's default currency.")
-    saft1_AssetLifeYear = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_AssetLifeYear = fields.Float(
+        currency_field="currency_id",
         choice='11',
         string="Periode of useful life in years",
         xsd_required=True,
         xsd_type="decimal")
-    saft1_AssetLifeMonth = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_AssetLifeMonth = fields.Float(
+        currency_field="currency_id",
         choice='11',
         string="Period of useful life in months",
         xsd_required=True,
         xsd_type="decimal")
-    saft1_AssetAddition = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_AssetAddition = fields.Float(
+        currency_field="currency_id",
         string="AssetAddition",
         xsd_type="SAFmonetaryType",
         help="Bookvalue of the acquisition and/or production of the asset"
         "\nin the Selectionperiod in the header's default"
         "\ncurrency.")
-    saft1_Transfers = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_Transfers = fields.Float(
+        currency_field="currency_id",
         string="Transfers",
         xsd_type="SAFmonetaryType",
         help="Book value of the transfers of the asset during the"
         "\nSelectionperiod in the header's default currency.")
-    saft1_AssetDisposal = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_AssetDisposal = fields.Float(
+        currency_field="currency_id",
         string="AssetDisposal",
         xsd_type="SAFmonetaryType",
         help="Book value of the disposals of the asset during the"
         "\nSelectionperiod in the header's default currency.")
-    saft1_BookValueBegin = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_BookValueBegin = fields.Float(
+        currency_field="currency_id",
         string="BookValueBegin",
         xsd_type="SAFmonetaryType",
         help="Bookvalue at the beginning of the Selectionperiod in the"
@@ -3266,21 +3266,21 @@ class Valuation(models.AbstractModel):
     saft1_DepreciationMethod = fields.Char(
         string="Method of normal depreciation during the Selectionperiod",
         xsd_type="SAFmiddle1textType")
-    saft1_DepreciationPercentage = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_DepreciationPercentage = fields.Float(
+        currency_field="currency_id",
         string="The rate of the normal depreciation per year or month",
         xsd_type="decimal",
         help="The rate of the normal depreciation per year or month"
         "\n(depends on choice useful life periode)")
-    saft1_DepreciationForPeriod = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_DepreciationForPeriod = fields.Float(
+        currency_field="currency_id",
         string="DepreciationForPeriod",
         xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="Total amouunt of normal depreciation during the"
         "\nSelectionperiod in the header's default currency.")
-    saft1_AppreciationForPeriod = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_AppreciationForPeriod = fields.Float(
+        currency_field="currency_id",
         string="AppreciationForPeriod",
         xsd_type="SAFmonetaryType",
         help="Total amouunt of appreciation during the Selectionperiod in"
@@ -3290,12 +3290,12 @@ class Valuation(models.AbstractModel):
         string="ExtraordinaryDepreciationsForPeriod",
         help="Extraordinary depreciations for this asset during the"
         "\nSelectionperiod.")
-    saft1_AccumulatedDepreciation = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_AccumulatedDepreciation = fields.Float(
+        currency_field="currency_id",
         string="Total amount of depreciation for this asset",
         xsd_type="SAFmonetaryType")
-    saft1_BookValueEnd = fields.Monetary(
-        currency_field="brl_currency_id",
+    saft1_BookValueEnd = fields.Float(
+        currency_field="currency_id",
         string="BookValueEnd", xsd_required=True,
         xsd_type="SAFmonetaryType",
         help="Bookvalue at the end of the Selectionperiod in the header's"

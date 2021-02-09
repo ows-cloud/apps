@@ -2,7 +2,78 @@
 <odoo>
     <data>
 
+        <!-- l10n_no_account_saft.xml -->
 
+        <record model="ir.ui.view" id="view_l10n_no_account_saft_xml_tree">
+            <field name="name">SAF-T XML</field>
+            <field name="model">l10n_no_account_saft.xml</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <tree string="SAF-T XML">
+                    <field name="month_from"/>
+                    <field name="month_to"/>
+                    <field name="company_id"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_l10n_no_account_saft_xml_form">
+            <field name="name">SAF-T XML</field>
+            <field name="model">l10n_no_account_saft.xml</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <form string="SAF-T XML" create="0" edit="0">
+                    <group colspan="4">
+                        <group colspan="2" col="2">
+                            <field name="month_from"/>
+                            <field name="month_to"/>
+                            <field name="company_id"/>
+                            <field name="saft_filename" invisible="1"/>
+                            <field name="saft_binary" filename="saft_filename"/>
+                            <field name="saft_xml" widget="ace" options="{'mode': 'xml'}"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_l10n_no_account_saft_xml_tree">
+            <field name="name">SAF-T XML</field>
+            <field name="res_model">l10n_no_account_saft.xml</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- l10n_no_account_saft.xml.wizard -->
+
+        <record model="ir.ui.view" id="view_l10n_no_account_saft_xml_wizard_form">
+            <field name="name">Create SAF-T XML</field>
+            <field name="model">l10n_no_account_saft.xml.wizard</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <form string="Create SAF-T XML">
+                    <group colspan="4">
+                        <group colspan="2" col="2">
+                            <separator string="Create SAF-T XML" colspan="2"/>
+                            <field name="month_from" placeholder="yyyy-mm" default_focus="1"/>
+                            <field name="month_to" placeholder="yyyy-mm"/>
+                            <button name="create_xml" type="object" string="Create SAF-T XML" class="oe_highlight"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <act_window id="action_l10n_no_account_saft_xml_wizard_form"
+                    name="Lag SAF-T XML"
+                    src_model=""
+                    res_model="l10n_no_account_saft.xml.wizard"
+                    view_mode="form"
+                    target="inline"/>
+
+        <!-- menu -->
+
+        <menuitem id="menu_l10n_no_account_saft_xml_wizard"
+                    name="Create SAF-T XML"
+                    sequence="20"
+                    parent="account.menu_finance_reports"
+                    action="action_l10n_no_account_saft_xml_wizard_form"/>
 
     </data>
 </odoo>

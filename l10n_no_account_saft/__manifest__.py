@@ -10,6 +10,7 @@
     'author': 'AppsToGROW',
     'category': 'Localization',
     'data': [
+        'security/ir.model.access.csv',
         'views/views.xml',
     ],
     'depends': [
@@ -33,5 +34,6 @@ https://github.com/akretion/generateds-odoo
 I had to remove this element from the XSD:
 <xs:element name="MovementPostingTime" type="xs:time" minOccurs="0">
 python3 gends_run_gen_odoo.py -p /home/ag/.local/bin/generateDS.py -d ./saft -l saft -x 1 saft_1.10.xsd
+replace 'fields.Monetary' with 'fields.Float'
 ''',
 }
