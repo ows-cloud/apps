@@ -3,9 +3,12 @@
 
 import base64
 from datetime import datetime
+from io import StringIO
+from lxml import etree
+import sys
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from odoo.addons.spec_driven_model.models import spec_models
+from . import saft_1_10 as saft
 
 
 # TODO The wizard should download the SAF-T XML file directly. Then this class may be deleted.
@@ -21,6 +24,7 @@ class Saft(models.Model):
     @api.depends('saft_xml')
     def _compute_saft_binary(self):
         self.saft_binary = base64.b64encode(bytes(self.saft_xml, 'utf-8'))
+        #pass
 
     company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.user.company_id)
     month_from = fields.Char()
@@ -46,7 +50,7 @@ class SaftWizard(models.TransientModel):
             raise UserError(_('The period should have this format: yyyy-mm'))
 
         # Create record with xml
-        d = {'month_from': self.month_from, 'month_to': self.month_to, 'saft_xml': '<AuditFile></AuditFile>'}
+        d = {'month_from': self.month_from, 'month_to': self.month_to, 'saft_xml': self._create_xml()}
         record = self.env['l10n_no_account_saft.xml'].create(d)
 
         return {
@@ -57,42 +61,66 @@ class SaftWizard(models.TransientModel):
             'view_mode': 'form',
         }
 
-class SpecMixinSaft(models.AbstractModel):
-    _description = "Abstract Model"
-    _inherit = 'spec.mixin'
-    _name = 'spec.mixin.saft'
+    def _create_xml(self):
+        audit_file = self.AuditFile()
+        xml_io = StringIO()
+        audit_file.export(xml_io, level=0)
+        return xml_io.getvalue()
 
-    saft_company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        compute='_compute_saft_company_id',
-        default=lambda self: self.env.ref('base.main_company').id,
-    )
+    def AuditFile(self):
+        audit_file = saft.AuditFile()
+        audit_file.Header = self.Header()
+        audit_file.MasterFiles = self.MasterFiles()
+        audit_file.GeneralLedgerEntries = self.GeneralLedgerEntries()
+        return audit_file
 
-    def _compute_saft_company_id(self):
-        for item in self:
-            item.company_id = self.env.ref('base.main_company').id
+    def Header(self):
+        h = saft.HeaderStructure()
+        h.AuditFileVersion = '1.0'
+        h.AuditFileCountry = 'NO'
+        h.AuditFileDateCreated = datetime.now() 
+        h.SoftwareCompanyName = 'Norske Apps2GROW AS'
+        h.SoftwareID = 'Odoo'
+        h.SoftwareVersion = '12.0'
+        h.Company = self.Company()
+        h.DefaultCurrencyCode = 'NOK'
+        h.SelectionCriteria = saft.SelectionCriteriaStructure()
+        h.SelectionCriteria.PeriodStart = 1
+        h.SelectionCriteria.PeriodStartYear = 2020
+        h.SelectionCriteria.PeriodEnd = 12
+        h.SelectionCriteria.PeriodEndYear = 2020
+        h.HeaderComment = 'No comment'
+        h.TaxAccountingBasis = 'A' # TODO not working
+        return h
 
-    saft_currency_id = fields.Many2one(
-        comodel_name='res.currency',
-        string='Currency',
-        compute='_compute_saft_currency_id',
-        default=lambda self: self.saft_company_id.currency_id.id,
-    )
+    def Company(self):
+        c = saft.CompanyStructure()
+        
+        return c
+    def (self):
 
-    def _compute_saft_currency_id(self):
-        for item in self:
-            item.currency_id = self.saft_company_id.currency_id.id
+    def (self):
 
+    def MasterFiles(self):
+        mf = saft.MasterFilesType()
+        return mf
 
-# saft.1.generalledgeraccounts ?
-# class Account(spec_models.StackedModel):
-#     _name = 'account.account'
-#     _inherit = ["account.account", "saft.1.account"]
-#     _inherit = ["saft.1.account"]
-#     _stacked = 'saft.1.account'
-#     _spec_module = 'odoo.addons.l10n_no_account_saft.models.saft_1_10_lib'
+    def (self):
 
-#     saft1_AccountID = fields.Char(related='code')
-#     saft1_AccountDescription = fields.Char(related='name')
+    def (self):
 
+    def (self):
+
+    def (self):
+
+    def GeneralLedgerEntries(self):
+        gle = saft.GeneralLedgerEntriesType()
+        return gle
+
+    def (self):
+
+    def (self):
+
+    def (self):
+
+    def (self):
