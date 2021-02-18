@@ -2,6 +2,20 @@
 <odoo>
     <data>
 
+        <!-- res.company -->
+
+        <record model="ir.ui.view" id="view_res_company_form">
+            <field name="name">res.company saft</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='sequence']" position="after">
+                    <field name="partner_saft_id"/>
+                </xpath>
+            </field>
+        </record>
+
         <!-- l10n_no_account_saft.xml -->
 
         <record model="ir.ui.view" id="view_l10n_no_account_saft_xml_tree">
@@ -10,8 +24,8 @@
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">
                 <tree string="SAF-T XML">
-                    <field name="month_from"/>
-                    <field name="month_to"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
                     <field name="company_id"/>
                 </tree>
             </field>

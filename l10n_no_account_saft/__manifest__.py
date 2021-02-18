@@ -15,7 +15,6 @@
     ],
     'depends': [
         'account',
-        'spec_driven_model', # https://github.com/OCA/l10n-brazil
     ],
     'license': 'AGPL-3',
     'website': 'http://www.appstogrow.co',

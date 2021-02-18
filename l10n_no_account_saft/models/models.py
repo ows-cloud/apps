@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import base64
+import calendar
 from datetime import datetime
 from io import StringIO
 from lxml import etree
@@ -11,6 +12,12 @@ from odoo.exceptions import UserError
 from . import saft_1_10 as saft
 
 
+class Saft(models.Model):
+    _inherit = 'res.company'
+
+    partner_saft_id = fields.Many2one('res.partner', 'SAF-T Contact Person')
+
+
 # TODO The wizard should download the SAF-T XML file directly. Then this class may be deleted.
 class Saft(models.Model):
     _name = 'l10n_no_account_saft.xml'
@@ -18,6 +25,7 @@ class Saft(models.Model):
     @api.depends('month_from', 'month_to')
     def _compute_saft_filename(self):
         self.ensure_one()
+
         name = 'SAF-T from {month_from} to {month_to}.xml'.format(month_from=self.month_from, month_to=self.month_to)
         self.saft_filename = name
 
@@ -29,6 +37,8 @@ class Saft(models.Model):
     company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.user.company_id)
     month_from = fields.Char()
     month_to = fields.Char()
+    date_from = fields.Date()
+    date_to = fields.Date()
     timestamp = fields.Datetime(readonly=True)
     saft_xml = fields.Text(readonly=True)
     saft_filename = fields.Char(compute=_compute_saft_filename)
@@ -45,14 +55,18 @@ class SaftWizard(models.TransientModel):
         # Verify periods
         try:
             date_from = datetime.strptime(self.month_from + '-01', '%Y-%m-%d')
-            date_to = datetime.strptime(self.month_to + '-01', '%Y-%m-%d') # TODO get last day of the month or first day of next month
+            year = int(self.month_to[:4])
+            month = int(self.month_to[-2:])
+            date = calendar.monthrange(year, month)[1]
+            date_to = datetime.strptime(self.month_to + '-' + str(date), '%Y-%m-%d')
         except:
             raise UserError(_('The period should have this format: yyyy-mm'))
 
         # Create record with xml
-        d = {'month_from': self.month_from, 'month_to': self.month_to}
+        d = {'month_from': self.month_from, 'month_to': self.month_to, 'date_from': date_from, 'date_to': date_to, }
         record = self.env['l10n_no_account_saft.xml'].create(d)
-        audit_file = AuditFile.AuditFile(record)
+        audit_file_class = AuditFile(record)
+        audit_file = audit_file_class.AuditFile()
         xml_io = StringIO()
         audit_file.export(xml_io, level=0)      
         record.saft_xml = xml_io.getvalue()
@@ -69,15 +83,15 @@ class AuditFile:
 
     def __init__(self, saft_record):
         self.company = saft_record.company_id
+        self.date_from = saft_record.date_from
+        self.date_to = saft_record.date_to
 
     def AuditFile(self):
         audit_file = saft.AuditFile()
         audit_file.Header = self.Header()
-        audit_file.MasterFiles = self.MasterFiles()
-        audit_file.GeneralLedgerEntries = self.GeneralLedgerEntries()
+        audit_file.MasterFiles = saft.MasterFilesType()
+        audit_file.GeneralLedgerEntries = saft.GeneralLedgerEntriesType()
         return audit_file
-
-
 
     def Header(self):
         h = saft.HeaderStructure()
@@ -127,7 +141,8 @@ class AuditFile:
         
         # TODO should not depend on l10n_no_hr_payroll
         c.TaxRegistration = saft.TaxInformationStructure()
-        mvanr = self.company.field_value_hr_ids.filtered(lambda r: r.field_code == 'l10n_no_virksomhet').value
+        # mvanr = self.company.field_value_hr_ids.filtered(lambda r: r.field_code == 'l10n_no_virksomhet').value
+        mvanr = self.company.vat # TODO probably not correct
         c.TaxRegistration.TaxRegistrationNumber = mvanr + 'MVA' 
         c.TaxRegistration.TaxAuthority = "Skatteetaten"
         c.TaxRegistration.TaxVerificationDate = self.company.write_date
@@ -208,13 +223,13 @@ class AuditFile:
     def Contact(self, partner):
         c = saft.ContactHeaderStructure()
         c.ContactPerson = saft.ContactInformationStructure()
-        c.ContactPerson.FirstName = self.company.user_tech_id.name.partition(' ')[0]
-        c.ContactPerson.LastName = self.company.user_tech_id.name.partition(' ')[-1]
+        c.ContactPerson.FirstName = self.company.partner_saft_id.name.partition(' ')[0]
+        c.ContactPerson.LastName = self.company.partner_saft_id.name.partition(' ')[-1]
         # otherwise try this https://www.codespeedy.com/get-the-last-word-from-a-string-in-python/
-        c.Telephone = self.company.user_tech_id.phone
-        c.Email = self.company.user_tech_id.email
-        c.Website = self.company.user_tech_id.website
-        c.MobilePhone = self.company.user_tech_id.mobile
+        c.Telephone = self.company.partner_saft_id.phone
+        c.Email = self.company.partner_saft_id.email
+        c.Website = self.company.partner_saft_id.website
+        c.MobilePhone = self.company.partner_saft_id.mobile
         return c
 
     def TaxRegistration(self, partner):
@@ -227,11 +242,12 @@ class AuditFile:
 
     def BankAccount(self, partner):
         b = saft.BankAccountStructure()
-        bank_account = partner.bank_ids[0]
-        b.BankAccountNumber = bank_account.acc_number
-        b.BIC = bank_account.bank_bic
-        b.CurrencyCode = bank_account.currency_id.name
-        # b.GeneralLedgerAccountID
+        if partner.bank_ids:
+            bank_account = partner.bank_ids[0]
+            b.BankAccountNumber = bank_account.acc_number
+            b.BIC = bank_account.bank_bic
+            b.CurrencyCode = bank_account.currency_id.name
+            # b.GeneralLedgerAccountID
         return b
 
     def PartyInfo(self, partner, partner_type):
@@ -289,23 +305,24 @@ class AuditFile:
         j.Description = journal.name
         j.Type = journal.code # ?
         j.Transaction = saft.TransactionType()
-        for move in self.company.env['account.move'].browse().filtered(lambda r: r.journal_id == journal):
+        for move in self.company.env['account.move'].browse().filtered(lambda r: r.journal_id == journal, r.date >= self.date_from, r.date <= self.date_to):
             j.Transaction.append(self.Transaction(move))
         return j
 
     def Transaction(self, move):
         t = saft.TransactionType()
         t.TransactionID = move.name
-        t.Period = move.
-        t.PeriodYear = move.
+        t.Period = move.date.strftime("%m")
+        t.PeriodYear = move.date.strftime("%Y")
         t.TransactionID = move.date
-        t.SourceID = move.
-        t.TransactionType = move.
-        t.Description = move.
-        t.BatchID = move.
-        t.SystemEntryDate = move.
-        t.GLPostingDate = move.
-        t.SystemID = move.
+        # TODO
+        # t.SourceID = move.
+        # t.TransactionType = move.
+        # t.Description = move.
+        # t.BatchID = move.
+        # t.SystemEntryDate = move.
+        # t.GLPostingDate = move.
+        # t.SystemID = move.
         for line in move.line_ids:
             t.append(self.Line(line))
         return t
