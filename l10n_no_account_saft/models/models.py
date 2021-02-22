@@ -178,24 +178,24 @@ class AuditFile:
         mf = saft.MasterFilesType()
 
         mf.GeneralLedgerAccounts = saft.GeneralLedgerAccountsType()
-        for account in self.company.env['account.account'].browse():
-            mf.GeneralLedgerAccounts.append(self.Account(account))
+        for account in self.company.env['account.account'].search([]):
+            mf.GeneralLedgerAccounts.add_Account(self.Account(account))
 
         mf.Customers = saft.CustomersType()
-        for customer in self.company.env['res.partner'].browse().filtered(lambda r: r.is_customer == True):
-            mf.Customers.append(self.Customer(customer))
+        for customer in self.company.env['res.partner'].search([('customer', '=', True)]):
+            mf.Customers.add_Customer(self.Customer(customer))
 
         mf.Suppliers = saft.SuppliersType()
-        for supplier in self.company.env['res.partner'].browse().filtered(lambda r: r.is_supplier == True):
-            mf.Suppliers.append(self.Supplier(supplier))
+        for supplier in self.company.env['res.partner'].browse().search([('supplier', '=', True)]):
+            mf.Suppliers.add_Supplier(self.Supplier(supplier))
 
         mf.TaxTable = saft.TaxTableType()
-        for tax in self.company.env['account.tax'].browse():
-            mf.TaxTable.append(self.TaxTableEntry(tax))
+        for tax in self.company.env['account.tax'].search([]):
+            mf.TaxTable.add_TaxTableEntry(self.TaxTableEntry(tax))
 
         mf.AnalysisTypeTable = saft.AnalysisTypeTableType()
-        for analytic in self.company.env['account.analytic.account'].browse():
-            mf.AnalysisTypeTable.append(self.AnalysisTypeTableEntry(analytic))
+        for analytic in self.company.env['account.analytic.account'].search([]):
+            mf.AnalysisTypeTable.add_AnalysisTypeTableEntry(self.AnalysisTypeTableEntry(analytic))
 
         mf.Owners = saft.OwnersType()
         # for owner in self.company.env[''].browse():
@@ -227,9 +227,9 @@ class AuditFile:
         
         p.RegistrationNumber = partner.vat
         p.Name = partner.name
-        p.Address = self.Address(partner)
+        #p.Address = self.Address(partner)
         #p.Contact = self.Contact(partner)
-        p.TaxRegistration = partner.vat[2:] # TODO 'MVA'
+        #p.TaxRegistration = partner.vat # [2:] # TODO 'MVA'
         return p
 
     def Address(self, partner):
@@ -296,11 +296,11 @@ class AuditFile:
         t = saft.TaxTableEntryType()
         t.TaxType = 'MVA'
         t.Description = tax.name
-        t.TaxCodeDetails = saft.TaxCodeDetailsType()
-        t.TaxCodeDetails.TaxPercentage = tax.amount * 100
-        t.TaxCodeDetails.Country = 'NO'
-        # t.TaxCodeDetails.StandardTaxCode # TODO mandatory
-        t.TaxCodeDetails.BaseRate = 100
+        # t.TaxCodeDetails = saft.TaxCodeDetailsType()
+        # t.TaxCodeDetails.TaxPercentage = tax.amount * 100
+        # t.TaxCodeDetails.Country = 'NO'
+        # # t.TaxCodeDetails.StandardTaxCode # TODO mandatory
+        # t.TaxCodeDetails.BaseRate = 100
         return t
 
     def AnalysisTypeTableEntry(self, analytic):
@@ -320,9 +320,8 @@ class AuditFile:
         e.NumberOfEntries = 1 # TODO
         e.TotalDebit = 1000 # TODO
         e.TotalCredit = 1000 # TODO
-        # e.Journal = saft.JournalType()
-        # for journal in self.company.env['account.journal'].browse():
-        #     e.Journal.append(self.Journal(journal))
+        for journal in self.company.env['account.journal'].search([]):
+            e.add_Journal(self.Journal(journal))
         return e
 
     def Journal(self, journal):
@@ -330,16 +329,15 @@ class AuditFile:
         j.JournalID = journal.code
         j.Description = journal.name
         j.Type = journal.code # ?
-        j.Transaction = saft.TransactionType()
-        for move in self.company.env['account.move'].browse().filtered(lambda r: r.journal_id == journal, r.date >= self.date_from, r.date <= self.date_to):
-            j.Transaction.append(self.Transaction(move))
+        for move in self.company.env['account.move'].search([('journal_id', '=', journal.id), ('date', '>=', self.date_from), ('date', '<=', self.date_to)]):
+            j.add_Transaction(self.Transaction(move))
         return j
 
     def Transaction(self, move):
         t = saft.TransactionType()
         t.TransactionID = move.name
-        t.Period = move.date.strftime("%m")
-        t.PeriodYear = move.date.strftime("%Y")
+        t.Period = int(move.date.strftime("%m"))
+        t.PeriodYear = int(move.date.strftime("%Y"))
         t.TransactionID = move.date
         # TODO
         # t.SourceID = move.
@@ -350,37 +348,39 @@ class AuditFile:
         # t.GLPostingDate = move.
         # t.SystemID = move.
         for line in move.line_ids:
-            t.append(self.Line(line))
+            t.add_Line(self.Line(line))
         return t
 
     def Line(self, line):
         l = saft.LineType()
         l.RecordID = 1 # TODO
         l.AccountID = line.account_id.code
-        l.Analysis = saft.AnalysisStructure
-        l.Analysis.AnalysisType = 'A'
-        l.Analysis.AnalysisID = line.analytic_account_id.code
+        # l.Analysis = saft.AnalysisStructure()
+        # l.Analysis.AnalysisType = 'A'
+        # l.Analysis.AnalysisID = line.analytic_account_id.code
         l.ValueDate = line.move_id.date
         # l.SourceDocumentID = 
         l.Description = line.name
-        l.DebitAmount = saft.DebitCreditIndicatorType()
-        l.DebitAmount.Amount = line.debit
-        l.CreditAmount = saft.DebitCreditIndicatorType()
-        l.CreditAmount.Amount = line.credit
+        # l.DebitAmount = saft.DebitCreditIndicatorType('D')
+        # l.DebitAmount.Amount = line.debit
+        # l.CreditAmount = saft.DebitCreditIndicatorType('C')
+        # l.CreditAmount.Amount = line.credit
+        # l.DebitAmount = line.debit
+        # l.CreditAmount = line.credit
         for tax in line.tax_ids:
-            l.append(self.TaxInformation(tax))
+            l.add_TaxInformation(self.TaxInformation(tax))
         # l.ReferenceNumber
         # l.CID
         l.SystemEntryTime = datetime.now()
         # l.ownerID
         return l
 
-    def TaxInformation(self, move, tax):
+    def TaxInformation(self, tax):
         t = saft.TaxInformationStructure()
         t.TaxType = 'MVA'
         # t.TaxCode
         t.TaxPercent = tax.amount * 100
         # t.TaxBase
-        t.TaxAmount = saft.TaxAmount() # doesn't exist!
+        # t.TaxAmount = saft.TaxAmount() # doesn't exist!
         # t.TaxAmount.Amount
         return t
