@@ -9,10 +9,12 @@ from lxml import etree
 import sys
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+
+# from . import saft_no_validation as saft
 from . import saft_1_10 as saft
 
 
-class Saft(models.Model):
+class Company(models.Model):
     _inherit = 'res.company'
 
     partner_saft_id = fields.Many2one('res.partner', 'SAF-T Contact Person')
@@ -67,9 +69,9 @@ class SaftWizard(models.TransientModel):
         record = self.env['l10n_no_account_saft.xml'].create(d)
         audit_file_class = AuditFile(record)
         audit_file = audit_file_class.AuditFile()
-        xml_io = StringIO()
-        audit_file.export(xml_io, level=0)      
-        record.saft_xml = xml_io.getvalue()
+
+        record.saft_xml = self._create_xml_generateds(audit_file)
+
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'l10n_no_account_saft.xml',
@@ -78,6 +80,26 @@ class SaftWizard(models.TransientModel):
             'view_mode': 'form',
         }
 
+    def _create_xml_generateds(self, audit_file):
+        xml_io = StringIO()
+        audit_file.export(xml_io, level=0)
+        return xml_io.getvalue()
+
+    def _create_xml_pyxb(self, audit_file):
+        myxml = audit_file.toxml('utf-8')
+        return myxml
+    # def melding_xml(self):
+    #     m = self.melding()
+    #     myxml = m.toxml('utf-8')
+    #     myetree = etree.fromstring(myxml)
+        
+    #     no_of_times = 5 # Do a few times to remove nested empty nodes
+    #     for i in range(0, no_of_times):
+    #         for element in myetree.xpath('//*[not(node())]'):
+    #             element.getparent().remove(element)
+        
+    #     mypretty = etree.tostring(myetree, pretty_print=True)
+    #     return mypretty
 
 class AuditFile:
 
@@ -89,8 +111,8 @@ class AuditFile:
     def AuditFile(self):
         audit_file = saft.AuditFile()
         audit_file.Header = self.Header()
-        audit_file.MasterFiles = saft.MasterFilesType()
-        audit_file.GeneralLedgerEntries = saft.GeneralLedgerEntriesType()
+        audit_file.MasterFiles = self.MasterFiles()
+        audit_file.GeneralLedgerEntries = self.GeneralLedgerEntries()
         return audit_file
 
     def Header(self):
@@ -116,10 +138,11 @@ class AuditFile:
         c = saft.CompanyStructure()
         c.RegistrationNumber = self.company.vat[2:]
         c.Name = self.company.name
-        c.Address = self.Address(self.company)
-        c.Contact = self.Contact(self.company)
-        c.TaxRegistration = self.TaxRegistration(self.company.partner_id)
-        c.BankAccount = self.BankAccount(self.company.partner_id)
+        partner = self.company.partner_id
+        #c.Address = self.Address(partner)
+        #c.Contact = self.Contact(self.company.partner_id)
+        #c.TaxRegistration = self.TaxRegistration(self.company.partner_id)
+        #c.BankAccount = self.BankAccount(self.company.partner_id)
         # c.Address = saft.AddressStructure()
         # c.Address.StreetName = self.company.street
         # c.Address.AdditionalAddressDetail = self.company.street2
@@ -140,12 +163,12 @@ class AuditFile:
         # c.Contact.MobilePhone = self.company.user_tech_id.mobile
         
         # TODO should not depend on l10n_no_hr_payroll
-        c.TaxRegistration = saft.TaxInformationStructure()
-        # mvanr = self.company.field_value_hr_ids.filtered(lambda r: r.field_code == 'l10n_no_virksomhet').value
-        mvanr = self.company.vat # TODO probably not correct
-        c.TaxRegistration.TaxRegistrationNumber = mvanr + 'MVA' 
-        c.TaxRegistration.TaxAuthority = "Skatteetaten"
-        c.TaxRegistration.TaxVerificationDate = self.company.write_date
+        # c.TaxRegistration = saft.TaxInformationStructure()
+        # # mvanr = self.company.field_value_hr_ids.filtered(lambda r: r.field_code == 'l10n_no_virksomhet').value
+        # mvanr = self.company.vat # TODO probably not correct
+        # c.TaxRegistration.TaxRegistrationNumber = mvanr + 'MVA' 
+        # c.TaxRegistration.TaxAuthority = "Skatteetaten"
+        # c.TaxRegistration.TaxVerificationDate = self.company.write_date
 
         # TODO BankAccount
 
@@ -175,8 +198,8 @@ class AuditFile:
             mf.AnalysisTypeTable.append(self.AnalysisTypeTableEntry(analytic))
 
         mf.Owners = saft.OwnersType()
-        for owner in self.company.env[''].browse():
-            mf.Owners.append(self.Owner(owner))
+        # for owner in self.company.env[''].browse():
+        #     mf.Owners.append(self.Owner(owner))
 
         return mf
 
@@ -205,14 +228,15 @@ class AuditFile:
         p.RegistrationNumber = partner.vat
         p.Name = partner.name
         p.Address = self.Address(partner)
-        p.Contact = self.Contact(partner)
+        #p.Contact = self.Contact(partner)
         p.TaxRegistration = partner.vat[2:] # TODO 'MVA'
         return p
 
     def Address(self, partner):
         a = saft.AddressStructure()
         a.StreetName = partner.street
-        a.AdditionalAddressDetail = partner.street2
+        if partner.street2:
+            a.AdditionalAddressDetail = partner.street2
         a.City = partner.city
         a.PostalCode = partner.zip
         a.Region = partner.state_id.name or ''
@@ -221,19 +245,21 @@ class AuditFile:
         return a
 
     def Contact(self, partner):
-        c = saft.ContactHeaderStructure()
-        c.ContactPerson = saft.ContactInformationStructure()
-        c.ContactPerson.FirstName = self.company.partner_saft_id.name.partition(' ')[0]
-        c.ContactPerson.LastName = self.company.partner_saft_id.name.partition(' ')[-1]
-        # otherwise try this https://www.codespeedy.com/get-the-last-word-from-a-string-in-python/
-        c.Telephone = self.company.partner_saft_id.phone
-        c.Email = self.company.partner_saft_id.email
-        c.Website = self.company.partner_saft_id.website
-        c.MobilePhone = self.company.partner_saft_id.mobile
+        c = saft.ContactHeaderStructure() # ContactHeaderStructure or ContactInformationStructure? None of them are iterable
+        # # for Contact_ in self.Contact:
+        # # TypeError: 'ContactHeaderStructure' object is not iterable
+        # c.ContactPerson = saft.PersonNameStructure()
+        # c.ContactPerson.FirstName = self.company.partner_saft_id.name.partition(' ')[0]
+        # c.ContactPerson.LastName = self.company.partner_saft_id.name.partition(' ')[-1]
+        # # otherwise try this https://www.codespeedy.com/get-the-last-word-from-a-string-in-python/
+        # c.Telephone = self.company.partner_saft_id.phone
+        # c.Email = self.company.partner_saft_id.email
+        # c.Website = self.company.partner_saft_id.website
+        # c.MobilePhone = self.company.partner_saft_id.mobile or ''
         return c
 
     def TaxRegistration(self, partner):
-        t = saft.TaxInformationStructure()
+        t = saft.TaxIDStructure()
         # mvanr = self.company.field_value_hr_ids.filtered(lambda r: r.field_code == 'l10n_no_virksomhet').value
         t.TaxRegistrationNumber = partner.vat 
         # c.TaxRegistration.TaxAuthority = "Skatteetaten"
@@ -294,9 +320,9 @@ class AuditFile:
         e.NumberOfEntries = 1 # TODO
         e.TotalDebit = 1000 # TODO
         e.TotalCredit = 1000 # TODO
-        e.Journal = saft.JournalType()
-        for journal in self.company.env['account.journal'].browse():
-            e.Journal.append(self.Journal(journal))
+        # e.Journal = saft.JournalType()
+        # for journal in self.company.env['account.journal'].browse():
+        #     e.Journal.append(self.Journal(journal))
         return e
 
     def Journal(self, journal):
