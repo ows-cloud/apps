@@ -1117,7 +1117,7 @@ class AuditFile(GeneratedsSuper):
             return True
         else:
             return False
-    def export(self, outfile, level, namespaceprefix_='', namespacedef_=' xmlns:None="urn:StandardAuditFile-Taxation-Financial:NO" ', name_='AuditFile', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_=' xmlns:None="urn:StandardAuditFile-Taxation-Financial:NO" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:StandardAuditFile-Taxation-Financial:NO Norwegian_SAF-T_Financial_Schema_v_1.10.xsd" ', name_='AuditFile', pretty_print=True):
         imported_ns_def_ = GenerateDSNamespaceDefs_.get('AuditFile')
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_

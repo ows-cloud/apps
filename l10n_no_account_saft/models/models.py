@@ -17,6 +17,17 @@ from . import saft_1_10 as saft
 def decimal_string(myfloat):
     return "{:.2f}".format(myfloat)
 
+def set_balance(obj, opening_balance, closing_balance):
+    if opening_balance >= 0:
+        obj.OpeningDebitBalance = decimal_string(opening_balance)
+    else:
+        obj.OpeningCreditBalance = decimal_string(-opening_balance)
+    if closing_balance >= 0:
+        obj.ClosingDebitBalance = decimal_string(closing_balance)
+    else:
+        obj.ClosingCreditBalance = decimal_string(-closing_balance)
+    return obj
+
 
 class Company(models.Model):
     _inherit = 'res.company'
@@ -113,6 +124,8 @@ class AuditFile:
         self.date_to = saft_record.date_to
 
     def AuditFile(self):
+        # saft_1_10.py#L1120 AuditFile
+        # def export(self, outfile, level, namespaceprefix_='', namespacedef_=' xmlns:None="urn:StandardAuditFile-Taxation-Financial:NO" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:StandardAuditFile-Taxation-Financial:NO Norwegian_SAF-T_Financial_Schema_v_1.10.xsd" ', name_='AuditFile', pretty_print=True):
         audit_file = saft.AuditFile()
         audit_file.Header = self.Header()
         audit_file.MasterFiles = self.MasterFiles()
@@ -139,6 +152,10 @@ class AuditFile:
         return h
 
     def Company(self):
+        p = saft.CompanyStructure()
+        return self.Partner(p, self.company.partner_id)
+
+    def Company_old(self):
         c = saft.CompanyStructure()
         c.RegistrationNumber = self.company.vat[2:]
         c.Name = self.company.name
@@ -180,8 +197,10 @@ class AuditFile:
 
     def MasterFiles(self):
         mf = saft.MasterFilesType()
-
         line_obj = self.company.env['account.move.line']
+
+        # accounts
+
         opening_balance_records = line_obj.read_group(
             domain=[('date', '<', self.date_from)],
             fields=['account_id', 'balance'],
@@ -199,13 +218,47 @@ class AuditFile:
         for account in self.company.env['account.account'].search([]):
             mf.GeneralLedgerAccounts.add_Account(self.Account(account, opening_balance.get(account.id, 0), closing_balance.get(account.id, 0)))
 
+        # customers
+
+        receivable_accounts = self.company.env['account.account'].filtered(lambda r: r.user_type_id.type == 'receivable')
+        opening_balance_records = line_obj.read_group(
+            domain=[('date', '<', self.date_from), ('account_id', 'in', [r.id for r in receivable_accounts])],
+            fields=['partner_id', 'balance'],
+            groupby=['partner_id'],
+        )
+        opening_balance = {r['partner_id'][0]: r['balance'] for r in opening_balance_records}
+        closing_balance_records = line_obj.read_group(
+            domain=[('date', '<=', self.date_to), ('account_id', 'in', [r.id for r in receivable_accounts])],
+            fields=['partner_id', 'balance'],
+            groupby=['partner_id'],
+        )
+        closing_balance = {r['partner_id'][0]: r['balance'] for r in closing_balance_records}
+
         mf.Customers = saft.CustomersType()
         for customer in self.company.env['res.partner'].search([('customer', '=', True)]):
-            mf.Customers.add_Customer(self.Customer(customer))
+            mf.Customers.add_Customer(self.Customer(customer, opening_balance.get(customer.id, 0), closing_balance.get(customer.id, 0)))
+
+        # suppliers
+
+        payable_accounts = self.company.env['account.account'].filtered(lambda r: r.user_type_id.type == 'payable')
+        opening_balance_records = line_obj.read_group(
+            domain=[('date', '<', self.date_from), ('account_id', 'in', [r.id for r in payable_accounts])],
+            fields=['partner_id', 'balance'],
+            groupby=['partner_id'],
+        )
+        opening_balance = {r['partner_id'][0]: r['balance'] for r in opening_balance_records}
+        closing_balance_records = line_obj.read_group(
+            domain=[('date', '<=', self.date_to), ('account_id', 'in', [r.id for r in payable_accounts])],
+            fields=['partner_id', 'balance'],
+            groupby=['partner_id'],
+        )
+        closing_balance = {r['partner_id'][0]: r['balance'] for r in closing_balance_records}
 
         mf.Suppliers = saft.SuppliersType()
         for supplier in self.company.env['res.partner'].browse().search([('supplier', '=', True)]):
-            mf.Suppliers.add_Supplier(self.Supplier(supplier))
+            mf.Suppliers.add_Supplier(self.Supplier(supplier, opening_balance.get(supplier.id, 0), closing_balance.get(supplier.id, 0)))
+
+        # other
 
         mf.TaxTable = saft.TaxTableType()
         for tax in self.company.env['account.tax'].search([]):
@@ -227,36 +280,32 @@ class AuditFile:
         a.AccountDescription = account.name
         a.AccountType = "GL"
         a.AccountCreationDate = account.create_date
-        if opening_balance >= 0:
-            a.OpeningDebitBalance = decimal_string(opening_balance)
-        else:
-            a.OpeningCreditBalance = decimal_string(-opening_balance)
-        if closing_balance >= 0:
-            a.ClosingDebitBalance = decimal_string(closing_balance)
-        else:
-            a.ClosingCreditBalance = decimal_string(-closing_balance)
+        set_balance(a, opening_balance, closing_balance)
         return a
 
-    def Customer(self, customer):
-        return self.Partner(customer, 'customer')
+    def Customer(self, partner, opening_balance, closing_balance):
+        p = saft.CustomerType()
+        p.CustomerID = partner.id
+        p.AccountID = partner.property_account_receivable_id.id
+        set_balance(p, opening_balance, closing_balance)
+        return self.Partner(p, partner)
 
-    def Supplier(self, supplier):
-        return self.Partner(supplier, 'supplier')
+    def Supplier(self, partner, opening_balance, closing_balance):
+        p = saft.SupplierType()
+        p.SupplierID = partner.id
+        p.AccountID = partner.property_account_payable_id.id
+        set_balance(p, opening_balance, closing_balance)
+        return self.Partner(p, partner)
 
-    def Partner(self, partner, partner_type):
-        if partner_type == 'customer':
-            p = saft.CustomerType()
-            p.CustomerID = partner.id
-        elif partner_type == 'supplier':
-            p = saft.SupplierType()
-            p.SupplierID = partner.id
-        
-        p.RegistrationNumber = partner.vat
+    def Partner(self, p, partner):
+        p.RegistrationNumber = partner.vat and partner.vat[2:] or ''
         p.Name = partner.name
         p.add_Address(self.Address(partner))
         p.add_Contact(self.Contact(partner))
-        #p.TaxRegistration = partner.vat # [2:] # TODO 'MVA'
-        #p.BankAccount
+        if partner.vat: # then we assume that the partner is VAT registered
+            p.add_TaxRegistration(self.TaxRegistration(partner))
+        # p.add_BankAccount(self.BankAccount(partner))
+        # p.PartyInfo
         return p
 
     def Address(self, partner):
@@ -285,10 +334,9 @@ class AuditFile:
 
     def TaxRegistration(self, partner):
         t = saft.TaxIDStructure()
-        # mvanr = self.company.field_value_hr_ids.filtered(lambda r: r.field_code == 'l10n_no_virksomhet').value
-        t.TaxRegistrationNumber = partner.vat 
-        # c.TaxRegistration.TaxAuthority = "Skatteetaten"
-        # c.TaxRegistration.TaxVerificationDate = self.company.write_date
+        t.TaxRegistrationNumber = partner.vat[2:] + 'MVA'
+        t.TaxAuthority = "Skatteetaten"
+        # t.TaxVerificationDate # The date that the tax registration details referred to above were last checked or when the tax registration was completed in the VAT register (Merverdiavgiftsregisteret).
         return t
 
     def BankAccount(self, partner):
