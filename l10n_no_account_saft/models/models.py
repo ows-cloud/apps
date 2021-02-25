@@ -10,7 +10,6 @@ import sys
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
-# from . import saft_no_validation as saft
 from . import saft_1_10 as saft
 
 
@@ -32,7 +31,44 @@ def set_balance(obj, opening_balance, closing_balance):
 class Company(models.Model):
     _inherit = 'res.company'
 
-    partner_saft_id = fields.Many2one('res.partner', 'SAF-T Contact Person')
+    l10n_no_partner_saft_id = fields.Many2one('res.partner', 'SAF-T Contact Person')
+
+
+class Tax(models.Model):
+    _inherit = 'account.tax'
+
+    l10n_no_standard_tax_code = fields.Selection([
+        (0, '0 No VAT treatment'),
+        (1, '1 Input VAT deductible (domestic) - Regular rate'),
+        (3, '3 Output VAT - Regular rate'),
+        (5, '5 No output VAT - Zero rate'),
+        (6, '6 Not liable to VAT treatment, turnover outside the scope of the VAT legislation'),
+        (7, '7 No VAT treatment - no turnover according to the VAT legislation'),
+        (11, '11 Input VAT deductible (domestic) - Reduced rate, middle'),
+        (12, '12 Input VAT deductible (domestic) - Reduced rate, raw fish'),
+        (13, '13 Input VAT deductible (domestic) - Reduced rate, low'),
+        (14, '14 Input VAT deductible (payed on import) - Regular rate'),
+        (15, '15 Input VAT deductible (payed on import) - Reduced rate, middle'),
+        (20, '20 No VAT treatment'),
+        (21, '21 Basis on import of goods - Regular rate'),
+        (22, '22 Basis on import of goods - Reduced rate, middle'),
+        (31, '31 Output VAT - Reduced rate, middle'),
+        (32, '32 Output VAT - Reduced rate, raw fish'),
+        (33, '33 Output VAT - Reduced rate, low'),
+        (51, '51 Domestic sales of reverce charge /VAT obligation - Zero rate'),
+        (52, '52 Export of goods and services - Zero rate'),
+        (81, '81 Importation of goods, VAT deductible - Regular rate'),
+        (82, '82 Importation of goods, without deduction of VAT - Regular rate'),
+        (83, '83 Importation of goods, VAT deductible - Reduced rate, middle'),
+        (84, '84 Importation of goods, without deduction of VAT - Reduced rate, middle'),
+        (85, '85 Importation of goods, not applicable for VAT - Zero rate'),
+        (86, '86 Services purchased from abroad, VAT deductible - Regular rate'),
+        (87, '87 Services purchased from abroad, without deduction of VAT - Regular rate'),
+        (88, '88 Services purchased from abroad, VAT deductible - Reduced rate, low'),
+        (89, '89 Services purchased from abroad, without deduction of VAT - Reduced rate, low'),
+        (91, '91 Purchase of emissions trading or gold, VAT deductible - Regular rate'),
+        (92, '92 Purchase of emissions trading or gold, without deduction of VAT - Regular rate'),
+    ], 'Standard Tax Code')
 
 
 # TODO The wizard should download the SAF-T XML file directly. Then this class may be deleted.
@@ -100,21 +136,7 @@ class SaftWizard(models.TransientModel):
         audit_file.export(xml_io, level=0)
         return xml_io.getvalue()
 
-    def _create_xml_pyxb(self, audit_file):
-        myxml = audit_file.toxml('utf-8')
-        return myxml
-    # def melding_xml(self):
-    #     m = self.melding()
-    #     myxml = m.toxml('utf-8')
-    #     myetree = etree.fromstring(myxml)
-        
-    #     no_of_times = 5 # Do a few times to remove nested empty nodes
-    #     for i in range(0, no_of_times):
-    #         for element in myetree.xpath('//*[not(node())]'):
-    #             element.getparent().remove(element)
-        
-    #     mypretty = etree.tostring(myetree, pretty_print=True)
-    #     return mypretty
+
 
 class AuditFile:
 
@@ -134,7 +156,7 @@ class AuditFile:
 
     def Header(self):
         h = saft.HeaderStructure()
-        h.AuditFileVersion = '1.0'
+        h.AuditFileVersion = '1.10'
         h.AuditFileCountry = 'NO'
         h.AuditFileDateCreated = datetime.now() 
         h.SoftwareCompanyName = 'Norske Apps2GROW AS'
@@ -143,57 +165,17 @@ class AuditFile:
         h.Company = self.Company()
         h.DefaultCurrencyCode = 'NOK'
         h.SelectionCriteria = saft.SelectionCriteriaStructure()
-        h.SelectionCriteria.PeriodStart = 1
-        h.SelectionCriteria.PeriodStartYear = 2020
-        h.SelectionCriteria.PeriodEnd = 12
-        h.SelectionCriteria.PeriodEndYear = 2020
-        h.HeaderComment = 'No comment'
-        h.TaxAccountingBasis = 'A' # TODO not working
+        h.SelectionCriteria.PeriodStart = self.date_from.month
+        h.SelectionCriteria.PeriodStartYear = self.date_from.year
+        h.SelectionCriteria.PeriodEnd = self.date_to.month
+        h.SelectionCriteria.PeriodEndYear = self.date_to.year
+        h.HeaderComment = ''
+        h.TaxAccountingBasis = 'A'
         return h
 
     def Company(self):
         p = saft.CompanyStructure()
         return self.Partner(p, self.company.partner_id)
-
-    def Company_old(self):
-        c = saft.CompanyStructure()
-        c.RegistrationNumber = self.company.vat[2:]
-        c.Name = self.company.name
-        partner = self.company.partner_id
-        #c.Address = self.Address(partner)
-        #c.Contact = self.Contact(self.company.partner_id)
-        #c.TaxRegistration = self.TaxRegistration(self.company.partner_id)
-        #c.BankAccount = self.BankAccount(self.company.partner_id)
-        # c.Address = saft.AddressStructure()
-        # c.Address.StreetName = self.company.street
-        # c.Address.AdditionalAddressDetail = self.company.street2
-        # c.Address.City = self.company.city
-        # c.Address.PostalCode = self.company.zip
-        # c.Address.Region = self.company.state_id.name or ''
-        # c.Address.Country = self.company.country_id.code or ''
-        # c.Address.AddressType = 'PostalAddress'
-
-        # c.Contact = saft.ContactHeaderStructure()
-        # c.Contact.ContactPerson = saft.ContactInformationStructure()
-        # c.Contact.ContactPerson.FirstName = self.company.user_tech_id.name.partition(' ')[0]
-        # c.Contact.ContactPerson.LastName = self.company.user_tech_id.name.partition(' ')[-1]
-        # # otherwise try this https://www.codespeedy.com/get-the-last-word-from-a-string-in-python/
-        # c.Contact.Telephone = self.company.user_tech_id.phone
-        # c.Contact.Email = self.company.user_tech_id.email
-        # c.Contact.Website = self.company.user_tech_id.website
-        # c.Contact.MobilePhone = self.company.user_tech_id.mobile
-        
-        # TODO should not depend on l10n_no_hr_payroll
-        # c.TaxRegistration = saft.TaxInformationStructure()
-        # # mvanr = self.company.field_value_hr_ids.filtered(lambda r: r.field_code == 'l10n_no_virksomhet').value
-        # mvanr = self.company.vat # TODO probably not correct
-        # c.TaxRegistration.TaxRegistrationNumber = mvanr + 'MVA' 
-        # c.TaxRegistration.TaxAuthority = "Skatteetaten"
-        # c.TaxRegistration.TaxVerificationDate = self.company.write_date
-
-        # TODO BankAccount
-
-        return c
 
     def MasterFiles(self):
         mf = saft.MasterFilesType()
@@ -261,7 +243,7 @@ class AuditFile:
         # other
 
         mf.TaxTable = saft.TaxTableType()
-        for tax in self.company.env['account.tax'].search([]):
+        for tax in self.company.env['account.tax'].search([('type_tax_use', 'in', ['sale', 'purchase'])]):
             mf.TaxTable.add_TaxTableEntry(self.TaxTableEntry(tax))
 
         mf.AnalysisTypeTable = saft.AnalysisTypeTableType()
@@ -286,14 +268,14 @@ class AuditFile:
     def Customer(self, partner, opening_balance, closing_balance):
         p = saft.CustomerType()
         p.CustomerID = partner.id
-        p.AccountID = partner.property_account_receivable_id.id
+        p.AccountID = partner.property_account_receivable_id.code
         set_balance(p, opening_balance, closing_balance)
         return self.Partner(p, partner)
 
     def Supplier(self, partner, opening_balance, closing_balance):
         p = saft.SupplierType()
         p.SupplierID = partner.id
-        p.AccountID = partner.property_account_payable_id.id
+        p.AccountID = partner.property_account_payable_id.code
         set_balance(p, opening_balance, closing_balance)
         return self.Partner(p, partner)
 
@@ -322,14 +304,14 @@ class AuditFile:
 
     def Contact(self, partner):
         c = saft.ContactInformationStructure()
-        c.ContactPerson = saft.PersonNameStructure()
-        c.ContactPerson.FirstName = self.company.partner_saft_id.name.partition(' ')[0]
-        c.ContactPerson.LastName = self.company.partner_saft_id.name.partition(' ')[-1]
-        # # otherwise try this https://www.codespeedy.com/get-the-last-word-from-a-string-in-python/
-        c.Telephone = self.company.partner_saft_id.phone
-        c.Email = self.company.partner_saft_id.email
-        c.Website = self.company.partner_saft_id.website
-        c.MobilePhone = self.company.partner_saft_id.mobile or ''
+        if len(partner.name.partition(' ')) >= 2:
+            c.ContactPerson = saft.PersonNameStructure()
+            c.ContactPerson.FirstName = partner.name.partition(' ')[0]
+            c.ContactPerson.LastName = partner.name.partition(' ')[-1]
+        c.Telephone = partner.phone
+        c.Email = partner.email
+        c.Website = partner.website
+        c.MobilePhone = partner.mobile or ''
         return c
 
     def TaxRegistration(self, partner):
@@ -369,12 +351,15 @@ class AuditFile:
         t = saft.TaxTableEntryType()
         t.TaxType = 'MVA'
         t.Description = 'Merverdiavgift'
-        t.add_TaxCodeDetails(saft.TaxCodeDetailsType(
-            TaxPercentage = tax.amount,
-            Country = 'NO',
-            StandardTaxCode = 1, # TODO mandatory
-            BaseRate = [100],
-        ))
+        tax_details = tax.children_tax_ids or [tax]
+        for tax_detail in tax_details:
+            t.add_TaxCodeDetails(saft.TaxCodeDetailsType(
+                Description = tax_detail.name,
+                TaxPercentage = tax_detail.amount,
+                Country = 'NO',
+                StandardTaxCode = tax_detail.l10n_no_standard_tax_code,
+                BaseRate = [100], # TODO
+            ))
         return t
 
     def AnalysisTypeTableEntry(self, analytic):

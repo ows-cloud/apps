@@ -11,7 +11,38 @@
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='sequence']" position="after">
-                    <field name="partner_saft_id"/>
+                    <field name="l10n_no_partner_saft_id"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- account.tax -->
+
+        <record model="ir.ui.view" id="view_tax_form">
+            <field name="name">account.tax saft</field>
+            <field name="model">account.tax</field>
+            <field name="inherit_id" ref="account.view_tax_form"/>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//field[@name='tax_group_id']" position="after">
+                        <field name="l10n_no_standard_tax_code"/>
+                    </xpath>
+                    <xpath expr="//field[@name='children_tax_ids']/tree" position="inside">
+                        <field name="l10n_no_standard_tax_code"/>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_tax_tree">
+            <field name="name">account.tax saft</field>
+            <field name="model">account.tax</field>
+            <field name="inherit_id" ref="account.view_tax_tree"/>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='active']" position="after">
+                    <field name="l10n_no_standard_tax_code"/>
                 </xpath>
             </field>
         </record>
