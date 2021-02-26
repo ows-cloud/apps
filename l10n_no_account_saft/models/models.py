@@ -304,10 +304,10 @@ class AuditFile:
 
     def Contact(self, partner):
         c = saft.ContactInformationStructure()
-        if len(partner.name.partition(' ')) >= 2:
+        if len(partner.name.split(' ')) >= 2:
             c.ContactPerson = saft.PersonNameStructure()
-            c.ContactPerson.FirstName = partner.name.partition(' ')[0]
-            c.ContactPerson.LastName = partner.name.partition(' ')[-1]
+            c.ContactPerson.FirstName = partner.name.split(' ')[0]
+            c.ContactPerson.LastName = partner.name.split(' ')[-1]
         c.Telephone = partner.phone
         c.Email = partner.email
         c.Website = partner.website
@@ -418,7 +418,9 @@ class AuditFile:
             l.add_Analysis(saft.AnalysisStructure(AnalysisType='A', AnalysisID=line.analytic_account_id.id))
         l.ValueDate = line.move_id.date
         # l.SourceDocumentID
-        l.Description = line.name
+        l.Description = line.name or ''
+        if line.partner_id:
+            l.Description = "{} (partner: {})".format(l.Description, line.partner_id.name).strip()
         l.DebitAmount = saft.AmountStructure(Amount=line.debit)
         l.CreditAmount = saft.AmountStructure(Amount=line.credit)
         for tax in line.tax_ids:

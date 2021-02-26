@@ -74,7 +74,6 @@
                             <field name="company_id"/>
                             <field name="saft_filename" invisible="1"/>
                             <field name="saft_binary" filename="saft_filename"/>
-                            <field name="saft_xml" widget="ace" options="{'mode': 'xml'}"/>
                         </group>
                     </group>
                 </form>
