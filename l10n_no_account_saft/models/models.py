@@ -155,7 +155,7 @@ class AuditFile:
         return audit_file
 
     def Header(self):
-        h = saft.HeaderStructure()
+        h = saft.HeaderType()
         h.AuditFileVersion = '1.10'
         h.AuditFileCountry = 'NO'
         h.AuditFileDateCreated = datetime.now() 
@@ -250,7 +250,7 @@ class AuditFile:
         for analytic in self.company.env['account.analytic.account'].search([]):
             mf.AnalysisTypeTable.add_AnalysisTypeTableEntry(self.AnalysisTypeTableEntry(analytic))
 
-        mf.Owners = saft.OwnersType()
+        # mf.Owners = saft.OwnersType()
         # for owner in self.company.env[''].browse():
         #     mf.Owners.append(self.Owner(owner))
 
@@ -360,6 +360,7 @@ class AuditFile:
         tax_details = tax.children_tax_ids or [tax]
         for tax_detail in tax_details:
             t.add_TaxCodeDetails(saft.TaxCodeDetailsType(
+                TaxCode = tax_detail.id,
                 Description = tax_detail.name,
                 TaxPercentage = tax_detail.amount,
                 Country = 'NO',
@@ -427,8 +428,10 @@ class AuditFile:
         l.Description = line.name or ''
         if line.partner_id:
             l.Description = "{} (partner: {})".format(l.Description, line.partner_id.name).strip()
-        l.DebitAmount = saft.AmountStructure(Amount=line.debit)
-        l.CreditAmount = saft.AmountStructure(Amount=line.credit)
+        if line.debit:
+            l.DebitAmount = saft.AmountStructure(Amount=line.debit)
+        elif line.credit:
+            l.CreditAmount = saft.AmountStructure(Amount=line.credit)
         for tax in line.tax_ids:
             l.add_TaxInformation(self.TaxInformation(line, tax))
         # l.ReferenceNumber
