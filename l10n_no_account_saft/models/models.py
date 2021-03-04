@@ -147,7 +147,7 @@ class AuditFile:
 
     def AuditFile(self):
         # saft_1_10.py#L1120 AuditFile
-        # def export(self, outfile, level, namespaceprefix_='', namespacedef_=' xmlns:None="urn:StandardAuditFile-Taxation-Financial:NO" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:StandardAuditFile-Taxation-Financial:NO Norwegian_SAF-T_Financial_Schema_v_1.10.xsd" ', name_='AuditFile', pretty_print=True):
+        # def export(self, outfile, level, namespaceprefix_='', namespacedef_=' xmlns="urn:StandardAuditFile-Taxation-Financial:NO" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:StandardAuditFile-Taxation-Financial:NO Norwegian_SAF-T_Financial_Schema_v_1.10.xsd" ', name_='AuditFile', pretty_print=True):
         audit_file = saft.AuditFile()
         audit_file.Header = self.Header()
         audit_file.MasterFiles = self.MasterFiles()
@@ -217,7 +217,7 @@ class AuditFile:
         closing_balance = {r['partner_id'][0]: r['balance'] for r in closing_balance_records}
 
         mf.Customers = saft.CustomersType()
-        for customer in self.company.env['res.partner'].search([('customer', '=', True)]):
+        for customer in self.company.env['res.partner'].search([('customer', '=', True), ('parent_id', '=', False)]):
             mf.Customers.add_Customer(self.Customer(customer, opening_balance.get(customer.id, 0), closing_balance.get(customer.id, 0)))
 
         # suppliers
@@ -237,7 +237,7 @@ class AuditFile:
         closing_balance = {r['partner_id'][0]: r['balance'] for r in closing_balance_records}
 
         mf.Suppliers = saft.SuppliersType()
-        for supplier in self.company.env['res.partner'].browse().search([('supplier', '=', True)]):
+        for supplier in self.company.env['res.partner'].browse().search([('supplier', '=', True), ('parent_id', '=', False)]):
             mf.Suppliers.add_Supplier(self.Supplier(supplier, opening_balance.get(supplier.id, 0), closing_balance.get(supplier.id, 0)))
 
         # other
@@ -284,6 +284,11 @@ class AuditFile:
         p.Name = partner.name
         p.add_Address(self.Address(partner))
         p.add_Contact(self.Contact(partner))
+        for child in partner.child_ids:
+            if child.type == 'contact':
+                p.add_Contact(self.Contact(child))
+            else:
+                p.add_Address(self.Address(child))
         if partner.vat: # then we assume that the partner is VAT registered
             p.add_TaxRegistration(self.TaxRegistration(partner))
         # p.add_BankAccount(self.BankAccount(partner))
@@ -304,14 +309,15 @@ class AuditFile:
 
     def Contact(self, partner):
         c = saft.ContactInformationStructure()
+        c.ContactPerson = saft.PersonNameStructure()
+        c.ContactPerson.FirstName = partner.name.split(' ')[0]
+        c.ContactPerson.LastName = partner.name.split(' ')[0]
         if len(partner.name.split(' ')) >= 2:
-            c.ContactPerson = saft.PersonNameStructure()
-            c.ContactPerson.FirstName = partner.name.split(' ')[0]
             c.ContactPerson.LastName = partner.name.split(' ')[-1]
         c.Telephone = partner.phone
         c.Email = partner.email
         c.Website = partner.website
-        c.MobilePhone = partner.mobile or ''
+        c.MobilePhone = partner.mobile
         return c
 
     def TaxRegistration(self, partner):
