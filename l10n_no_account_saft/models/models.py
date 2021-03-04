@@ -433,7 +433,7 @@ class AuditFile:
             l.Description = "{} (partner: {})".format(l.Description, line.partner_id.name).strip()
         if line.debit:
             l.DebitAmount = saft.AmountStructure(Amount=line.debit)
-        elif line.credit:
+        else: # required with debit or credit
             l.CreditAmount = saft.AmountStructure(Amount=line.credit)
         for tax in line.tax_ids:
             l.add_TaxInformation(self.TaxInformation(line, tax))
