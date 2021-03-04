@@ -281,9 +281,8 @@ class AuditFile:
 
     def Partner(self, p, partner):
         p.RegistrationNumber = partner.vat and partner.vat[2:] or ''
-        p.Name = partner.name
-        if partner.zip and partner.city:
-            p.add_Address(self.Address(partner))
+        p.Name = partner.name # required
+        p.add_Address(self.Address(partner)) # required
         p.add_Contact(self.Contact(partner))
         for child in partner.child_ids:
             if child.type == 'contact':
@@ -302,8 +301,8 @@ class AuditFile:
             a.StreetName = partner.street
         if partner.street2:
             a.AdditionalAddressDetail = partner.street2
-        a.City = partner.city
-        a.PostalCode = partner.zip
+        a.City = partner.city or 'unknown' # required
+        a.PostalCode = partner.zip or 'unknown' # required
         if partner.state_id.name:
             a.Region = partner.state_id.name
         if partner.country_id.code:
