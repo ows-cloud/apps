@@ -297,13 +297,18 @@ class AuditFile:
 
     def Address(self, partner):
         a = saft.AddressStructure()
-        a.StreetName = partner.street
+        if partner.street:
+            a.StreetName = partner.street
         if partner.street2:
             a.AdditionalAddressDetail = partner.street2
-        a.City = partner.city
-        a.PostalCode = partner.zip
-        a.Region = partner.state_id.name or ''
-        a.Country = partner.country_id.code or ''
+        if partner.city:
+            a.City = partner.city
+        if partner.zip:
+            a.PostalCode = partner.zip
+        if partner.state_id.name:
+            a.Region = partner.state_id.name
+        if partner.country_id.code:
+            a.Country = partner.country_id.code
         a.AddressType = 'PostalAddress'
         return a
 
