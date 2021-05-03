@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- res.company -->
+
+        <record model="ir.ui.view" id="view_survey_form_event_settings">
+            <field name="name">Company SMS handling</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base_technical_user.res_company_view_form_inherit_base_technical_user"/>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_tech_id']" position="after">
+                    <field name="ref"/>
+                    <field name="sms_server_action_id"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
