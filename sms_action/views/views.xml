@@ -12,7 +12,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='user_tech_id']" position="after">
                     <field name="ref"/>
-                    <field name="sms_server_action_id"/>
+                    <field name="sms_receive_action_id"/>
                 </xpath>
             </field>
         </record>

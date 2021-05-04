@@ -2,18 +2,17 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': "Receive SMS",
+    'name': "SMS event signup",
     'summary': 'Action triggered by incoming SMS',
 
     'author': 'AppsToGROW',
     'category': 'Administration',
     'data': [
-        'security/ir.model.access.csv', # TODO restrict access
-        'views/views.xml',
+        'data/data.xml',
     ],
     'depends': [
-        'base_technical_user',
-        'sms',
+        'event', # event_sale?
+        'sms_action',
     ],
     'license': 'AGPL-3',
     'version': '12.0.1.0.0',

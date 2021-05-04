@@ -10,8 +10,8 @@ _logger = logging.getLogger(__name__)
 
 class SMSController(http.Controller):
 
-    @http.route(['/incoming_sms/<string:sms>'], type='http', auth="public", website=True)
-    def process_sms(self, sms, **kwargs):
+    @http.route(['/incoming_sms/<string:sender>/<string:message>'], type='http', auth="public", website=True)
+    def process_sms(self, sender, message, **kwargs):
 
         #_logger.warning(sms)
         #_logger.warning(kwargs['arg'])
@@ -20,18 +20,20 @@ class SMSController(http.Controller):
         SMS = request.env['sms.receive_sms']
         ServerAction = request.env['ir.actions.server']
 
-        company_ref, message = sms.split(maxsplit=1)
+        company_ref = message.split(' ', maxsplit=1)[0]
         company = Company.search([('ref', '=', company_ref)])
+        if not company:
+            return http.Response("Company doesn't exist", status=200) #####
         sms_dict = {
             'company_id': company.id,
             'message': message,
+            'sender': sender,
         }
         sms_record = SMS.sudo().create(sms_dict)
-        _logger.warning(sms_record)
-        if not company:
-            return http.Response("Company doesn't exist", status=200)
+        #_logger.warning(sms_record)
 
-        company.sms_server_action_id.sudo(company.user_tech_id.id
+        # TODO: user_tech_id is needed now to stay secure. Change later.
+        company.sms_receive_action_id.sudo(company.user_tech_id.id
             ).with_context({
                 'active_model': SMS._name, # SMS.sudo().model ?
                 'active_id': sms_record.id,
