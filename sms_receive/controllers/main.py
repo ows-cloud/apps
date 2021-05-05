@@ -10,12 +10,9 @@ _logger = logging.getLogger(__name__)
 
 class SMSController(http.Controller):
 
-    @http.route(['/incoming_sms/<string:sender>/<string:message>'], type='http', auth="public", website=True)
-    def process_sms(self, sender, message, **kwargs):
+    @http.route(['/receive_sms/<string:sender>/<string:message>'], type='http', auth="public", website=True)
+    def receive_sms(self, sender, message, **kwargs):
 
-        #_logger.warning(sms)
-        #_logger.warning(kwargs['arg'])
-        # %0A newline; %20 space
         Company = request.env['res.company']
         SMS = request.env['sms.receive_sms']
         ServerAction = request.env['ir.actions.server']
