@@ -9,6 +9,7 @@
     'category': 'Hidden/Dependency',
     'depends': [
         'mass_mailing',
+        'web_widget_x2many_2d_matrix',
     ],
     'data': [
         'data/data.xml',
