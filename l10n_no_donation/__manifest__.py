@@ -12,10 +12,12 @@
     'data': [
         'security/ir.rule.csv',
         'security/ir.model.access.csv',
+        'data/data.xml',
         'views/views.xml',
     ],
     'depends': [
-        'partner',
+        'donation',               # OCA/donation
+        'partner_identification', # OCA/partner-contact
     ],
     'license': 'AGPL-3',
     'website': 'http://www.appstogrow.co',
