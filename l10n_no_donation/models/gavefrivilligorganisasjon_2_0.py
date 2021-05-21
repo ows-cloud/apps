@@ -1133,7 +1133,7 @@ class Melding(GeneratedsSuper):
         else:
             return False
 
-    def export(self, outfile, level, namespaceprefix_='', namespacedef_=' xmlns:None="urn:ske:fastsetting:innsamling:gavefrivilligorganisasjon:v2" ', name_='Melding', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns="urn:ske:fastsetting:innsamling:gavefrivilligorganisasjon:v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ske:fastsetting:innsamling:gavefrivilligorganisasjon:v2 gavefrivilligorganisasjon_v2_0.xsd"', name_='melding', pretty_print=True):
         imported_ns_def_ = GenerateDSNamespaceDefs_.get('Melding')
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_

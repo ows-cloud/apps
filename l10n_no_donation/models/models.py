@@ -10,14 +10,12 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from . import gavefrivilligorganisasjon_2_0 as gave
 
-# mål: lage XML
-# importer partner med navn, fødselsnr, gavebeløp 2020
-# name, function, id_numbers.category_id id_numbers.name
 
 class Company(models.Model):
     _inherit = 'res.company'
 
     l10n_no_partner_donation_id = fields.Many2one('res.partner', 'Donation Contact Person')
+
 
 # TODO The wizard should download the donation XML file directly. Then this class may be deleted.
 class Donation(models.Model):
@@ -84,15 +82,15 @@ class DonationFile:
 
     def __init__(self, donation_record):
         self.company = donation_record.company_id
-        self.year = donation_record.year
+        self.year = int(donation_record.year)
         self.date_from = donation_record.date_from
         self.date_to = donation_record.date_to
 
     def DonationFile(self):
-        # saft_1_10.py#L1120 AuditFile
-        # def export(self, outfile, level, namespaceprefix_='', namespacedef_=' xmlns="urn:StandardAuditFile-Taxation-Financial:NO" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:StandardAuditFile-Taxation-Financial:NO Norwegian_SAF-T_Financial_Schema_v_1.10.xsd" ', name_='AuditFile', pretty_print=True):
+        # gavefrivilligorganisasjon_2_0.py#L1136 Melding
+        # def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns="urn:ske:fastsetting:innsamling:gavefrivilligorganisasjon:v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ske:fastsetting:innsamling:gavefrivilligorganisasjon:v2 gavefrivilligorganisasjon_v2_0.xsd"', name_='melding', pretty_print=True):
         donation_file = gave.Melding()
-        donation_file.Leveranse = self.Leveranse()
+        donation_file.add_leveranse(self.Leveranse())
         return donation_file
 
     def Leveranse(self):
@@ -105,9 +103,16 @@ class DonationFile:
         # TODO: select 'ordinaer' or 'ingenoppgaver'
         l.leveransetype = 'ordinaer'
         #for partner in self.company.env['res.partner'].search([('customer', '=', True)]):
-        for partner in self.company.env['res.partner'].search([('id', '=', 50)]):
+        count = 0
+        total = 0
+        # TODO: filter partners
+        for partner in self.company.env['res.partner'].search([('function', 'like', '%')]):
             l.add_oppgave(self.Oppgave(partner))
-
+            count += 1
+            total += int(partner.function)
+        l.oppgaveoppsummering = gave.Oppgaveoppsummering()
+        l.oppgaveoppsummering.antallOppgaver = count
+        l.oppgaveoppsummering.sumBeloep = total
         return l
 
     def Oppgavegiver(self):
@@ -119,7 +124,8 @@ class DonationFile:
 
     def Kontaktinformasjon(self):
         k = gave.Kontaktinformasjon()
-        partner = self.company.partner_id
+        # TODO: error handling if partner is missing
+        partner = self.company.l10n_no_partner_donation_id
         k.navn = partner.name
         k.telefonnummer = partner.phone
         k.varselEpostadresse = partner.email
@@ -138,3 +144,4 @@ class DonationFile:
         # TODO: error handling
         oe.foedselsnummer = partner.id_numbers.filtered(lambda r: r.category_id.code == 'l10n_no_personid').name
         oe.navn = partner.name
+        return oe
