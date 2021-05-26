@@ -120,7 +120,7 @@ class EventSurveyController(http.Controller):
         attendees = self._get_attendees(event, **post)
         for count, attendee in enumerate(attendees, start=1):
             i = str(count) + '-'
-            post.update({i+k: v for k, v in attendee.iteritems()})
+            post.update({i+k: v for k, v in attendee.items()})
 
         # Take the user to the next step (confirmation or payment)
         controller = WebsiteEventSaleController2()
@@ -202,25 +202,16 @@ class WebsiteEventSaleController2(WebsiteEventSaleController):
                 'event': event,
             })
 
+        # NEW ############################################################
+
+        if order.partner_id.id == request.website.partner_id.id:
+            partner = event.registration_partner_id
+            if partner and partner.country_id:
+
+                # set partner, skip address
+                order.write({'partner_id': partner.id, 'partner_invoice_id': partner.id, 'partner_shipping_id': partner.id})
+                return request.redirect('/shop/checkout?express=1')
+
+        # END ############################################################
+
         return request.redirect("/shop/checkout")
-
-
-class WebsiteSaleController2(WebsiteSaleController):
-
-    @http.route()
-    def address(self, **kw):
-        # If event registration with public user, and the event has registration_partner_id with country:
-        sale_order_id = request.session.get('sale_order_id')
-        if sale_order_id:
-            registration = request.env['event.registration'].sudo().search([('sale_order_id','=',sale_order_id)], limit=1)
-            if registration:
-                sale_order = request.env['sale.order'].sudo().search([('id','=',sale_order_id)])
-                if sale_order and sale_order.partner_id.id == request.website.partner_id.id:
-                    partner = registration.event_id.registration_partner_id
-                    if partner and partner.country_id:
-
-                        # set partner, skip address
-                        sale_order.write({'partner_id': partner.id, 'partner_invoice_id': partner.id, 'partner_shipping_id': partner.id})
-                        return request.redirect('/shop/confirm_order')
-
-        return super(WebsiteSaleController2, self).address(**kw)
