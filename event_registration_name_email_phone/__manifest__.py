@@ -8,6 +8,7 @@
     'author': 'AppsToGROW',
     'category': 'Administration',
     'data': [
+        'report/report.xml',
         'views/views.xml',
     ],
     'depends': [
