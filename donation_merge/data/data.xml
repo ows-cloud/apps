@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- DONATION RECEIPT res.partner -->
+
+        <template id="report_donation_merge">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+                            
+                        <h1><span t-field="o.name"/></h1>
+                        <img src="https://download.odoocdn.com/icons/crm/static/description/icon.svg" alt="Demo Icon" width="100" height="100"/>
+                        <p>   </p>
+                        <h2>Dear <span t-field="o.name"/>,</h2>
+
+                        <t t-if="o.donation_ids">
+                            <p>Thank you so much for your support!</p>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Date</th>
+                                        <th class="text-center">Project</th>
+                                        <th class="text-center">NOK</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="o.donation_ids" t-as="d">
+                                        <tr t-foreach="d.line_ids" t-as="dl">
+                                            <!-- user.lang returns "English", not the lang record.
+                                                 lang.date_format returns ERROR since the "lang" variable does not exist. -->
+                                            <td class="text-center"><span t-field="d.donation_date" t-options='{"format": "dd.MM.yyyy"}'/></td>
+                                            <td class="text-center"><span t-field="dl.product_id.name"/></td>
+                                            <td class="text-center"><span t-field="dl.amount"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <report
+            id="action_report_donation_merge"
+            string="Donation Merge Report"
+            model="res.partner"
+            report_type="qweb-pdf"
+            name="donation_merge.report_donation_merge"
+            file="donation_merge.report_donation_merge"
+            />
+
+        <record id="mail_template_donation_merge_report" model="mail.template">
+            <field name="name">Donation Merge Report</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="partner_to">${object.id}</field>
+            <field name="subject">Thank you for supporting!</field>
+            <field name="body_html"><![CDATA[
+<div>
+    <p>Dear ${object.name},</p>
+    <p>Thank you so much for supporting!</p>
+    <p>For more details, see the attachment.</p>
+    <p>Best regards,</p>
+</div>
+<div>
+    ${user.signature | safe}
+</div>]]></field>
+            <field name="user_signature" eval="False"/>
+            <field name="report_template" ref="donation_merge.action_report_donation_merge"/>
+            <field name="report_name">Donation Report.pdf</field>
+        </record>
+
+    </data>
+</odoo>

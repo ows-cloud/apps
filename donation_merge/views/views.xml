@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="view_donation_merge_partner_form">
+    		<field name="name">donation.merge.partner.form</field>
+    		<field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="groups_id" eval="[(4, ref('donation.group_donation_manager'))]"/>
+    		<field name="priority" eval="20"/>
+    		<field name="arch" type="xml">
+                <xpath expr="//sheet/group" position="inside">
+                    <group>
+                        <field name="donor_newsletter_delivery_method"/>
+                        <field name="donor_magazine_delivery_method"/>
+                        <field name="donation_receipt_delivery_method"/>
+                        <field name="donation_send_receipt"/>
+                        <field name="donation_country_group"/>
+                        <field name="donation_address_state"/>
+                    </group>
+                </xpath>
+    		</field>
+		</record>
+
+        <record model="ir.ui.view" id="view_donation_campaign_form">
+    		<field name="name">donation.campaign.form</field>
+    		<field name="model">donation.campaign</field>
+            <field name="inherit_id" ref="donation.donation_campaign_form"/>
+            <field name="groups_id" eval="[(4, ref('donation.group_donation_manager'))]"/>
+    		<field name="priority" eval="20"/>
+    		<field name="arch" type="xml">
+                <form position="inside">
+                    <group>
+                        <field name="image" widget="image" class="oe_avatar"/>
+                        <field name="letter"/>
+                    </group>
+                </form>
+    		</field>
+		</record>
+
+    </data>
+</odoo>
