@@ -19,4 +19,12 @@ class DonationCampaign(models.Model):
     _inherit = 'donation.campaign'
 
     image = fields.Binary()
-    letter = fields.Html()
+    image_text = fields.Html()
+    text1 = fields.Html()
+    text2 = fields.Html()
+
+
+class DonationTaxReceipt(models.Model):
+    _inherit = 'donation.tax.receipt'
+
+    campaign_id = fields.Many2one('donation.campaign', string='Donation Campaign')

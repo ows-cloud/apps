@@ -1,63 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- DONATION RECEIPT res.partner -->
 
-        <template id="report_donation_merge">
+        <record id="paperformat_a5" model="report.paperformat">
+            <field name="name">A5</field>
+            <field name="default" eval="False" />
+            <field name="format">A5</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">10</field>
+            <field name="margin_bottom">10</field>
+            <field name="margin_left">10</field>
+            <field name="margin_right">10</field>
+            <field name="header_line" eval="False" />
+            <field name="header_spacing">0</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <record id="paperformat_dle" model="report.paperformat">
+            <field name="name">DLE (110x220 mm)</field>
+            <field name="default" eval="False" />
+            <field name="format">DLE</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">10</field>
+            <field name="margin_bottom">10</field>
+            <field name="margin_left">10</field>
+            <field name="margin_right">10</field>
+            <field name="header_line" eval="False" />
+            <field name="header_spacing">0</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <!-- ENVELOPE DLE res.partner -->
+        <template id="report_envelope_dle">
+            <t t-call="web.html_container">
+                <t t-foreach="docs.sorted(key=lambda x: x.name)" t-as="o">
+                    <div class="page">
+                        <table style="width:100%;">
+                            <tr>
+                                <td style="width: 40%" valign="top">
+                                    <p>
+                                        Granheimstiftelsen<br/>
+                                        Postboks 243<br/>
+                                        1851 Mysen <br/>
+                                        <t t-if="o.country_id.code == 'NO'"></t>
+                                        <t t-elif="o.country_id.code in ['SE', 'DK']">NORGE</t>
+                                        <t t-else="">NORWAY</t>
+                                    </p>
+                                </td>
+                                <td style="width: 60%" align="right">
+                                    <img src="https://download.odoocdn.com/icons/crm/static/description/icon.svg" alt="Demo Icon" width="100" height="100"/>
+                                    <p>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 40%;"></td>
+                                <td style="width: 60%;">
+                                    <p style="font-size: 24px;">
+                                        <br/>
+                                        <span t-field="o.name"/><br/>
+                                        <span t-field="o.street"/><br t-if="o.street"/>
+                                        <span t-field="o.street2"/><br t-if="o.street2"/>
+                                        <span t-field="o.zip"/> <span t-field="o.city"/><br t-if="o.zip or o.city"/>
+                                        <t t-if="o.country_id.code == 'NO'"></t>
+                                        <t t-elif="o.country_id.code == 'SE'">SVERIGE</t>
+                                        <t t-elif="o.country_id.code == 'DK'">DANMARK</t>
+                                        <t t-else=""><span style="text-transform: uppercase" t-esc="o.country_id.name"/></t>
+                                    </p>
+                                    <!-- 
+                                        <t t-set="address">
+                                            <address t-field="o" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                                        </t>
+                                        <t t-call="web.address_layout"/>
+                                        t-field="o" -> ERROR; field must have dot, e.g. o.partner_id - but the 'o' is the partner already!
+                                    -->
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- DONATION RECEIPT donation.tax.receipt -->
+
+        <template id="report_donation_tax_receipt">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
-                            
-                        <h1><span t-field="o.name"/></h1>
-                        <img src="https://download.odoocdn.com/icons/crm/static/description/icon.svg" alt="Demo Icon" width="100" height="100"/>
-                        <p>   </p>
-                        <h2>Dear <span t-field="o.name"/>,</h2>
-
-                        <t t-if="o.donation_ids">
-                            <p>Thank you so much for your support!</p>
-                            <table class="table table-condensed">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">Date</th>
-                                        <th class="text-center">Project</th>
-                                        <th class="text-center">NOK</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <t t-foreach="o.donation_ids" t-as="d">
-                                        <tr t-foreach="d.line_ids" t-as="dl">
-                                            <!-- user.lang returns "English", not the lang record.
-                                                 lang.date_format returns ERROR since the "lang" variable does not exist. -->
-                                            <td class="text-center"><span t-field="d.donation_date" t-options='{"format": "dd.MM.yyyy"}'/></td>
-                                            <td class="text-center"><span t-field="dl.product_id.name"/></td>
-                                            <td class="text-center"><span t-field="dl.amount"/></td>
-                                        </tr>
-                                    </t>
-                                </tbody>
-                            </table>
-                        </t>
+                        <table style="width:100%;">
+                            <tr>
+                                <td colspan="2">
+                                    <img src="https://download.odoocdn.com/icons/crm/static/description/icon.svg" alt="Demo Icon" width="100" height="100"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span t-field="o.campaign_id.text1"/>
+                                </td>
+                                <td>
+                                    <img t-if="o.campaign_id.image" t-att-src="image_data_uri(o.campaign_id.image)" alt="Logo"/>
+                                    <span t-field="o.campaign_id.image_text"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <span t-field="o.campaign_id.text2"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <table style="width:80%;" align="center">
+                            <tr>
+                                <td align="center" colspan="3">
+                                    Kvittering <span t-field="o.date" t-options='{"format": "dd.MM.yyyy"}'/> <br/>
+                                    Granheimstiftelsen har mottatt fra <br/>
+                                    <span t-field="o.partner_id.name"/>
+                                </td>
+                            </tr>
+                            <t t-foreach="o.donation_ids" t-as="d">
+                                <tr t-foreach="d.line_ids" t-as="dl">
+                                    <!-- user.lang returns "English", not the lang record.
+                                         lang.date_format returns ERROR since the "lang" variable does not exist. -->
+                                    <td style="width:20%;" align="center"><span t-field="d.donation_date" t-options='{"format": "dd.MM.yyyy"}'/></td>
+                                    <td style="width:60%;" align="center"><span t-field="dl.product_id.name"/></td>
+                                    <td style="width:20%;" align="center"><span t-field="dl.amount"/></td>
+                                </tr>
+                            </t>
+                        </table>
                     </div>
                 </t>
             </t>
         </template>
 
         <report
-            id="action_report_donation_merge"
-            string="Donation Merge Report"
+            id="action_report_envelope_dle"
+            string="Envelope DLE (110x220 mm)"
             model="res.partner"
             report_type="qweb-pdf"
-            name="donation_merge.report_donation_merge"
-            file="donation_merge.report_donation_merge"
+            paperformat="donation_merge.paperformat_dle"
+            name="donation_merge.report_envelope_dle"
+            file="donation_merge.report_envelope_dle"
+            />
+
+        <report
+            id="action_report_donation_tax_receipt"
+            string="Thank-you letter"
+            model="donation.tax.receipt"
+            report_type="qweb-pdf"
+            paperformat="donation_merge.paperformat_a5"
+            name="donation_merge.report_donation_tax_receipt"
+            file="donation_merge.report_donation_tax_receipt"
             />
 
         <record id="mail_template_donation_merge_report" model="mail.template">
             <field name="name">Donation Merge Report</field>
-            <field name="model_id" ref="base.model_res_partner"/>
-            <field name="partner_to">${object.id}</field>
+            <field name="model_id" ref="donation_merge.model_donation_tax_receipt"/>
+            <field name="partner_to">${object.partner_id.id}</field>
             <field name="subject">Thank you for supporting!</field>
             <field name="body_html"><![CDATA[
 <div>
-    <p>Dear ${object.name},</p>
+    <p>Dear ${object.partner_id.name},</p>
     <p>Thank you so much for supporting!</p>
     <p>For more details, see the attachment.</p>
     <p>Best regards,</p>
@@ -66,7 +176,7 @@
     ${user.signature | safe}
 </div>]]></field>
             <field name="user_signature" eval="False"/>
-            <field name="report_template" ref="donation_merge.action_report_donation_merge"/>
+            <field name="report_template" ref="donation_merge.action_report_donation_tax_receipt"/>
             <field name="report_name">Donation Report.pdf</field>
         </record>
 
