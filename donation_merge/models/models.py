@@ -8,6 +8,7 @@ class Partner(models.Model):
 
     donor_newsletter_delivery_method = fields.Char('Newsletter Delivery Method')
     donor_magazine_delivery_method = fields.Char('Magazine Delivery Method')
+    donor_magazine_amount = fields.Integer('# of Magazines')
     donation_receipt_delivery_method = fields.Char('Donation Receipt Delivery Method')
 
     donation_address_state = fields.Char('Donation Address State')

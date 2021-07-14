@@ -13,6 +13,7 @@
                     <group>
                         <field name="donor_newsletter_delivery_method"/>
                         <field name="donor_magazine_delivery_method"/>
+                        <field name="donor_magazine_amount"/>
                         <field name="donation_receipt_delivery_method"/>
                         <field name="donation_send_receipt"/>
                         <field name="donation_country_group"/>
