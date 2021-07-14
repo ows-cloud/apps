@@ -33,6 +33,8 @@
                 <form position="inside">
                     <group>
                         <field name="image" widget="image" class="oe_avatar"/>
+                        <field name="image_height"/>
+                        <field name="image_width"/>
                         <field name="image_text"/>
                         <field name="text1"/>
                         <field name="text2"/>
@@ -51,6 +53,31 @@
                 <group name="main" position="inside">
                     <field name="campaign_id"/>
                 </group>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_donation_tax_receipt_tree">
+            <field name="name">donation.tax.receipt.tree.inherit</field>
+            <field name="model">donation.tax.receipt</field>
+            <field name="inherit_id" ref="donation_base.donation_tax_receipt_tree"/>
+            <field name="groups_id" eval="[(4, ref('donation.group_donation_manager'))]"/>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <field name="donation_date" position="after">
+                    <field name="date"/>
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_donation_line_tree">
+            <field name="name">donation.line.tree.inherit</field>
+            <field name="model">donation.line</field>
+            <field name="inherit_id" ref="donation.donation_line_tree"/>
+            <field name="groups_id" eval="[(4, ref('donation.group_donation_manager'))]"/>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <field name="amount" position="before">
+                    <field name="description"/>
+                </field>
             </field>
         </record>
 

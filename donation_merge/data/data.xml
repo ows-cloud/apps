@@ -9,10 +9,10 @@
             <field name="page_height">0</field>
             <field name="page_width">0</field>
             <field name="orientation">Portrait</field>
-            <field name="margin_top">10</field>
-            <field name="margin_bottom">10</field>
-            <field name="margin_left">10</field>
-            <field name="margin_right">10</field>
+            <field name="margin_top">5</field>
+            <field name="margin_bottom">5</field>
+            <field name="margin_left">5</field>
+            <field name="margin_right">5</field>
             <field name="header_line" eval="False" />
             <field name="header_spacing">0</field>
             <field name="dpi">90</field>
@@ -38,54 +38,55 @@
         <template id="report_envelope_dle">
             <t t-call="web.html_container">
                 <t t-foreach="docs.sorted(key=lambda x: x.name)" t-as="o">
-                    <div class="page">
-                        <table style="width:100%;">
-                            <tr>
-                                <td style="width: 40%" valign="top">
-                                    <p>
-                                        Granheimstiftelsen<br/>
-                                        Postboks 243<br/>
-                                        1851 Mysen <br/>
-                                        <t t-if="o.country_id.code == 'NO'"></t>
-                                        <t t-elif="o.country_id.code in ['SE', 'DK']">NORGE</t>
-                                        <t t-else="">NORWAY</t>
-                                    </p>
-                                </td>
-                                <td style="width: 60%" align="right">
-                                    <img src="https://download.odoocdn.com/icons/crm/static/description/icon.svg" alt="Demo Icon" width="100" height="100"/>
-                                    <p>
-                                        <br/>
-                                        <br/>
-                                        <br/>
-                                        <br/>
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 40%;"></td>
-                                <td style="width: 60%;">
-                                    <p style="font-size: 24px;">
-                                        <br/>
-                                        <span t-field="o.name"/><br/>
-                                        <span t-field="o.street"/><br t-if="o.street"/>
-                                        <span t-field="o.street2"/><br t-if="o.street2"/>
-                                        <span t-field="o.zip"/> <span t-field="o.city"/><br t-if="o.zip or o.city"/>
-                                        <t t-if="o.country_id.code == 'NO'"></t>
-                                        <t t-elif="o.country_id.code == 'SE'">SVERIGE</t>
-                                        <t t-elif="o.country_id.code == 'DK'">DANMARK</t>
-                                        <t t-else=""><span style="text-transform: uppercase" t-esc="o.country_id.name"/></t>
-                                    </p>
-                                    <!-- 
-                                        <t t-set="address">
-                                            <address t-field="o" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
-                                        </t>
-                                        <t t-call="web.address_layout"/>
-                                        t-field="o" -> ERROR; field must have dot, e.g. o.partner_id - but the 'o' is the partner already!
-                                    -->
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
+                    <t t-call="web.basic_layout">
+                        <div class="page">
+                            <table style="width:100%;">
+                                <tr>
+                                    <td style="width: 40%" valign="top">
+                                        <p>
+                                            Granheimstiftelsen<br/>
+                                            Postboks 243<br/>
+                                            1851 Mysen <br/>
+                                            <t t-if="o.country_id.code == 'NO'"></t>
+                                            <t t-elif="o.country_id.code in ['SE', 'DK']">NORGE</t>
+                                            <t t-else="">NORWAY</t>
+                                        </p>
+                                    </td>
+                                    <td style="width: 60%" align="right">
+                                        <img src="https://granheims.no/wp-content/uploads/2021/07/Posten.png" alt="Demo Icon" width="100" height="100"/>
+                                        <p>
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 40%;"></td>
+                                    <td style="width: 60%;">
+                                        <p style="font-size: 24px;">
+                                            <br/>
+                                            <span t-field="o.name"/><br/>
+                                            <span t-field="o.street"/><br t-if="o.street"/>
+                                            <span t-field="o.street2"/><br t-if="o.street2"/>
+                                            <span t-field="o.zip"/> <span t-field="o.city"/><br t-if="o.zip or o.city"/>
+                                            <t t-if="o.country_id.code == 'NO'"></t>
+                                            <t t-elif="o.country_id.code == 'SE'">SVERIGE</t>
+                                            <t t-elif="o.country_id.code == 'DK'">DANMARK</t>
+                                            <t t-else=""><span style="text-transform: uppercase" t-esc="o.country_id.name"/></t>
+                                        </p>
+                                        <!-- 
+                                            <t t-set="address">
+                                                <address t-field="o" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                                            </t>
+                                            <t t-call="web.address_layout"/>
+                                            t-field="o" -> ERROR; field must have dot, e.g. o.partner_id - but the 'o' is the partner already!
+                                        -->
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </t>
                 </t>
             </t>
         </template>
@@ -95,47 +96,62 @@
         <template id="report_donation_tax_receipt">
             <t t-call="web.html_container">
                 <t t-foreach="docs" t-as="o">
-                    <div class="page">
-                        <table style="width:100%;">
-                            <tr>
-                                <td colspan="2">
-                                    <img src="https://download.odoocdn.com/icons/crm/static/description/icon.svg" alt="Demo Icon" width="100" height="100"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span t-field="o.campaign_id.text1"/>
-                                </td>
-                                <td>
-                                    <img t-if="o.campaign_id.image" t-att-src="image_data_uri(o.campaign_id.image)" alt="Logo"/>
-                                    <span t-field="o.campaign_id.image_text"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <span t-field="o.campaign_id.text2"/>
-                                </td>
-                            </tr>
-                        </table>
-                        <table style="width:80%;" align="center">
-                            <tr>
-                                <td align="center" colspan="3">
-                                    Kvittering <span t-field="o.date" t-options='{"format": "dd.MM.yyyy"}'/> <br/>
-                                    Granheimstiftelsen har mottatt fra <br/>
-                                    <span t-field="o.partner_id.name"/>
-                                </td>
-                            </tr>
-                            <t t-foreach="o.donation_ids" t-as="d">
-                                <tr t-foreach="d.line_ids" t-as="dl">
-                                    <!-- user.lang returns "English", not the lang record.
-                                         lang.date_format returns ERROR since the "lang" variable does not exist. -->
-                                    <td style="width:20%;" align="center"><span t-field="d.donation_date" t-options='{"format": "dd.MM.yyyy"}'/></td>
-                                    <td style="width:60%;" align="center"><span t-field="dl.product_id.name"/></td>
-                                    <td style="width:20%;" align="center"><span t-field="dl.amount"/></td>
+                    <t t-call="web.basic_layout">
+                        <div class="page">
+                            <table style="width:100%;">
+                                <tr>
+                                    <td colspan="2">
+                                        <img src="https://granheims.no/wp-content/uploads/2021/07/Hjertelig-takk-for-gaven.png" alt="Demo Icon" width="625" height="196"/>
+                                        <p><br/></p>
+                                    </td>
                                 </tr>
-                            </t>
-                        </table>
-                    </div>
+                                <tr>
+                                    <td valign="top">
+                                        <span t-field="o.campaign_id.text1"/>
+                                    </td>
+                                    <td valign="top">
+                                        <img t-if="o.campaign_id.image" 
+                                            t-att-src="image_data_uri(o.campaign_id.image)"
+                                            t-att-height="o.campaign_id.image_height"
+                                            t-att-width="o.campaign_id.image_width"
+                                            alt="Logo"/>
+                                        <span t-field="o.campaign_id.image_text"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <span t-field="o.campaign_id.text2"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p/>
+                            <table style="width:80%;" align="center">
+                                <tr>
+                                    <td align="center" colspan="3">
+                                        <t t-if="o.partner_id.lang == 'nb_NO'">
+                                            <b><i>Kvittering <span t-field="o.date" t-options='{"format": "dd.MM.yyyy"}'/></i></b> <br/>
+                                            Granheimstiftelsen har mottatt fra <br/>
+                                            <span t-field="o.partner_id.name"/>:
+                                        </t>
+                                        <t t-else="">
+                                            <b><i>Receipt <span t-field="o.date" t-options='{"format": "MM/dd/yyyy"}'/></i></b> <br/>
+                                            The Granheim Foundation has received from <br/>
+                                            <span t-field="o.partner_id.name"/>:
+                                        </t>
+                                    </td>
+                                </tr>
+                                <t t-foreach="o.donation_ids" t-as="d">
+                                    <tr t-foreach="d.line_ids" t-as="dl">
+                                        <!-- user.lang returns "English", not the lang record.
+                                            lang.date_format returns ERROR since the "lang" variable does not exist. -->
+                                        <td style="width:20%;" align="center"><span t-field="d.donation_date" t-options='{"format": "dd.MM.yyyy"}'/></td>
+                                        <td style="width:60%;" align="center"><span t-field="dl.description"/></td>
+                                        <td style="width:20%;" align="center"><span t-field="dl.amount"/></td>
+                                    </tr>
+                                </t>
+                            </table>
+                        </div>
+                    </t>
                 </t>
             </t>
         </template>

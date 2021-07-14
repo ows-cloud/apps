@@ -20,6 +20,8 @@ class DonationCampaign(models.Model):
     _inherit = 'donation.campaign'
 
     image = fields.Binary()
+    image_height = fields.Integer('Image Height')
+    image_width = fields.Integer('Image Width')
     image_text = fields.Html()
     text1 = fields.Html()
     text2 = fields.Html()
@@ -29,3 +31,9 @@ class DonationTaxReceipt(models.Model):
     _inherit = 'donation.tax.receipt'
 
     campaign_id = fields.Many2one('donation.campaign', string='Donation Campaign')
+
+
+class DonationLine(models.Model):
+    _inherit = 'donation.line'
+
+    description = fields.Char('Description')
