@@ -28,7 +28,7 @@
             <field name="margin_top">5</field>
             <field name="margin_bottom">5</field>
             <field name="margin_left">5</field>
-            <field name="margin_right">5</field>
+            <field name="margin_right">8</field>
             <field name="header_line" eval="False" />
             <field name="header_spacing">0</field>
             <field name="dpi">90</field>
@@ -96,7 +96,7 @@
 
         <template id="report_donation_tax_receipt">
             <t t-call="web.html_container">
-                <t t-foreach="docs" t-as="o">
+                <t t-foreach="docs.sorted(key=lambda x: x.partner_id.name)" t-as="o">
                     <t t-call="web.basic_layout">
                         <div class="page">
                             <table style="width:100%;">
@@ -127,7 +127,7 @@
                                 </tr>
                             </table>
                             <p/>
-                            <table style="width:100%;" align="center">
+                            <table style="width:100%; font-size: 18px;" align="center">
                                 <tr>
                                     <td align="center" colspan="3" style="font-size: 18px;">
                                         <t t-if="o.partner_id.lang == 'nb_NO'">

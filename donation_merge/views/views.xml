@@ -73,6 +73,7 @@
                     <field name="campaign_id"/>
                     <field name="donor_newsletter_delivery_method"/>
                     <field name="donation_receipt_delivery_method"/>
+                    <field name="donation_address_state"/>
                 </group>
             </field>
         </record>
@@ -99,6 +100,7 @@
                     <field name="campaign_id"/>
                     <field name="donor_newsletter_delivery_method"/>
                     <field name="donation_receipt_delivery_method"/>
+                    <field name="donation_address_state"/>
                 </search>
             </field>
         </record>

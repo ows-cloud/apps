@@ -33,6 +33,7 @@ class DonationTaxReceipt(models.Model):
     campaign_id = fields.Many2one('donation.campaign', string='Donation Campaign')
     donor_newsletter_delivery_method = fields.Char('Newsletter Delivery Method', related='partner_id.donor_newsletter_delivery_method')
     donation_receipt_delivery_method = fields.Char('Donation Receipt Delivery Method', related='partner_id.donation_receipt_delivery_method')
+    donation_address_state = fields.Char('Donation Address State', related='partner_id.donation_address_state')
 
 
 class DonationLine(models.Model):
