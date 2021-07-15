@@ -10,11 +10,11 @@
             <field name="page_width">0</field>
             <field name="orientation">Portrait</field>
             <field name="margin_top">5</field>
-            <field name="margin_bottom">5</field>
-            <field name="margin_left">5</field>
+            <field name="margin_bottom">17</field>
+            <field name="margin_left">2</field>
             <field name="margin_right">5</field>
             <field name="header_line" eval="False" />
-            <field name="header_spacing">0</field>
+            <field name="header_spacing">5</field>
             <field name="dpi">90</field>
         </record>
 
@@ -101,20 +101,21 @@
                             <table style="width:100%;">
                                 <tr>
                                     <td colspan="2">
-                                        <img src="https://granheims.no/wp-content/uploads/2021/07/Hjertelig-takk-for-gaven.png" alt="Demo Icon" width="625" height="196"/>
-                                        <p><br/></p>
+                                        <img src="https://granheims.no/wp-content/uploads/2021/07/Hjertelig-takk-for-gaven.png" alt="Demo Icon" width="730" height="228"/>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td valign="top">
+                                    <td valign="top" style="padding-right: 15px;">
+                                        <p style="font-size: 6px;"><br/></p>
                                         <span t-field="o.campaign_id.text1"/>
                                     </td>
-                                    <td valign="top">
+                                    <td valign="top" align="center">
+                                        <p style="font-size: 6px;"><br/></p>
                                         <img t-if="o.campaign_id.image" 
                                             t-att-src="image_data_uri(o.campaign_id.image)"
                                             t-att-height="o.campaign_id.image_height"
                                             t-att-width="o.campaign_id.image_width"
-                                            alt="Logo"/>
+                                            alt="Bilde av person"/>
                                         <span t-field="o.campaign_id.image_text"/>
                                     </td>
                                 </tr>
@@ -125,9 +126,9 @@
                                 </tr>
                             </table>
                             <p/>
-                            <table style="width:80%;" align="center">
+                            <table style="width:100%;" align="center">
                                 <tr>
-                                    <td align="center" colspan="3">
+                                    <td align="center" colspan="3" style="font-size: 18px;">
                                         <t t-if="o.partner_id.lang == 'nb_NO'">
                                             <b><i>Kvittering <span t-field="o.date" t-options='{"format": "dd.MM.yyyy"}'/></i></b> <br/>
                                             Granheimstiftelsen har mottatt fra <br/>
@@ -144,12 +145,23 @@
                                     <tr t-foreach="d.line_ids" t-as="dl">
                                         <!-- user.lang returns "English", not the lang record.
                                             lang.date_format returns ERROR since the "lang" variable does not exist. -->
-                                        <td style="width:20%;" align="center"><span t-field="d.donation_date" t-options='{"format": "dd.MM.yyyy"}'/></td>
-                                        <td style="width:60%;" align="center"><span t-field="dl.description"/></td>
-                                        <td style="width:20%;" align="center"><span t-field="dl.amount"/></td>
+                                        <td style="width:35%;" align="right">
+                                            <t t-if="o.partner_id.lang == 'nb_NO'">
+                                                <span t-field="d.donation_date" t-options='{"format": "dd.MM.yyyy"}'/>
+                                            </t>
+                                            <t t-else="">
+                                                <span t-field="d.donation_date" t-options='{"format": "MM/dd/yyyy"}'/>
+                                            </t>
+                                        </td>
+                                        <td style="width:30%;" align="center"><span t-field="dl.description"/></td>
+                                        <td style="width:35%;" align="left"><span t-field="dl.amount"/></td>
                                     </tr>
                                 </t>
                             </table>
+                            <div class="footer">
+                                <img src="https://granheims.no/wp-content/uploads/2021/07/Granheimstiftelsen-skaper-bærekraftige-løsninger.png" alt="Demo Icon" width="872" height="87"/>
+                                <p style="font-size: 15px;"><br/></p>
+                            </div>
                         </div>
                     </t>
                 </t>
