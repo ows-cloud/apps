@@ -13,7 +13,7 @@ class Partner(models.Model):
 
     donation_address_state = fields.Char('Donation Address State')
     donation_country_group = fields.Char('Donation Country Group')
-    donation_send_receipt = fields.Boolean('Donation Send Receipt')
+    donation_send_receipt = fields.Boolean('Send thank-you letter now')
     
 
 class DonationCampaign(models.Model):
@@ -31,6 +31,8 @@ class DonationTaxReceipt(models.Model):
     _inherit = 'donation.tax.receipt'
 
     campaign_id = fields.Many2one('donation.campaign', string='Donation Campaign')
+    donor_newsletter_delivery_method = fields.Char('Newsletter Delivery Method', related='partner_id.donor_newsletter_delivery_method')
+    donation_receipt_delivery_method = fields.Char('Donation Receipt Delivery Method', related='partner_id.donation_receipt_delivery_method')
 
 
 class DonationLine(models.Model):

@@ -25,10 +25,10 @@
             <field name="page_height">0</field>
             <field name="page_width">0</field>
             <field name="orientation">Landscape</field>
-            <field name="margin_top">10</field>
-            <field name="margin_bottom">10</field>
-            <field name="margin_left">10</field>
-            <field name="margin_right">10</field>
+            <field name="margin_top">5</field>
+            <field name="margin_bottom">5</field>
+            <field name="margin_left">5</field>
+            <field name="margin_right">5</field>
             <field name="header_line" eval="False" />
             <field name="header_spacing">0</field>
             <field name="dpi">90</field>
@@ -42,8 +42,9 @@
                         <div class="page">
                             <table style="width:100%;">
                                 <tr>
-                                    <td style="width: 40%" valign="top">
-                                        <p>
+                                    <td style="width: 45%" valign="top">
+                                        <p style="font-size: 6px;"><br/></p>
+                                        <p style="font-size: 18px;">
                                             Granheimstiftelsen<br/>
                                             Postboks 243<br/>
                                             1851 Mysen <br/>
@@ -52,18 +53,18 @@
                                             <t t-else="">NORWAY</t>
                                         </p>
                                     </td>
-                                    <td style="width: 60%" align="right">
+                                    <td style="width: 55%" align="right">
+                                        <p style="font-size: 6px;"><br/></p>
                                         <img src="https://granheims.no/wp-content/uploads/2021/07/Posten.png" alt="Demo Icon" width="100" height="100"/>
                                         <p>
-                                            <br/>
                                             <br/>
                                             <br/>
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td style="width: 40%;"></td>
-                                    <td style="width: 60%;">
+                                    <td style="width: 45%;"></td>
+                                    <td style="width: 55%;">
                                         <p style="font-size: 24px;">
                                             <br/>
                                             <span t-field="o.name"/><br/>

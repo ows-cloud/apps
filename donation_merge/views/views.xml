@@ -2,13 +2,13 @@
 <odoo>
     <data>
 
-        <record model="ir.ui.view" id="view_donation_merge_partner_form">
-    		<field name="name">donation.merge.partner.form</field>
-    		<field name="model">res.partner</field>
+        <record model="ir.ui.view" id="view_res_partner_form">
+            <field name="name">res.partner.form.merge</field>
+            <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="groups_id" eval="[(4, ref('donation.group_donation_manager'))]"/>
-    		<field name="priority" eval="20"/>
-    		<field name="arch" type="xml">
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
                 <xpath expr="//sheet/group" position="inside">
                     <group>
                         <field name="donor_newsletter_delivery_method"/>
@@ -20,16 +20,35 @@
                         <field name="donation_address_state"/>
                     </group>
                 </xpath>
-    		</field>
-		</record>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_res_partner_search">
+            <field name="name">res.partner.search.merge</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="groups_id" eval="[(4, ref('donation.group_donation_manager'))]"/>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <search position="inside">
+                    <field name="lang"/>
+                    <field name="donation_send_receipt"/>
+                    <field name="donor_newsletter_delivery_method"/>
+                    <field name="donor_magazine_delivery_method"/>
+                    <field name="donor_magazine_amount"/>
+                    <field name="donation_receipt_delivery_method"/>
+                    <field name="donation_country_group"/>
+                    <field name="donation_address_state"/>
+                </search>
+            </field>
+        </record>
 
         <record model="ir.ui.view" id="view_donation_campaign_form">
-    		<field name="name">donation.campaign.form</field>
-    		<field name="model">donation.campaign</field>
+            <field name="name">donation.campaign.form</field>
+            <field name="model">donation.campaign</field>
             <field name="inherit_id" ref="donation.donation_campaign_form"/>
             <field name="groups_id" eval="[(4, ref('donation.group_donation_manager'))]"/>
-    		<field name="priority" eval="20"/>
-    		<field name="arch" type="xml">
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
                 <form position="inside">
                     <group>
                         <field name="image" widget="image" class="oe_avatar"/>
@@ -40,8 +59,8 @@
                         <field name="text2"/>
                     </group>
                 </form>
-    		</field>
-		</record>
+            </field>
+        </record>
 
         <record model="ir.ui.view" id="view_donation_tax_receipt_form">
             <field name="name">donation.tax.receipt.form.inherit</field>
@@ -52,6 +71,8 @@
             <field name="arch" type="xml">
                 <group name="main" position="inside">
                     <field name="campaign_id"/>
+                    <field name="donor_newsletter_delivery_method"/>
+                    <field name="donation_receipt_delivery_method"/>
                 </group>
             </field>
         </record>
@@ -65,6 +86,20 @@
                 <field name="donation_date" position="after">
                     <field name="date"/>
                 </field>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_donation_tax_receipt_search">
+            <field name="name">donation.tax.receipt.search.merge</field>
+            <field name="model">donation.tax.receipt</field>
+            <field name="inherit_id" ref="donation_base.donation_tax_receipt_search"/>
+            <field name="groups_id" eval="[(4, ref('donation.group_donation_manager'))]"/>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <search position="inside">
+                    <field name="campaign_id"/>
+                    <field name="donor_newsletter_delivery_method"/>
+                    <field name="donation_receipt_delivery_method"/>
+                </search>
             </field>
         </record>
 
