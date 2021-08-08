@@ -77,13 +77,14 @@ class AccountBudgetLine(models.Model):
     name = fields.Char(string='Name')
     partner_id = fields.Many2one('res.partner', string='Partner')
     product_id = fields.Many2one('product.product', string='Product')
+    user_id = fields.Many2one('res.users', string="User")
 
     @api.model
     def create(self, values):
         for field in ['accounting_or_budget', 'journal_id', 'move_id']:
             values.pop(field, None)
         if values.get('crossovered_budget_id'):
-            date = values['date'] if values and 'date' in values else '0000-00-00'
+            date = values['date'] if values and 'date' in values else False
             budget = self.env['crossovered.budget'].browse(values['crossovered_budget_id'])
             self._check_date(date, budget)
         return super(AccountBudgetLine, self).create(values)
@@ -110,8 +111,8 @@ class AccountBudgetLine(models.Model):
 
     @api.model
     def _check_date(self, date, crossovered_budget_id):
-        lock_date = crossovered_budget_id and crossovered_budget_id.date_to or '0000-00-00'
-        if date <= (lock_date or '0000-00-00'):
+        lock_date = crossovered_budget_id and crossovered_budget_id.date_to or False
+        if date <= (lock_date):
             message = _(
                 "You cannot add/modify budget lines prior to and inclusive of the end date %s of the budget.") % (
                           lock_date)
