@@ -15,7 +15,7 @@
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">
                 <pivot>
-                    <field name="float" string="Hours" type="measure"/>>
+                    <field name="float" string="Hours" type="measure"/>
                     <field name="date" type="row" interval="week"/>
                     <field name="analytic_account_id" type="col"/>
                 </pivot>
@@ -28,7 +28,7 @@
             <field name="arch" type="xml">
                 <tree editable="top">
                     <field name="date"/>
-                    <field name="analytic_account"/>
+                    <field name="analytic_account_id"/>
                     <field name="float" string="Hours"/>
                     <field name="name" string="Comment"/>
                     <field name="user_id"/>
@@ -57,6 +57,8 @@
                     name="Work Hours"
                     res_model="custom.list.item"
                     view_mode="pivot,tree"
+                    domain=""
+                    context="{'search_default_filter_date': 1, 'search_default_filter_user': 1}"
                     />
         <menuitem id="menu_custom_list_work_hours"
                   name="Work Hours"

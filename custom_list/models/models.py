@@ -21,7 +21,10 @@ class CustomListItem(models.Model):
     company_id = fields.Many2one('res.company', string="Company", index=True, default=lambda self: self.env.user.company_id)
     date=fields.Date()
     list_id = fields.Many2one('custom.list', string="Custom List")
-    user_id = fields.Many2one('res.users', string="User")
+    
+    def compute_default_user(self):
+        return self.env.user
+    user_id = fields.Many2one('res.users', string="User", default=compute_default_user)
 
     #char = fields.Char()
     float = fields.Float()

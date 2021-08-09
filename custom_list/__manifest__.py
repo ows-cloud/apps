@@ -8,6 +8,8 @@
     'author': 'AppsToGROW',
     'category': 'Administration',
     'data': [
+        'security/ir.model.access.csv',
+        'security/ir.rule.csv',
         'views/views.xml',
         'views/granheim.xml',
     ],
