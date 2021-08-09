@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record model="ir.ui.view" id="view_custom_list_tree">
+            <field name="name">custom.list.tree</field>
+            <field name="model">custom.list</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <tree editable="top">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="uom"/>
+                </tree>
+            </field>
+        </record>
+        <act_window id="action_custom_list"
+                    name="Custom List"
+                    res_model="custom.list"
+                    view_mode="tree"
+                    />
+        <menuitem id="menu_custom_list"
+                  name="Custom Lists"
+                  sequence="21"
+                  parent="base.next_id_2"
+                  action="action_custom_list"
+                  />
+
+    </data>
+</odoo>

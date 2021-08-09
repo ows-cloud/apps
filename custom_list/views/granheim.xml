@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <menuitem id="menu_granheim"
+                  name="Granheim"
+                  sequence="2100"
+                  />
+        
+        <!-- WORK HOURS -->
+        
+        <record model="ir.ui.view" id="view_custom_list_work_hours_pivot">
+            <field name="name">custom.list.item.pivot work hours</field>
+            <field name="model">custom.list.item</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <pivot>
+                    <field name="float" string="Hours" type="measure"/>>
+                    <field name="date" type="row" interval="week"/>
+                    <field name="analytic_account_id" type="col"/>
+                </pivot>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_custom_list_work_hours_tree">
+            <field name="name">custom.list.item.tree work hours</field>
+            <field name="model">custom.list.item</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <tree editable="top">
+                    <field name="date"/>
+                    <field name="analytic_account"/>
+                    <field name="float" string="Hours"/>
+                    <field name="name" string="Comment"/>
+                    <field name="user_id"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_custom_list_work_hours_search">
+            <field name="name">custom.list.item.search work hours</field>
+            <field name="model">custom.list.item</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <search>
+                    <filter string="Date" name="filter_date" date="date" default_period="last_30_days"/>
+                    <separator/>
+                    <filter string="My Hours" name="filter_user" domain="[('user_id','=',uid)]"/>
+                    
+                    <group expand="0" string="Group By">
+                      <filter string="Date" name="date" domain="[]" context="{'group_by':'date'}" help="Date"/>
+                      <filter string="User" name="user_id" domain="[]" context="{'group_by':'user_id'}"/>
+                      <filter string="Analytic Account" name="analytic_account_id" domain="[]" context="{'group_by':'analytic_account_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <act_window id="action_custom_list_work_hours"
+                    name="Work Hours"
+                    res_model="custom.list.item"
+                    view_mode="pivot,tree"
+                    />
+        <menuitem id="menu_custom_list_work_hours"
+                  name="Work Hours"
+                  sequence="21"
+                  parent="menu_granheim"
+                  action="action_custom_list_work_hours"
+                  />
+
+    </data>
+</odoo>
