@@ -45,7 +45,7 @@
                 <search>
                     <filter string="Date" name="filter_date" date="date" default_period="last_30_days"/>
                     <separator/>
-                    <filter string="My Hours" name="filter_user" domain="[('user_id','=',uid)]"/>
+                    <filter string="My Work Hours" name="filter_user" domain="[('user_id','=',uid)]"/>
                     
                     <group expand="0" string="Group By">
                       <filter string="Date" name="date" domain="[]" context="{'group_by':'date'}" help="Date"/>
@@ -55,12 +55,14 @@
                 </search>
             </field>
         </record>
-        <act_window id="action_custom_list_work_hours"
-                    name="Work Hours"
-                    res_model="custom.list.item"
-                    view_mode="pivot,tree"
-                    context="{'search_default_filter_date': 1, 'search_default_filter_user': 1}"
-                    />
+        <record model="ir.actions.act_window" id="action_custom_list_work_hours">
+            <field name="name">Work Hours</field>
+            <field name="res_model">custom.list.item</field>
+            <field name="view_mode">pivot,tree</field>
+            <field name="search_view_id" ref="view_custom_list_work_hours_search"/>
+            <field name="domain">[('list_id', '=', 1)]</field>
+            <field name="context">{'search_default_filter_date': 1, 'search_default_filter_user': 1, 'default_list_id': 1}</field>
+        </record>
         <record model="ir.actions.act_window.view" id="action_custom_list_work_hours_pivot">
             <field name="sequence" eval="1"/>
             <field name="view_mode">pivot</field>
@@ -116,7 +118,7 @@
                 <search>
                     <filter string="Date" name="filter_date" date="date" default_period="last_365_days"/>
                     <separator/>
-                    <filter string="My Hours" name="filter_user" domain="[('user_id','=',uid)]"/>
+                    <filter string="My Food Days" name="filter_user" domain="[('user_id','=',uid)]"/>
                     
                     <group expand="0" string="Group By">
                       <filter string="Date" name="date" domain="[]" context="{'group_by':'date'}" help="Date"/>
@@ -126,12 +128,14 @@
                 </search>
             </field>
         </record>
-        <act_window id="action_custom_list_food_days"
-                    name="Food Days"
-                    res_model="custom.list.item"
-                    view_mode="pivot,tree"
-                    context="{'search_default_filter_date': 1, 'search_default_filter_user': 1}"
-                    />
+        <record model="ir.actions.act_window" id="action_custom_list_food_days">
+            <field name="name">Food Days</field>
+            <field name="res_model">custom.list.item</field>
+            <field name="view_mode">pivot,tree</field>
+            <field name="search_view_id" ref="view_custom_list_food_days_search"/>
+            <field name="domain">[('list_id', '=', 2)]</field>
+            <field name="context">{'search_default_filter_date': 1, 'search_default_filter_user': 1, 'default_list_id': 2}</field>
+        </record>
         <record model="ir.actions.act_window.view" id="action_custom_list_food_days_pivot">
             <field name="sequence" eval="1"/>
             <field name="view_mode">pivot</field>
