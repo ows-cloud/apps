@@ -5,9 +5,10 @@
         <menuitem id="menu_granheim"
                   name="Granheim"
                   sequence="2100"
+                  web_icon="custom_list,static/description/icon.png"
                   />
         
-        <!-- WORK HOURS -->
+        <!-- WORK HOURS PER WEEK -->
         
         <record model="ir.ui.view" id="view_custom_list_work_hours_pivot">
             <field name="name">custom.list.item.pivot work hours</field>
@@ -31,7 +32,8 @@
                     <field name="analytic_account_id"/>
                     <field name="float" string="Hours"/>
                     <field name="name" string="Comment"/>
-                    <field name="user_id"/>
+                    <field name="user_id" readonly="1"/>
+                    <field name="list_id" readonly="1"/>
                 </tree>
             </field>
         </record>
@@ -57,14 +59,96 @@
                     name="Work Hours"
                     res_model="custom.list.item"
                     view_mode="pivot,tree"
-                    domain=""
                     context="{'search_default_filter_date': 1, 'search_default_filter_user': 1}"
                     />
+        <record model="ir.actions.act_window.view" id="action_custom_list_work_hours_pivot">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">pivot</field>
+            <field name="view_id" ref="view_custom_list_work_hours_pivot"/>
+            <field name="act_window_id" ref="action_custom_list_work_hours"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_custom_list_work_hours_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_custom_list_work_hours_tree"/>
+            <field name="act_window_id" ref="action_custom_list_work_hours"/>
+        </record>
         <menuitem id="menu_custom_list_work_hours"
                   name="Work Hours"
                   sequence="21"
                   parent="menu_granheim"
                   action="action_custom_list_work_hours"
+                  />
+
+        <!-- FOOD DAYS PER MONTH -->
+        
+        <record model="ir.ui.view" id="view_custom_list_food_days_pivot">
+            <field name="name">custom.list.item.pivot food days</field>
+            <field name="model">custom.list.item</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <pivot>
+                    <field name="float" string="Days with food" type="measure"/>
+                    <field name="date" type="row" interval="month"/>
+                    <field name="user_id" type="col"/>
+                </pivot>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_custom_list_food_days_tree">
+            <field name="name">custom.list.item.tree food days</field>
+            <field name="model">custom.list.item</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <tree editable="top">
+                    <field name="date"/>
+                    <field name="float" string="Days with food"/>
+                    <field name="name" string="Comment"/>
+                    <field name="user_id" readonly="1"/>
+                    <field name="list_id" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_custom_list_food_days_search">
+            <field name="name">custom.list.item.search food days</field>
+            <field name="model">custom.list.item</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <search>
+                    <filter string="Date" name="filter_date" date="date" default_period="last_365_days"/>
+                    <separator/>
+                    <filter string="My Hours" name="filter_user" domain="[('user_id','=',uid)]"/>
+                    
+                    <group expand="0" string="Group By">
+                      <filter string="Date" name="date" domain="[]" context="{'group_by':'date'}" help="Date"/>
+                      <filter string="User" name="user_id" domain="[]" context="{'group_by':'user_id'}"/>
+                      <filter string="Analytic Account" name="analytic_account_id" domain="[]" context="{'group_by':'analytic_account_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <act_window id="action_custom_list_food_days"
+                    name="Food Days"
+                    res_model="custom.list.item"
+                    view_mode="pivot,tree"
+                    context="{'search_default_filter_date': 1, 'search_default_filter_user': 1}"
+                    />
+        <record model="ir.actions.act_window.view" id="action_custom_list_food_days_pivot">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">pivot</field>
+            <field name="view_id" ref="view_custom_list_food_days_pivot"/>
+            <field name="act_window_id" ref="action_custom_list_food_days"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_custom_list_food_days_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_custom_list_food_days_tree"/>
+            <field name="act_window_id" ref="action_custom_list_food_days"/>
+        </record>
+        <menuitem id="menu_custom_list_food_days"
+                  name="Food Days"
+                  sequence="21"
+                  parent="menu_granheim"
+                  action="action_custom_list_food_days"
                   />
 
     </data>
