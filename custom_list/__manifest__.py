@@ -8,6 +8,8 @@
     'author': 'AppsToGROW',
     'category': 'Administration',
     'data': [
+        'security/ir.model.access.csv',
+        'security/ir.rule.csv',
         'views/views.xml',
         'views/granheim.xml',
     ],
@@ -21,6 +23,11 @@
     'website': 'http://www.appstogrow.co',
 
     'description': '''
+GRANHEIM
+1. Create custom list for work and for food.
+2. Hard code window action domain & context (replace the number).
+Domain: [('list_id', '=', 1)]
+Context: 'default_list_id': 1
 
     ''',
 }

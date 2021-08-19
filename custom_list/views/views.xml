@@ -10,7 +10,7 @@
                 <tree editable="top">
                     <field name="name"/>
                     <field name="type"/>
-                    <field name="uom"/>
+                    <field name="id"/>
                 </tree>
             </field>
         </record>
