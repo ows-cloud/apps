@@ -299,25 +299,26 @@ class AmeldingLogikk:
             contract.l10n_no_arbeidsforhold = contract.env['ir.sequence'].next_by_code('l10n_no_hr_payroll.arbeidsforhold')
         af.arbeidsforholdId = contract.l10n_no_arbeidsforhold #string #optional
         af.typeArbeidsforhold = self._get(contract, 'l10n_no_Arbeidsforholdtype') #string #required
-        self._set(af, 'startdato', self._get(contract, 'date_start')) #date #optional
-        self._set(af, 'sluttdato', self._get(contract, 'date_end')) #date #optional
-        self._set(af, 'antallTimerPerUkeSomEnFullStillingTilsvarer', float(self._get(contract, 'l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer'))) #float #optional
-        #af.avloenningstype = self._get(contract, 'avloenningstype') #replace #string #optional #utgaar
-        job = self._get(contract, 'job_id')
-        self._set(af, 'yrke', self._get(job, 'l10n_no_profession_code')) #string #optional
-        self._set(af, 'arbeidstidsordning', self._get(contract, 'l10n_no_Arbeidstidsordning')) #selection #optional
-        self._set(af, 'stillingsprosent', self._get(contract, 'l10n_no_stillingsprosent')) #float #optional
-        self._set(af, 'sisteLoennsendringsdato', self._get(contract, 'l10n_no_sisteLoennsendringsdato')) #replace #datestring #optional
-        self._set(af, 'loennsansiennitet', self._get(contract, 'l10n_no_loennsansiennitet')) #datestring #optional
-        self._set(af, 'loennstrinn', self._get(contract, 'l10n_no_loennstrinn')) #string #optional
-        #af.fartoey = self.Fartoey() #optional
-        # permisjon
-        for leave in self._get(contract, 'leave_ids').sorted('date_from'):
-            p = self.Permisjon(leave)
-            af.permisjon.append(p)
-        self._set(af, 'sisteDatoForStillingsprosentendring', self._get(contract, 'l10n_no_sisteDatoForStillingsprosentendring')) #date #optional
-        self._set(af, 'aarsakTilSluttdato', self._get(contract, 'l10n_no_AarsakTilSluttdato'))  # string #optional
-        self._set(af, 'formForAnsettelse', self._get(contract, 'l10n_no_FormForAnsettelse'))  # string #optional
+        if af.typeArbeidsforhold != 'pensjonOgAndreTyperYtelserUtenAnsettelsesforhold':
+            self._set(af, 'startdato', self._get(contract, 'date_start')) #date #optional
+            self._set(af, 'sluttdato', self._get(contract, 'date_end')) #date #optional
+            self._set(af, 'antallTimerPerUkeSomEnFullStillingTilsvarer', float(self._get(contract, 'l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer'))) #float #optional
+            #af.avloenningstype = self._get(contract, 'avloenningstype') #replace #string #optional #utgaar
+            job = self._get(contract, 'job_id')
+            self._set(af, 'yrke', self._get(job, 'l10n_no_profession_code')) #string #optional
+            self._set(af, 'arbeidstidsordning', self._get(contract, 'l10n_no_Arbeidstidsordning')) #selection #optional
+            self._set(af, 'stillingsprosent', self._get(contract, 'l10n_no_stillingsprosent')) #float #optional
+            self._set(af, 'sisteLoennsendringsdato', self._get(contract, 'l10n_no_sisteLoennsendringsdato')) #replace #datestring #optional
+            self._set(af, 'loennsansiennitet', self._get(contract, 'l10n_no_loennsansiennitet')) #datestring #optional
+            self._set(af, 'loennstrinn', self._get(contract, 'l10n_no_loennstrinn')) #string #optional
+            #af.fartoey = self.Fartoey() #optional
+            # permisjon
+            for leave in self._get(contract, 'leave_ids').sorted('date_from'):
+                p = self.Permisjon(leave)
+                af.permisjon.append(p)
+            self._set(af, 'sisteDatoForStillingsprosentendring', self._get(contract, 'l10n_no_sisteDatoForStillingsprosentendring')) #date #optional
+            self._set(af, 'aarsakTilSluttdato', self._get(contract, 'l10n_no_AarsakTilSluttdato'))  # string #optional
+            self._set(af, 'formForAnsettelse', self._get(contract, 'l10n_no_FormForAnsettelse'))  # string #optional
         return af
         
     # def Fartoey(self):
