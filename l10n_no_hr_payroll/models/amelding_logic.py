@@ -302,7 +302,7 @@ class AmeldingLogikk:
         if af.typeArbeidsforhold != 'pensjonOgAndreTyperYtelserUtenAnsettelsesforhold':
             self._set(af, 'startdato', self._get(contract, 'date_start')) #date #optional
             self._set(af, 'sluttdato', self._get(contract, 'date_end')) #date #optional
-            self._set(af, 'antallTimerPerUkeSomEnFullStillingTilsvarer', float(self._get(contract, 'l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer'))) #float #optional
+            self._set(af, 'antallTimerPerUkeSomEnFullStillingTilsvarer', self._get(contract, 'l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer')) #float #optional
             #af.avloenningstype = self._get(contract, 'avloenningstype') #replace #string #optional #utgaar
             job = self._get(contract, 'job_id')
             self._set(af, 'yrke', self._get(job, 'l10n_no_profession_code')) #string #optional
