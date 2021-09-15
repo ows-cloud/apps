@@ -34,8 +34,37 @@
             <field name="dpi">90</field>
         </record>
 
-        <!-- ENVELOPE DLE res.partner -->
+        <record id="paperformat_c5" model="report.paperformat">
+            <field name="name">C5</field>
+            <field name="default" eval="False" />
+            <field name="format">A5</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">5</field>
+            <field name="margin_bottom">5</field>
+            <field name="margin_left">5</field>
+            <field name="margin_right">8</field>
+            <field name="header_line" eval="False" />
+            <field name="header_spacing">0</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <!-- ENVELOPE res.partner -->
         <template id="report_envelope_dle">
+            <t t-call="donation_merge.report_envelope_main">
+                <br/>
+            </t>
+        </template>
+        <template id="report_envelope_c5">
+            <t t-call="donation_merge.report_envelope_main">
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+            </t>
+        </template>
+        <template id="report_envelope_main">
             <t t-call="web.html_container">
                 <t t-foreach="docs.sorted(key=lambda x: x.name)" t-as="o">
                     <t t-call="web.basic_layout">
@@ -66,7 +95,7 @@
                                     <td style="width: 45%;"></td>
                                     <td style="width: 55%;">
                                         <p style="font-size: 24px;">
-                                            <br/>
+                                            <t t-raw="0"/>
                                             <span t-field="o.name"/><br/>
                                             <span t-field="o.street"/><br t-if="o.street"/>
                                             <span t-field="o.street2"/><br t-if="o.street2"/>
@@ -178,6 +207,17 @@
             name="donation_merge.report_envelope_dle"
             file="donation_merge.report_envelope_dle"
             attachment="'Envelope DL.pdf'"
+            />
+
+        <report
+            id="action_report_envelope_c5"
+            string="Envelope C5"
+            model="res.partner"
+            report_type="qweb-pdf"
+            paperformat="donation_merge.paperformat_c5"
+            name="donation_merge.report_envelope_c5"
+            file="donation_merge.report_envelope_c5"
+            attachment="'Envelope C5.pdf'"
             />
 
         <report
