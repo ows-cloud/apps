@@ -55,9 +55,9 @@ class AmeldingLogikk:
 
         period = self._get(self.amelding_record, 'kalendermaaned')
         date_from = datetime.strptime(period + '-01', '%Y-%m-%d')
-        self.date_from = date_from
+        self.date_from = date_from.date()
         date_to = date_from + relativedelta(day=31)
-        self.date_to = date_to
+        self.date_to = date_to.date()
         self.company = self._get(self.amelding_record, 'company_id')
         company_id = self._get(self.company,'id')
         self.employees = self._get_records('hr.employee', [('company_id','=',company_id)], self.company)
@@ -217,7 +217,7 @@ class AmeldingLogikk:
         # arbeidsforhold
         for contract in self._get(employee, 'contract_ids').sorted('date_start'):
             newer_period = contract.date_start > self.date_to
-            older_period = contract.date_end < self.date_from
+            older_period = contract.date_end and contract.date_end < self.date_from
             changed = contract.write_date.date() > self.date_from
             if newer_period or (older_period and not changed):
                 continue
