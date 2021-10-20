@@ -218,7 +218,7 @@ class AmeldingLogikk:
         for contract in self._get(employee, 'contract_ids').sorted('date_start'):
             newer_period = contract.date_start > self.date_to
             older_period = contract.date_end < self.date_from
-            changed = contract.write_date > self.date_from
+            changed = contract.write_date.date() > self.date_from
             if newer_period or (older_period and not changed):
                 continue
             af = self.Arbeidsforhold(contract)
@@ -320,9 +320,9 @@ class AmeldingLogikk:
             #af.fartoey = self.Fartoey() #optional
             # permisjon
             for leave in self._get(contract, 'leave_ids').sorted('date_from'):
-                newer_period = leave.date_from > self.date_to
-                older_period = leave.date_to < self.date_from
-                changed = leave.write_date > self.date_from
+                newer_period = leave.date_from.date() > self.date_to
+                older_period = leave.date_to.date() < self.date_from
+                changed = leave.write_date.date > self.date_from
                 if newer_period or (older_period and not changed):
                     continue
                 p = self.Permisjon(leave)
