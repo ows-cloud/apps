@@ -55,7 +55,9 @@ class AmeldingLogikk:
 
         period = self._get(self.amelding_record, 'kalendermaaned')
         date_from = datetime.strptime(period + '-01', '%Y-%m-%d')
+        self.date_from = date_from
         date_to = date_from + relativedelta(day=31)
+        self.date_to = date_to
         self.company = self._get(self.amelding_record, 'company_id')
         company_id = self._get(self.company,'id')
         self.employees = self._get_records('hr.employee', [('company_id','=',company_id)], self.company)
@@ -199,6 +201,7 @@ class AmeldingLogikk:
         return v
     
     def Inntektsmottaker(self, employee):
+        use = False
         im = a.Inntektsmottaker()
         norskIdentifikator = self._get(employee, 'identification_id') #string
         if norskIdentifikator:
@@ -213,13 +216,17 @@ class AmeldingLogikk:
         #im.identifiserendeInformasjon.ansattnummer = '123' #replace #optional
         # arbeidsforhold
         for contract in self._get(employee, 'contract_ids').sorted('date_start'):
-            if contract.state in ('close', 'cancel'):
+            newer_period = contract.date_start > self.date_to
+            older_period = contract.date_end < self.date_from
+            changed = contract.write_date > self.date_from
+            if newer_period or (older_period and not changed):
                 continue
             af = self.Arbeidsforhold(contract)
             im.arbeidsforhold.append(af) #optional
+            use = True
 
         for payslip in [p for p in self.payslips if self._get(self._get(p, 'employee_id'), 'id') == self._get(employee, 'id')]:
-
+            use = True
             for line in [l for l in self.payslip_lines if self._get(self._get(l, 'slip_id'), 'id') == self._get(payslip, 'id')]:
                 rule = self._get(line, 'salary_rule_id')
                 rule_type = self._get(rule, 'l10n_no_RegelType')
@@ -243,9 +250,6 @@ class AmeldingLogikk:
                         self.aga[navn[beregnAga]] += self._get(line, 'total')
                     else:
                         _debug('ERROR: payslip line rule_type = ' + str(rule_type))
-                        
-
-            
 
         # im.sjoefolksrelatertInformasjon = self.SjoefolksrelatertInformasjon()
         # # oppholdPaaSvalbardJanMayenOgBilandene
@@ -257,6 +261,8 @@ class AmeldingLogikk:
         #     trekk = self.Utleggstrekk()
         #     im.utleggstrekk.append(trekk) #optional
 
+        if not use:
+            return False
         return im
         
     def InternasjonalIdentifikator(self, employee):
@@ -314,6 +320,11 @@ class AmeldingLogikk:
             #af.fartoey = self.Fartoey() #optional
             # permisjon
             for leave in self._get(contract, 'leave_ids').sorted('date_from'):
+                newer_period = leave.date_from > self.date_to
+                older_period = leave.date_to < self.date_from
+                changed = leave.write_date > self.date_from
+                if newer_period or (older_period and not changed):
+                    continue
                 p = self.Permisjon(leave)
                 af.permisjon.append(p)
             self._set(af, 'sisteDatoForStillingsprosentendring', self._get(contract, 'l10n_no_sisteDatoForStillingsprosentendring')) #date #optional
@@ -624,7 +635,7 @@ class AmeldingLogikk:
         _debug('%s %s %s' % (str(model), str(domain), str(record)))
         if type(record) not in (dict, tuple):
             # odoo regular
-            records = record.env[model].search(domain)
+            records = record.env[model].with_context(active_test=False).search(domain)
             return records
         else:
             # test data (get all records)
