@@ -1,5 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_duty_availability,access_duty_availability,model_duty_availability,base.group_user,1,1,1,1
-access_duty_list,access_duty_list,model_duty_list,base.group_user,1,1,1,1
-access_duty_list_line,access_duty_list_line,model_duty_list_line,base.group_user,1,1,1,1
-access_duty_role,access_duty_role,model_duty_role,base.group_user,1,1,1,1

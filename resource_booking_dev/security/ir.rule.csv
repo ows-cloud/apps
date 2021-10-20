@@ -1,3 +1,0 @@
-id,name,model_id:id,groups:id,domain_force,perm_read,perm_write,perm_create,perm_unlink
-booking_booking_company_rule,#company booking.booking,model_booking_booking,,"['&',  '|',('company_id','child_of',[user.company_id.id]),('company_id','parent_of',[user.company_id.id]) ,  ('company_id','in',[c.id for c in user.company_ids]) ]",True,True,True,True
-booking_time_company_rule,#company booking.time,model_booking_time,,"['&',  '|',('company_id','child_of',[user.company_id.id]),('company_id','parent_of',[user.company_id.id]) ,  ('company_id','in',[c.id for c in user.company_ids]) ]",True,True,True,True
