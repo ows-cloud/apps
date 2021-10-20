@@ -325,7 +325,7 @@ class AmeldingLogikk:
             for leave in self._get(contract, 'leave_ids').sorted('date_from'):
                 newer_period = leave.date_from.date() > self.date_to
                 older_period = leave.date_to.date() < self.date_from
-                changed = leave.write_date.date > self.date_from
+                changed = leave.write_date.date() > self.date_from
                 if newer_period or (older_period and not changed):
                     continue
                 p = self.Permisjon(leave)
