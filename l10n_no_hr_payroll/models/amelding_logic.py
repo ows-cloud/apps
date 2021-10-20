@@ -217,7 +217,10 @@ class AmeldingLogikk:
         # arbeidsforhold
         for contract in self._get(employee, 'contract_ids').sorted('date_start'):
             newer_period = contract.date_start > self.date_to
-            older_period = contract.date_end and contract.date_end < self.date_from
+            if contract.date_end:
+                older_period = contract.date_end < self.date_from
+            else:
+                older_period = False
             changed = contract.write_date.date() > self.date_from
             if newer_period or (older_period and not changed):
                 continue
