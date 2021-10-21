@@ -51,13 +51,12 @@
                 </tree>
     		</field>
 		</record>
-		<act_window id="action_donation_fundrace_partner_tree"
-                    name="Partners"
-                    src_model=""
-                    res_model="donation.fundrace.partner"
-                    view_mode="tree,form"
-                    view_id="view_donation_fundrace_partner_tree"
-                    />
+        <record id="action_donation_fundrace_partner_tree" model="ir.actions.act_window">
+            <field name="name">Partners</field>
+            <field name="res_model">donation.fundrace.partner</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_donation_fundrace_partner_tree"/>
+        </record>
 
 		<record model="ir.ui.view" id="view_donation_fundrace_sponsorship_search">
     		<field name="name">donation.fundrace.sponsorship.search</field>
@@ -98,13 +97,12 @@
                 </tree>
     		</field>
 		</record>
-		<act_window id="action_donation_fundrace_sponsorship_tree"
-                    name="Sponsorships"
-                    src_model=""
-                    res_model="donation.fundrace.sponsorship"
-                    view_mode="tree"
-					context="{'default_currency_id': ref('base.NOK')}"
-                    />
+        <record id="action_donation_fundrace_sponsorship_tree" model="ir.actions.act_window">
+            <field name="name">Sponsorships</field>
+            <field name="res_model">donation.fundrace.sponsorship</field>
+            <field name="view_mode">tree</field>
+            <field name="context">{'default_currency_id': ref('base.NOK')}</field>
+        </record>
 
         <menuitem id="menu_donation" name="Donations" sequence="90" />
 		<menuitem id="menu_donation_fundrace" name="Fundrace" sequence="10" parent="menu_donation" groups="group_donation_fundrace" />

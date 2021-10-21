@@ -91,14 +91,14 @@
             </t>
         </template>
 
-        <report
-            id="action_report_donation_fundrace"
-            string="Donation Fundrace Report"
-            model="donation.fundrace.partner"
-            report_type="qweb-pdf"
-            name="donation_fundrace.report_donation_fundrace"
-            file="donation_fundrace.report_donation_fundrace"
-            />
+        <record id="action_report_donation_fundrace" model="ir.actions.report">
+            <field name="name">Donation Fundrace Report</field>
+            <field name="model">donation.fundrace.partner</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">donation_fundrace.report_donation_fundrace</field>
+            <field name="report_file">donation_fundrace.report_donation_fundrace</field>
+            <field name="binding_type">report</field>
+        </record>
 
         <record id="mail_template_donation_fundrace_report" model="mail.template">
             <field name="name">Donation Fundrace Report</field>
@@ -115,7 +115,6 @@
 <div>
     ${user.signature | safe}
 </div>]]></field>
-            <field name="user_signature" eval="False"/>
             <field name="report_template" ref="donation_fundrace.action_report_donation_fundrace"/>
             <field name="report_name">Fundrace Report.pdf</field>
         </record>

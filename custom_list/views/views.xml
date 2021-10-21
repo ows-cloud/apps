@@ -14,11 +14,12 @@
                 </tree>
             </field>
         </record>
-        <act_window id="action_custom_list"
-                    name="Custom List"
-                    res_model="custom.list"
-                    view_mode="tree"
-                    />
+        <record id="action_custom_list" model="ir.actions.act_window">
+            <field name="name">Custom List</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">custom.list</field>
+            <field name="view_mode">tree</field>
+        </record>
         <menuitem id="menu_custom_list"
                   name="Custom Lists"
                   sequence="21"

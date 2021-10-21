@@ -5,6 +5,7 @@ _logger = logging.getLogger(__name__)
 
 class DonationFundraceSponsorship(models.Model):
     _name = 'donation.fundrace.sponsorship'
+    _description = 'donation.fundrace.sponsorship'
 
     @api.depends('amount_per_lap','laps','amount_fixed')
     def _compute_amount_total(self):
@@ -36,6 +37,7 @@ class DonationFundraceSponsorship(models.Model):
 
 class DonationFundracePartner(models.Model):
     _name = 'donation.fundrace.partner'
+    _description = 'donation.fundrace.partner'
     _inherits = {'res.partner': 'partner_id'}
 
     @api.depends('runners.amount_total_nok')

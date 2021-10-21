@@ -4,7 +4,7 @@
         <!-- hr.payslip -->
 
         <record model="ir.ui.view" id="hr_payslip_view_form">
-            <field name="name">hr.payslip.form.hr_professional</field>
+            <field name="name">hr.payslip.form</field>
             <field name="model">hr.payslip</field>
             <field name="inherit_id" ref="payroll.hr_payslip_view_form"/>
             <field name="priority" eval="20"/>

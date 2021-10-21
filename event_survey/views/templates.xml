@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- ERROR: inherit_id="survey.page"
     <template id="survey_page" inherit_id="survey.page">
         <button t-if="last" type="submit" class="btn btn-primary" name="button_submit" position="replace">
             <button t-if="last and survey.event_id" type="submit" class="btn btn-primary" name="button_submit" value="finish">
                 Continue</button>
             <button t-if="last and not survey.event_id" type="submit" class="btn btn-primary" name="button_submit" value="finish">Submit survey</button>
         </button>
-    </template>
+    </template> -->
 
     <template id="registration_survey_list" name="Registrations">
     <t t-call="website.layout">

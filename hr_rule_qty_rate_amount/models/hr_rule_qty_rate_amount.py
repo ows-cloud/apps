@@ -3,6 +3,7 @@ from odoo import api, fields, models, _
 
 class HrRuleQtyRateAmount(models.Model):
     _name = 'hr.rule.qty_rate_amount'
+    _description = 'hr.rule.qty_rate_amount'
 
     salary_rule_id = fields.Many2one('hr.salary.rule', string="Salary Rule", ondelete='restrict')
     analytic_account_id = fields.Many2one('account.analytic.account', string="Analytic Account", ondelete='restrict')
@@ -15,6 +16,9 @@ class HrRuleQtyRateAmount(models.Model):
                             ondelete='''Should NOT be 'cascade', see the write method''')
     company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True,
                                  default=lambda self: self.env.user.company_id)
+
+    def _valid_field_parameter(self, field, name):
+        return name == 'ondelete' or super()._valid_field_parameter(field, name)
 
     @api.depends('quantity', 'rate', 'amount')
     def _compute_total(self):

@@ -198,38 +198,39 @@
             </t>
         </template>
 
-        <report
-            id="action_report_envelope_dle"
-            string="Envelope DLE (110x220 mm)"
-            model="res.partner"
-            report_type="qweb-pdf"
-            paperformat="donation_merge.paperformat_dle"
-            name="donation_merge.report_envelope_dle"
-            file="donation_merge.report_envelope_dle"
-            attachment="'Envelope DL.pdf'"
-            />
+        <record id="action_report_envelope_dle" model="ir.actions.report">
+            <field name="name">Envelope DLE (110x220 mm)</field>
+            <field name="model">res.partner</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">donation_merge.report_envelope_dle</field>
+            <field name="report_file">donation_merge.report_envelope_dle</field>
+            <field name="paperformat_id" ref="donation_merge.paperformat_dle"/>
+            <field name="binding_type">report</field>
+            <field name="attachment">Envelope DL.pdf</field>
+        </record>
 
-        <report
-            id="action_report_envelope_c5"
-            string="Envelope C5"
-            model="res.partner"
-            report_type="qweb-pdf"
-            paperformat="donation_merge.paperformat_c5"
-            name="donation_merge.report_envelope_c5"
-            file="donation_merge.report_envelope_c5"
-            attachment="'Envelope C5.pdf'"
-            />
+        <record id="action_report_envelope_c5" model="ir.actions.report">
+            <field name="name">Envelope C5</field>
+            <field name="model">res.partner</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">donation_merge.report_envelope_c5</field>
+            <field name="report_file">donation_merge.report_envelope_c5</field>
+            <field name="paperformat_id" ref="donation_merge.paperformat_c5"/>
+            <field name="binding_type">report</field>
+            <field name="attachment">Envelope C5.pdf</field>
+        </record>
 
-        <report
-            id="action_report_donation_tax_receipt"
-            string="Thank-you letter"
-            model="donation.tax.receipt"
-            report_type="qweb-pdf"
-            paperformat="donation_merge.paperformat_a5"
-            name="donation_merge.report_donation_tax_receipt"
-            file="donation_merge.report_donation_tax_receipt"
-            attachment="'Receipt to '+(object.partner_id.name)+'.pdf'"
-            /><!-- English only attachment name? -->
+        <record id="action_report_donation_tax_receipt" model="ir.actions.report">
+            <field name="name">Thank-you letter</field>
+            <field name="model">donation.tax.receipt</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">donation_merge.report_donation_tax_receipt</field>
+            <field name="report_file">donation_merge.report_donation_tax_receipt</field>
+            <field name="paperformat_id" ref="donation_merge.paperformat_a5"/>
+            <field name="binding_type">report</field>
+            <field name="attachment">Receipt to '+(object.partner_id.name)+'.pdf</field>
+            <!-- English only attachment name? -->
+        </record>
 
         <record id="mail_template_donation_tax_receipt_english" model="mail.template">
             <field name="name">Donation Tax Receipt - English</field>
@@ -251,7 +252,6 @@
 <div>
     ${user.signature | safe}
 </div>]]></field>
-            <field name="user_signature" eval="False"/>
             <field name="report_template" ref="donation_merge.action_report_donation_tax_receipt"/>
             <field name="report_name">Receipt to ${object.partner_id.name}.pdf</field>
         </record>
@@ -276,33 +276,12 @@
 <div>
     ${user.signature | safe}
 </div>]]></field>
-            <field name="user_signature" eval="False"/>
             <field name="report_template" ref="donation_merge.action_report_donation_tax_receipt"/>
             <field name="report_name">Kvittering til ${object.partner_id.name}.pdf</field>
         </record>
 
-        <act_window id="action_donation_tax_receipt_english"
-                    name="Send English Donation Receipts on Email"
-                    res_model="mail.compose.message"
-                    src_model="donation.tax.receipt"
-                    target="new"
-                    view_id="mail.email_compose_message_wizard_form"
-                    view_mode="form"
-                    context="{'default_composition_mode': 'mass_mail', 'default_template_id': (donation_merge.mail_template_donation_tax_receipt_english), 'default_use_template': True}"
-                    />
-        <act_window id="action_donation_tax_receipt_norwegian"
-                    name="Send Norwegian Donation Receipts on Email"
-                    res_model="mail.compose.message"
-                    src_model="donation.tax.receipt"
-                    target="new"
-                    view_id="mail.email_compose_message_wizard_form"
-                    view_mode="form"
-                    context="{'default_composition_mode': 'mass_mail', 'default_template_id': (donation_merge.mail_template_donation_tax_receipt_norwegian), 'default_use_template': True}"
-                    />
-        <!-- Context: Cannot get %('donation_merge.mail_template_donation_tax_receipt_english')s to database-id.
-
         <record id="action_donation_tax_receipt_english" model="ir.actions.act_window">
-            <field name="name">Send Donation Receipts on Email</field>
+            <field name="name">Send English Donation Receipts on Email</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">mail.compose.message</field>
             <field name="src_model">donation.tax.receipt</field>
@@ -310,7 +289,19 @@
             <field name="view_mode">form</field>
             <field name="view_id" ref="mail.email_compose_message_wizard_form"/>
             <field name="context">{'default_composition_mode': 'mass_mail', 'default_template_id': %('donation_merge.mail_template_donation_tax_receipt_english')s, 'default_use_template': True}</field>
+            <!-- ref('') ? -->
         </record>
-        -->
+        <record id="action_donation_tax_receipt_norwegian" model="ir.actions.act_window">
+            <field name="name">Send Norwegian Donation Receipts on Email</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mail.compose.message</field>
+            <field name="src_model">donation.tax.receipt</field>
+            <field name="target">new</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="mail.email_compose_message_wizard_form"/>
+            <field name="context">{'default_composition_mode': 'mass_mail', 'default_template_id': %('donation_merge.mail_template_donation_tax_receipt_norwegian')s, 'default_use_template': True}</field>
+            <!-- ref('') ? -->
+        </record>
+        <!-- Context: Cannot get %('donation_merge.mail_template_donation_tax_receipt_english')s to database-id. -->
     </data>
 </odoo>

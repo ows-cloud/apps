@@ -38,42 +38,43 @@ class Tax(models.Model):
     _inherit = 'account.tax'
 
     l10n_no_standard_tax_code = fields.Selection([
-        (0, '0 No VAT treatment'),
-        (1, '1 Input VAT deductible (domestic) - Regular rate'),
-        (3, '3 Output VAT - Regular rate'),
-        (5, '5 No output VAT - Zero rate'),
-        (6, '6 Not liable to VAT treatment, turnover outside the scope of the VAT legislation'),
-        (7, '7 No VAT treatment - no turnover according to the VAT legislation'),
-        (11, '11 Input VAT deductible (domestic) - Reduced rate, middle'),
-        (12, '12 Input VAT deductible (domestic) - Reduced rate, raw fish'),
-        (13, '13 Input VAT deductible (domestic) - Reduced rate, low'),
-        (14, '14 Input VAT deductible (payed on import) - Regular rate'),
-        (15, '15 Input VAT deductible (payed on import) - Reduced rate, middle'),
-        (20, '20 No VAT treatment'),
-        (21, '21 Basis on import of goods - Regular rate'),
-        (22, '22 Basis on import of goods - Reduced rate, middle'),
-        (31, '31 Output VAT - Reduced rate, middle'),
-        (32, '32 Output VAT - Reduced rate, raw fish'),
-        (33, '33 Output VAT - Reduced rate, low'),
-        (51, '51 Domestic sales of reverce charge /VAT obligation - Zero rate'),
-        (52, '52 Export of goods and services - Zero rate'),
-        (81, '81 Importation of goods, VAT deductible - Regular rate'),
-        (82, '82 Importation of goods, without deduction of VAT - Regular rate'),
-        (83, '83 Importation of goods, VAT deductible - Reduced rate, middle'),
-        (84, '84 Importation of goods, without deduction of VAT - Reduced rate, middle'),
-        (85, '85 Importation of goods, not applicable for VAT - Zero rate'),
-        (86, '86 Services purchased from abroad, VAT deductible - Regular rate'),
-        (87, '87 Services purchased from abroad, without deduction of VAT - Regular rate'),
-        (88, '88 Services purchased from abroad, VAT deductible - Reduced rate, low'),
-        (89, '89 Services purchased from abroad, without deduction of VAT - Reduced rate, low'),
-        (91, '91 Purchase of emissions trading or gold, VAT deductible - Regular rate'),
-        (92, '92 Purchase of emissions trading or gold, without deduction of VAT - Regular rate'),
+        ('0', '0 No VAT treatment'),
+        ('1', '1 Input VAT deductible (domestic) - Regular rate'),
+        ('3', '3 Output VAT - Regular rate'),
+        ('5', '5 No output VAT - Zero rate'),
+        ('6', '6 Not liable to VAT treatment, turnover outside the scope of the VAT legislation'),
+        ('7', '7 No VAT treatment - no turnover according to the VAT legislation'),
+        ('11', '11 Input VAT deductible (domestic) - Reduced rate, middle'),
+        ('12', '12 Input VAT deductible (domestic) - Reduced rate, raw fish'),
+        ('13', '13 Input VAT deductible (domestic) - Reduced rate, low'),
+        ('14', '14 Input VAT deductible (payed on import) - Regular rate'),
+        ('15', '15 Input VAT deductible (payed on import) - Reduced rate, middle'),
+        ('20', '20 No VAT treatment'),
+        ('21', '21 Basis on import of goods - Regular rate'),
+        ('22', '22 Basis on import of goods - Reduced rate, middle'),
+        ('31', '31 Output VAT - Reduced rate, middle'),
+        ('32', '32 Output VAT - Reduced rate, raw fish'),
+        ('33', '33 Output VAT - Reduced rate, low'),
+        ('51', '51 Domestic sales of reverce charge /VAT obligation - Zero rate'),
+        ('52', '52 Export of goods and services - Zero rate'),
+        ('81', '81 Importation of goods, VAT deductible - Regular rate'),
+        ('82', '82 Importation of goods, without deduction of VAT - Regular rate'),
+        ('83', '83 Importation of goods, VAT deductible - Reduced rate, middle'),
+        ('84', '84 Importation of goods, without deduction of VAT - Reduced rate, middle'),
+        ('85', '85 Importation of goods, not applicable for VAT - Zero rate'),
+        ('86', '86 Services purchased from abroad, VAT deductible - Regular rate'),
+        ('87', '87 Services purchased from abroad, without deduction of VAT - Regular rate'),
+        ('88', '88 Services purchased from abroad, VAT deductible - Reduced rate, low'),
+        ('89', '89 Services purchased from abroad, without deduction of VAT - Reduced rate, low'),
+        ('91', '91 Purchase of emissions trading or gold, VAT deductible - Regular rate'),
+        ('92', '92 Purchase of emissions trading or gold, without deduction of VAT - Regular rate'),
     ], 'Standard Tax Code')
 
 
 # TODO The wizard should download the SAF-T XML file directly. Then this class may be deleted.
 class Saft(models.Model):
     _name = 'l10n_no_account_saft.xml'
+    _description = 'l10n_no_account_saft.xml'
 
     @api.depends('month_from', 'month_to')
     def _compute_saft_filename(self):
@@ -100,6 +101,7 @@ class Saft(models.Model):
 
 class SaftWizard(models.TransientModel):
     _name = 'l10n_no_account_saft.xml.wizard'
+    _description = 'l10n_no_account_saft.xml.wizard'
 
     month_from = fields.Char()
     month_to = fields.Char()

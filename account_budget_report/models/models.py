@@ -52,6 +52,7 @@ class CrossoveredBudget(models.Model):
 
 class AccountBudgetLine(models.Model):
     _name = 'account.budget.line'
+    _description = "Budget Line"
 
     @api.model
     def _compute_analytic_domain(self):
@@ -156,6 +157,7 @@ class AccountBudgetLine(models.Model):
 # VIEW depends on account.budget.line
 class AccountBudgetReport(models.Model):
     _name = "account.budget.report"
+    _description = "Report: Budget & Accounting"
     _auto = False
 
     @api.model

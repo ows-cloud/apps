@@ -43,6 +43,7 @@
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">
                 <search>
+                    <field name="name"/>
                     <filter string="Date" name="filter_date" date="date" default_period="last_30_days"/>
                     <separator/>
                     <filter string="My Work Hours" name="filter_user" domain="[('user_id','=',uid)]"/>
@@ -116,6 +117,7 @@
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">
                 <search>
+                    <field name="name"/>
                     <filter string="Date" name="filter_date" date="date" default_period="last_365_days"/>
                     <separator/>
                     <filter string="My Food Days" name="filter_user" domain="[('user_id','=',uid)]"/>

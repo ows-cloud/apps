@@ -97,11 +97,13 @@
                 </form>
             </field>
         </record>
-        <act_window id="action_account_budget_line"
-                    name="Journal Items Budget"
-                    res_model="account.budget.line"
-                    view_mode="tree,pivot,graph,form"
-                    />
+        <record id="action_account_budget_line" model="ir.actions.act_window">
+            <field name="name">Journal Items Budget</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.budget.line</field>
+            <field name="view_mode">tree,pivot,graph,form</field>
+
+        </record>
         <menuitem id="menu_account_budget_line"
                   name="Budget Lines"
                   sequence="61"
@@ -265,11 +267,12 @@
                 </search>
             </field>
         </record>
-        <act_window id="action_account_budget_report"
-                    name="Journal Items Report"
-                    res_model="account.budget.report"
-                    view_mode="pivot,graph,tree,form"
-                    />
+        <record id="action_account_budget_report" model="ir.actions.act_window">
+            <field name="name">Journal Items Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.budget.report</field>
+            <field name="view_mode">pivot,graph,tree,form</field>
+        </record>
         <menuitem id="menu_account_budget_report"
                   name="Account/Budget"
                   sequence="21"

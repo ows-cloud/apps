@@ -3,6 +3,7 @@ from odoo import api, fields, models
 
 class CustomList(models.Model):
     _name = 'custom.list'
+    _description = 'Custom List'
     
     company_id = fields.Many2one('res.company', string="Company", index=True, default=lambda self: self.env.user.company_id)
     name = fields.Char()
@@ -11,6 +12,7 @@ class CustomList(models.Model):
 
 class CustomListItem(models.Model):
     _name = 'custom.list.item'
+    _description = 'Custom List Item'
 
     name = fields.Char()
 

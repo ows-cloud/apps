@@ -167,15 +167,18 @@ class ResFieldValue(models.Model):
     field_id = fields.Many2one('res.field', string="Field", required=True, index=True, ondelete='restrict')
     field_code = fields.Char(string='Code', related='field_id.code', store=False, readonly=True)
     field_app = fields.Selection(string='Application', related='field_id.app', store=False, readonly=True)
-    field_country_id = fields.Many2one('res.country', string='Country', related='field_id.country_id', store=False, readonly=True)
+    field_country_id = fields.Many2one('res.country', string='Field Country', related='field_id.country_id', store=False, readonly=True)
     field_data_type = fields.Selection(string='Data Type', related='field_id.data_type', store=False, readonly=True)
     selection_value_id = fields.Many2one('res.field.selection_value', string='Selection')
     reference_value = fields.Reference('_get_reference_model', string="Reference")
     value = fields.Char()
     model = fields.Char(required=True, readonly=True, index=True)
-    res_id = fields.Integer(required=True, readonly=True, index=True, ondelete='''Should NOT be 'cascade', see the write method''')
+    res_id = fields.Integer(required=True, readonly=True, index=True, ondelete='restrict') # '''ondelete SHOULD NOT be 'cascade', see the write method''')
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, store=True, index=True, default=lambda self: self.env.user.company_id)
-    company_country_id = fields.Many2one('res.country', string='Country', related='company_id.country_id', store=False, readonly=True)
+    company_country_id = fields.Many2one('res.country', string='Company Country', related='company_id.country_id', store=False, readonly=True)
+
+    def _valid_field_parameter(self, field, name):
+        return name == 'ondelete' or super()._valid_field_parameter(field, name)
 
     @api.model
     def _get_apps(self):
