@@ -51,7 +51,6 @@ for record in records:
   result_list.append((result, record.quantity, record.rate, record.analytic_account_id.id))''')
 
     #TODO should add some checks on the type of result (should be float)
-    @api.multi
     def _compute_rule(self, localdict):
         """
         :param localdict: dictionary containing the environement in which to compute the rule
@@ -87,7 +86,6 @@ for record in records:
             except:
                 raise UserError(_('Wrong python code defined for salary rule %s (%s).') % (self.name, self.code))
 
-    @api.multi
     def _satisfy_condition(self, localdict):
         """
         @param contract_id: id of hr.contract to be tested

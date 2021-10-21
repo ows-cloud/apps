@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- hr.contract -->
+
+        <record model="ir.ui.view" id="view_hr_contract_form">
+            <field name="name">hr.contract.form.leaves</field>
+            <field name="model">hr.contract</field>
+            <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/> 
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page name="leaves" string="Leaves">
+                        <button name="l10n_no_action_new_leave" type="object" string="Create new leave"/>
+                        <field name="leave_ids">
+                            <tree create="0">
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                                <field name="employee_id"/>
+                                <field name="state" invisible="1"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+        <!-- hr.leave -->
+
+        <record model="ir.ui.view" id="view_hr_leave_form">
+            <field name="name">hr.leave.form.contract</field>
+            <field name="model">hr.leave</field>
+            <field name="inherit_id" ref="hr_holidays.hr_leave_view_form_manager"/> 
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <field name="payslip_status" position="after">
+                    <field name="contract_id" domain="[('employee_id','=',employee_id)]"/>
+                    <field name="percent"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- l10n_no_payroll.amelding -->
+        
+        <record model="ir.ui.view" id="view_l10n_no_payroll_amelding_tree">
+            <field name="name">A-melding</field>
+            <field name="model">l10n_no_payroll.amelding</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <tree string="A-melding" create="0" edit="0">
+                    <field name="kalendermaaned"/>
+                    <field name="meldingsId"/>
+                    <field name="erstatterMeldingsId"/>
+                    <field name="state"/>
+                    <field name="leveringstidspunkt"/>
+                    <field name="company_id"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="view_l10n_no_payroll_amelding_form">
+            <field name="name">A-melding</field>
+            <field name="model">l10n_no_payroll.amelding</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <form string="A-melding" create="0" edit="0">
+                    <header>
+                        <button name="set_state_done" type="object" string="Done" states="new"/>
+                        <field name="state" widget="statusbar" />
+                    </header>
+                    <group colspan="4">
+                        <group colspan="2" col="2">
+                            <separator string="A-melding" colspan="2"/>
+                            <field name="kalendermaaned"/>
+                            <field name="meldingsId"/>
+                            <field name="erstatterMeldingsId"/>
+                            <field name="leveringstidspunkt"/>
+                            <field name="company_id"/>
+                            <field name="amelding_filename" invisible="1"/>
+                            <field name="amelding_xml" filename="amelding_filename"/>
+                            <!-- <field name="amelding" widget="ace" options="{'mode': 'xml'}"/> -->
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_l10n_no_payroll_amelding_tree">
+            <field name="name">A-melding</field>
+            <field name="res_model">l10n_no_payroll.amelding</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- l10n_no_payroll.amelding.wizard -->
+
+        <record model="ir.ui.view" id="view_l10n_no_payroll_amelding_wizard_form">
+            <field name="name">Lag A-melding</field>
+            <field name="model">l10n_no_payroll.amelding.wizard</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <form string="Lag A-melding">
+                    <group colspan="4">
+                        <group colspan="2" col="2">
+                            <separator string="Lag A-melding" colspan="2"/>
+                            <field name="kalendermaaned" default_focus="1" placeholder="yyyy-mm"/>
+                            <button name="lag_amelding" type="object" string="Lag A-melding" class="oe_highlight"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <!-- <act_window id="action_l10n_no_payroll_amelding_wizard_form"
+                    name="Lag A-melding"
+                    src_model=""
+                    res_model="l10n_no_payroll.amelding.wizard"
+                    view_mode="form"
+                    target="inline"/> -->
+        <record id="action_l10n_no_payroll_amelding_wizard_form" model="ir.actions.act_window">
+            <field name="name">Lag A-melding</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">l10n_no_payroll.amelding.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+
+        <!-- feriepenger (hr.payslip.line) -->
+
+        <record model="ir.actions.server" id="action_l10n_no_feriepenger">
+            <field name="name">Vis feriepenger</field>
+            <field name="model_id" ref="payroll.model_hr_payslip_line"/>
+            <field name="state">code</field>
+            <field name="code">env['hr.payslip.line'].l10n_no_feriepenger()</field>
+        </record>
+
+        <!-- l10n_no_payroll.tabelltrekk -->
+
+        <record model="ir.actions.server" id="action_l10n_no_import_tax_deduction">
+            <field name="name">Importer trekktabeller</field>
+            <field name="model_id" ref="model_l10n_no_payroll_tabelltrekk"/>
+            <field name="state">code</field>
+            <field name="code">model.l10n_no_import_tax_deduction()</field>
+        </record>
+
+        <!-- menu -->
+
+        <menuitem id="menu_payroll_norway" name="Norge" sequence="20" parent="payroll.payroll_menu_root"/>
+        <menuitem id="menu_payroll_norway_lag_amelding"
+                  name="Lag A-melding"
+                  sequence="20"
+                  parent="menu_payroll_norway"
+                  groups="payroll.group_payroll_manager"
+                  action="action_l10n_no_payroll_amelding_wizard_form"/>
+        <menuitem id="menu_payroll_norway_amelding"
+                  name="A-melding"
+                  sequence="21"
+                  parent="menu_payroll_norway"
+                  action="action_l10n_no_payroll_amelding_tree"/>
+        <menuitem id="menu_payroll_norway_feriepenger"
+                  name="Vis feriepenger"
+                  sequence="22"
+                  parent="menu_payroll_norway"
+                  action="action_l10n_no_feriepenger"/>
+        <menuitem id="menu_l10n_no_import_tax_deduction"
+                  name="Importer trekktabeler"
+                  sequence="100"
+                  parent="menu_payroll_norway"
+                  groups="base.group_system"
+                  action="action_l10n_no_import_tax_deduction"/>
+
+    </data>
+</odoo>

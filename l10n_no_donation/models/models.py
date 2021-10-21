@@ -68,7 +68,6 @@ class DonationWizard(models.TransientModel):
             'type': 'ir.actions.act_window',
             'res_model': 'l10n_no_donation.xml',
             'res_id': record.id,
-            'view_type': 'tree,form',
             'view_mode': 'form',
         }
 

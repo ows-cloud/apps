@@ -21,7 +21,6 @@ class HrRuleQtyRateAmount(models.Model):
         for rec in self:
             rec.total = rec.quantity * rec.rate / 100 * rec.amount
 
-    @api.multi
     def write(self, values):
         '''
         SOURCE: base_field_value

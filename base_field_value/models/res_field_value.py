@@ -110,7 +110,6 @@ class ResField(models.Model):
                 date_format = self.env['res.lang'].search([('code','=',self.env.user.lang)]).ensure_one().date_format
             self.default_value = _validate(self.default_value, self.data_type, date_format)
 
-    @api.multi
     def copy(self, default=None):
         if default is None:
             default = {}
@@ -151,7 +150,6 @@ class ResFieldSelectionValue(models.Model):
     #     records = self.search(domain + args, limit=limit)
     #     return records.name_get()
     #
-    # @api.multi
     # @api.depends('name', 'code')
     # def name_get(self):
     #     result = []
@@ -168,9 +166,9 @@ class ResFieldValue(models.Model):
 
     field_id = fields.Many2one('res.field', string="Field", required=True, index=True, ondelete='restrict')
     field_code = fields.Char(string='Code', related='field_id.code', store=False, readonly=True)
-    field_app = fields.Selection(selection='_get_apps', string='Application', related='field_id.app', store=False, readonly=True)
+    field_app = fields.Selection(string='Application', related='field_id.app', store=False, readonly=True)
     field_country_id = fields.Many2one('res.country', string='Country', related='field_id.country_id', store=False, readonly=True)
-    field_data_type = fields.Selection(selection=data_type_selection, string='Data Type', related='field_id.data_type', store=False, readonly=True)
+    field_data_type = fields.Selection(string='Data Type', related='field_id.data_type', store=False, readonly=True)
     selection_value_id = fields.Many2one('res.field.selection_value', string='Selection')
     reference_value = fields.Reference('_get_reference_model', string="Reference")
     value = fields.Char()
@@ -199,7 +197,6 @@ class ResFieldValue(models.Model):
                 date_format = self.env['res.lang'].search([('code','=',self.env.user.lang)]).ensure_one().date_format
             self.value = _validate(self.value, self.field_id.data_type, date_format)
             
-    @api.multi
     def write(self, values):
         '''
         For models where field_value_ids = fields.One2many('res.field.value', 'res_id'):

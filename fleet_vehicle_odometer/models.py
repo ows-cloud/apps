@@ -7,44 +7,11 @@ from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
 
-class fleet_service_type(models.Model):
-    _inherit = 'fleet.service.type'
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
-
-class fleet_vehicle(models.Model):
-    _inherit = 'fleet.vehicle'
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
-
-class fleet_vehicle_cost(models.Model):
-    _inherit = 'fleet.vehicle.cost'
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
-
-class fleet_vehicle_log_contract(models.Model):
-    _inherit = 'fleet.vehicle.log.contract'
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
-
-class fleet_vehicle_log_fuel(models.Model):
-    _inherit = 'fleet.vehicle.log.fuel'
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
-
-class fleet_vehicle_log_services(models.Model):
-    _inherit = 'fleet.vehicle.log.services'
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
-
-class fleet_vehicle_model(models.Model):
-    _inherit = 'fleet.vehicle.model'
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
-
-class fleet_vehicle_model_brand(models.Model):
-    _inherit = 'fleet.vehicle.model.brand'
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
-
 class fleet_vehicle_odometer(models.Model):
     _inherit = 'fleet.vehicle.odometer'
 
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account')
     comment = fields.Char('Comment')
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
     distance = fields.Integer('Distance')
     
     @api.model
@@ -75,7 +42,6 @@ class fleet_vehicle_odometer(models.Model):
         if above:
             above.distance = above.value - values['value']
 
-    @api.multi
     def unlink(self):
         for record in self:
 
@@ -93,7 +59,6 @@ class fleet_vehicle_odometer(models.Model):
         elif above:
             above.distance = None
 
-    @api.multi
     def write(self, values):
 
         recompute_distance = False
@@ -109,13 +74,3 @@ class fleet_vehicle_odometer(models.Model):
                 record._recompute_distance_before_create(values, record.id)
         
         return super(fleet_vehicle_odometer, self).write(values)
-    
-
-class fleet_vehicle_state(models.Model):
-    _inherit = 'fleet.vehicle.state'
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
-
-class fleet_vehicle_tag(models.Model):
-    _inherit = 'fleet.vehicle.tag'
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
-

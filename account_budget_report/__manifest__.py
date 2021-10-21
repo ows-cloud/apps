@@ -14,7 +14,7 @@
     ],
     'depends': [
         'account',
-        'account_bank_statement_import',
+        # 'account_bank_statement_import',
         'account_new_fields',
         'base_field_value',
         'sale',

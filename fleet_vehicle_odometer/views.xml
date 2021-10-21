@@ -18,17 +18,14 @@
         <record id='fleet.fleet_vehicle_odometer_action' model='ir.actions.act_window'>
             <field name="name">Vehicles Odometer</field>
             <field name="res_model">fleet.vehicle.odometer</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,pivot,graph</field>
+            <field name="view_mode">tree,kanban,form,graph,pivot</field>
             <field name="context">{"search_default_groupby_vehicle" : True}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
-                Click to create a new odometer log.
+                Create a new odometer log
               </p>
               <p>
-                Here you can add various odometer entries for all vehicles.
-                You can also show odometer value for a particular vehicle using
-                the search field.
+                You can add various odometer entries for all vehicles. 
               </p>
             </field>
         </record>

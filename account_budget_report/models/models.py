@@ -28,29 +28,24 @@ class CrossoveredBudget(models.Model):
         ('confirm', 'Confirmed'),
         ('validate', 'Validated'),
         ('done', 'Done')
-        ], 'Status', default='draft', index=True, required=True, readonly=True, copy=False, track_visibility='always')
+        ], 'Status', default='draft', index=True, required=True, readonly=True, copy=False)
     #crossovered_budget_line = fields.One2many('crossovered.budget.lines', 'crossovered_budget_id', 'Budget Lines',
     #    states={'done': [('readonly', True)]}, copy=True)
     company_id = fields.Many2one('res.company', 'Company', required=True,
         default=lambda self: self.env['res.company']._company_default_get('account.budget.post'))
 
-    @api.multi
     def action_budget_confirm(self):
         self.write({'state': 'confirm'})
 
-    @api.multi
     def action_budget_draft(self):
         self.write({'state': 'draft'})
 
-    @api.multi
     def action_budget_validate(self):
         self.write({'state': 'validate'})
 
-    @api.multi
     def action_budget_cancel(self):
         self.write({'state': 'cancel'})
 
-    @api.multi
     def action_budget_done(self):
         self.write({'state': 'done'})
 
@@ -89,7 +84,6 @@ class AccountBudgetLine(models.Model):
             self._check_date(date, budget)
         return super(AccountBudgetLine, self).create(values)
 
-    @api.multi
     def write(self, values):
         for field in ['accounting_or_budget', 'journal_id', 'move_id']:
             values.pop(field, None)
@@ -202,7 +196,6 @@ class AccountBudgetReport(models.Model):
     balance2 = fields.Monetary('Acc+Bud', store=True)
     balance2_minus_budget = fields.Monetary('Acc-Bud', store=True)
     
-    @api.model_cr
     def init(self):
         tools.drop_view_if_exists(self._cr, 'account_budget_report')
         self._cr.execute("""
@@ -278,10 +271,8 @@ class AccountBudgetReport(models.Model):
         # del values['accounting_or_budget'], values['journal_id'], values['move_id']
         return self.env['account.budget.line'].create(values)
         
-    @api.multi
     def write(self, values):
         return self.env['account.budget.line'].browse([id for id in self._ids if id > 0]).write(values)
         
-    @api.multi
     def unlink(self):  
         return self.env['account.budget.line'].browse([id for id in self._ids if id > 0]).unlink()
