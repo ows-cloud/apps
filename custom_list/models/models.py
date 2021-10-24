@@ -5,7 +5,7 @@ class CustomList(models.Model):
     _name = 'custom.list'
     _description = 'Custom List'
     
-    company_id = fields.Many2one('res.company', string="Company", index=True, default=lambda self: self.env.user.company_id)
+    company_id = fields.Many2one('res.company', string="Company", index=True, default=lambda self: self.env.company)
     name = fields.Char()
     type = fields.Selection([('budget', 'Budget'), ('other', 'Other')])
 
@@ -18,7 +18,7 @@ class CustomListItem(models.Model):
 
     account_id = fields.Many2one('account.account', string="Account")
     analytic_account_id = fields.Many2one('account.analytic.account', string="Anaytic Account")
-    company_id = fields.Many2one('res.company', string="Company", index=True, default=lambda self: self.env.user.company_id)
+    company_id = fields.Many2one('res.company', string="Company", index=True, default=lambda self: self.env.company)
     date=fields.Date()
     list_id = fields.Many2one('custom.list', string="Custom List")
     

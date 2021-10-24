@@ -88,7 +88,7 @@ class Saft(models.Model):
         self.saft_binary = base64.b64encode(bytes(self.saft_xml, 'utf-8'))
         #pass
 
-    company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.user.company_id)
+    company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.company)
     month_from = fields.Char()
     month_to = fields.Char()
     date_from = fields.Date()

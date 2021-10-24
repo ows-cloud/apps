@@ -18,7 +18,7 @@ class EventEvent(models.Model):
     registration_phone_question_id = fields.Many2one('survey.question', "Question: Phone", help="Single line text box.")
     registration_ticket_question_id = fields.Many2one('survey.question', "Question: Ticket", help="Multiple choice: only one answer. Mandatory answer. BUG: Creating new ticket will set this field blank.")
     registration_products_question_id = fields.Many2one('survey.question', "Question: Products", help="Multiple choice: multiple answers allowed.")
-    registration_products_label_ids = fields.One2many('survey.label', 'question_id', "Question: Product Labels", related='registration_products_question_id.labels_ids')
+    registration_products_label_ids = fields.One2many('survey.question.answer', 'question_id', "Question: Product Labels", related='registration_products_question_id.labels_ids')
     registration_validation_action_id = fields.Many2one('ir.actions.server', "Validation Action")
 
     # copied from website_event/models/event.py 12.0
@@ -57,11 +57,11 @@ class EventEventTicket(models.Model):
     _inherit = 'event.event.ticket'
 
     survey_question_id = fields.Many2one('survey.question', "Survey Ticket Question", related='event_id.registration_ticket_question_id')
-    survey_label_id = fields.Many2one('survey.label', "Survey Ticket")
+    survey_label_id = fields.Many2one('survey.question.answer', "Survey Ticket")
 
 
-class SurveyLabel(models.Model):
-    _inherit = "survey.label"
+class SurveyQuestionAnswer(models.Model):
+    _inherit = "survey.question.answer"
 
     product_id = fields.Many2one('product.template', "Product")
     product_list_price = fields.Float("List Price", related='product_id.list_price')
@@ -85,9 +85,9 @@ class SurveyUserInput(models.Model):
     # used by controller
     answers_url = fields.Char('Answers URL', compute='_compute_answers_url')
     
-    @api.one
     def _compute_answers_url(self):
-        self.answers_url = "/survey/print/%s/%s" % (slugify(self.survey_id), self.token)
+        for record in self:
+            record.answers_url = "/survey/print/%s/%s" % (slugify(self.survey_id), self.token)
 
 class SurveySurvey(models.Model):
     _inherit = 'survey.survey'

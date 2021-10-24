@@ -52,4 +52,4 @@ class AccountAnalyticAccount(models.Model):
 #     price_subtotal = fields.Monetary(compute='_compute_price')
 #     price_subtotal_signed = fields.Monetary(compute='_compute_price')
 
-#     company_id = fields.Many2one(related='', default=lambda self: self.env.user.company_id)
+#     company_id = fields.Many2one(related='', default=lambda self: self.env.company)

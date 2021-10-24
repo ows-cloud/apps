@@ -1,6 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_res_field_group_company_manager,res.field,model_res_field,base.group_system,1,1,1,1
+access_res_field_group_system,res.field,model_res_field,base.group_system,1,1,1,1
 access_res_field_group_user,res.field,model_res_field,base.group_user,1,0,0,0
 access_res_field_value,res.field.value,model_res_field_value,base.group_user,1,1,1,1
-access_res_field_selection_value_group_company_manager,res.field.selection_value,model_res_field_selection_value,base.group_system,1,1,1,1
+access_res_field_selection_value_group_system,res.field.selection_value,model_res_field_selection_value,base.group_system,1,1,1,1
 access_res_field_selection_value_group_user,res.field.selection_value,model_res_field_selection_value,base.group_user,1,0,0,0

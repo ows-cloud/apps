@@ -33,7 +33,7 @@ class DonationFundraceSponsorship(models.Model):
     runner_id = fields.Many2one('donation.fundrace.partner', string='Runner')
     sponsor_id = fields.Many2one('donation.fundrace.partner', string='Sponsor')
     event_id = fields.Many2one('event.event', string='Event')
-    company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.user.company_id)
+    company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.company)
 
 class DonationFundracePartner(models.Model):
     _name = 'donation.fundrace.partner'

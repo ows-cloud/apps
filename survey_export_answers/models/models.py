@@ -30,7 +30,7 @@ class SurveySurvey(models.Model):
                 question_answer = user_answers.get(key, [])
                 if question_answer:
                     if type in ('simple_choice','multiple_choice','matrix'):
-                        answer_labels = self.env['survey.label'].browse(question_answer)
+                        answer_labels = self.env['survey.question.answer'].browse(question_answer)
                         csv_answer = '"%s"' % ', '.join([label.value for label in answer_labels])
                     else:
                         assert len(question_answer) == 1, "%s answers to the question %s" % (len(question_answer), question)
@@ -43,7 +43,7 @@ class SurveySurvey(models.Model):
     # copied from survey.controllers.main, 'request' -> 'self'
     # odoo.addons.survey.controllers.main.WebsiteSurvey().prefill(survey, input.token) does not return JSON but <Response 61 bytes [200 OK]> because of @http.route()
     def prefill(self, survey, token, page=None, **post):
-        UserInputLine = self.env['survey.user_input_line']
+        UserInputLine = self.env['survey.user_input.line']
         ret = {}
 
         # Fetch previous answers

@@ -66,7 +66,7 @@ class AccountBudgetLine(models.Model):
     balance = fields.Monetary('Balance')
     balance_history = fields.Char('Balance History', readonly=True)
     company_id = fields.Many2one('res.company', string='Company', index=True,
-                                 default=lambda self: self.env.user.company_id)
+                                 default=lambda self: self.env.company)
     crossovered_budget_id = fields.Many2one('crossovered.budget', string='Budget')
     currency_id = fields.Many2one('res.currency', string='Currency')
     date = fields.Date(string='Date')
@@ -169,7 +169,7 @@ class AccountBudgetReport(models.Model):
     
     account_id = fields.Many2one('account.account', string='Account', store=True)
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', store=True, domain=_compute_analytic_domain)
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
+    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', string='Currency', store=True)
     date = fields.Date(string='Date', store=True)
     journal_id = fields.Many2one('account.journal', string='Journal', store=True)

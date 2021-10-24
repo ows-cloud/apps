@@ -122,11 +122,11 @@
     		</field>
 		</record>
 
-        <!-- survey.user_input_line (move to module that only depends on survey) -->
+        <!-- survey.user_input.line (move to module that only depends on survey) -->
 
         <record model="ir.ui.view" id="view_survey_user_input_line_pivot">
-            <field name="name">survey.user_input_line.pivot</field>
-            <field name="model">survey.user_input_line</field>
+            <field name="name">survey.user_input.line.pivot</field>
+            <field name="model">survey.user_input.line</field>
             <field name="mode">primary</field>
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">

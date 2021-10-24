@@ -15,7 +15,7 @@ class HrRuleQtyRateAmount(models.Model):
     res_id = fields.Integer(required=True, readonly=True, index=True,
                             ondelete='''Should NOT be 'cascade', see the write method''')
     company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True,
-                                 default=lambda self: self.env.user.company_id)
+                                 default=lambda self: self.env.company)
 
     def _valid_field_parameter(self, field, name):
         return name == 'ondelete' or super()._valid_field_parameter(field, name)

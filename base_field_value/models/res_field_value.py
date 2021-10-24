@@ -82,7 +82,7 @@ class ResField(models.Model):
         (object.one2many('res.field.value'): selection function runs only once for the object, not once per res.field.value.)""")
     default_value = fields.Char("Default Value")
     auto_create = fields.Boolean("Create on new object")
-    company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.user.company_id)
+    company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.company)
     country_id = fields.Many2one('res.country', string='Country')
     active = fields.Boolean(default=True)
     # readonly = fields.Boolean(default=False) # How to enforce readonly on 'res.field.value' with python?
@@ -128,7 +128,7 @@ class ResFieldSelectionValue(models.Model):
     _name = 'res.field.selection_value'
     _description = 'Field Selection Value'
     
-    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, store=True, index=True, default=lambda self: self.env.user.company_id)
+    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, store=True, index=True, default=lambda self: self.env.company)
     field_id = fields.Many2one('res.field', string="Field", required=True, index=True)
     code = fields.Char('Code')
     name = fields.Char('Name')
@@ -174,7 +174,7 @@ class ResFieldValue(models.Model):
     value = fields.Char()
     model = fields.Char(required=True, readonly=True, index=True)
     res_id = fields.Integer(required=True, readonly=True, index=True, ondelete='restrict') # '''ondelete SHOULD NOT be 'cascade', see the write method''')
-    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, store=True, index=True, default=lambda self: self.env.user.company_id)
+    company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, store=True, index=True, default=lambda self: self.env.company)
     company_country_id = fields.Many2one('res.country', string='Company Country', related='company_id.country_id', store=False, readonly=True)
 
     def _valid_field_parameter(self, field, name):
@@ -232,9 +232,9 @@ class ResCompany(models.Model):
     def _compute_default_field_value_ids(self):
         result = []
         records = self.env['res.field'].search([('model','=','res.company'),('auto_create','=',True),
-            '|',('country_id','=',False),('country_id','=',self.env.user.company_id.country_id.id)])
+            '|',('country_id','=',False),('country_id','=',self.env.company.country_id.id)])
         for record in records:
-            result.append((0, 0, {'model': 'res.company', 'company_id': self.env.user.company_id.id, 
+            result.append((0, 0, {'model': 'res.company', 'company_id': self.env.company.id, 
                 'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
         return result
         
@@ -248,9 +248,9 @@ class ResUsers(models.Model):
     def _compute_default_field_value_ids(self):
         result = []
         records = self.env['res.field'].search([('model','=','res.users'),('auto_create','=',True),
-            '|',('country_id','=',False),('country_id','=',self.env.user.company_id.country_id.id)])
+            '|',('country_id','=',False),('country_id','=',self.env.company.country_id.id)])
         for record in records:
-            result.append((0, 0, {'model': 'res.users', 'company_id': self.env.user.company_id.id, 
+            result.append((0, 0, {'model': 'res.users', 'company_id': self.env.company.id, 
                 'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
         return result
         

@@ -24,41 +24,39 @@
 
         <template id="registration_attendee_details" inherit_id="website_event.registration_attendee_details">
             <data>
-                <xpath expr="//t[@t-foreach='tickets']/div[@class='row']" position="replace">
+                <xpath expr="//div[hasclass('row')]" position="replace">
                     <div class="row">
-                        <div class="col-lg-4"><strong>Name</strong></div>
-                        <div class="col-lg-5"><strong>Email</strong>
-                            <t t-if="not event.require_email">
-                                <span class="text-muted">(Optional)</span>
-                            </t>                     
-                        </div>
-                        <div class="col-lg-3"><strong>Phone</strong>
-                            <t t-if="not event.require_phone">
-                                <span class="text-muted">(Optional)</span>
-                            </t> 
-                        </div>
-                    </div>
-                </xpath>
-                <xpath expr="//t[@t-foreach='tickets']/t/div[@class='row mb4']" position="replace">
-                    <div class="row mb4">
-                        <t t-set="attendee_placeholder">Attendee #%s</t>
                         <t t-set="user_id" t-value="request.env.user"/>
                         <t t-set="public_user_id" t-value="request.website.user_id"/>
                         <t t-if="user_id != public_user_id" t-set="name" t-value="request.env.user.name"/><t t-else="" t-set="name" t-value=""/>
                         <t t-if="user_id != public_user_id" t-set="email" t-value="request.env.user.email"/><t t-else="" t-set="email" t-value=""/>
                         <t t-if="user_id != public_user_id" t-set="phone" t-value="request.env.user.phone"/><t t-else="" t-set="phone" t-value=""/>
-                        <div class="col-lg-4"><input class="form-control" type="text" t-attf-name="#{counter}-name" t-att-value="name" required="This field is required" t-att-placeholder="attendee_placeholder %counter"/></div>
-                        <div class="col-lg-5">
+                        <div class="col-lg my-2">
+                            <label>Name</label>
+                            <input class="form-control" type="text" t-attf-name="#{counter}-name" t-att-value="name" required="This field is required"/>
+                        </div>
+                        <div class="col-lg my-2">
+                            <label>Email
+                                <t t-if="not event.require_email">
+                                    <small>(Optional)</small>
+                                </t>
+                            </label>
                             <input t-if="event.require_email" class="form-control" type="email" t-attf-name="#{counter}-email" t-att-value="email" required="This field is required"/>
                             <input t-else=""                  class="form-control" type="email" t-attf-name="#{counter}-email" t-att-value="email"/>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg my-2">
+                            <label>Phone
+                                <t t-if="not event.require_phone">
+                                    <small>(Optional)</small>
+                                </t> 
+                            </label>
                             <input t-if="event.require_phone" class="form-control" type="tel" t-attf-name="#{counter}-phone" t-att-value="phone" required="This field is required"/>
                             <input t-else=""                  class="form-control" type="tel" t-attf-name="#{counter}-phone" t-att-value="phone"/>
                         </div>
-                        <input class="d-none" type="text" t-attf-name="#{counter}-ticket_id" t-attf-value="#{ticket['id']}"/>
-                    </div>
+                        <input class="d-none" type="text" t-attf-name="#{counter}-event_ticket_id" t-attf-value="#{ticket['id']}"/>
+                    </div>                
                 </xpath>
+
             </data>
         </template>
 

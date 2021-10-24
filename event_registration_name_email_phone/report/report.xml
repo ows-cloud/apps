@@ -31,14 +31,14 @@
             </t>
         </template>
 
-        <report
-        id="action_report_event_attendees"
-        string="Event Attendees"
-        model="event.event"
-        report_type="qweb-pdf"
-        name="event_registration_name_email_phone.report_event_attendees"
-        file="event_registration_name_email_phone.report_event_attendees"
-        />
+        <record id="action_report_event_attendees" model="ir.actions.report">
+            <field name="name">Event Attendees</field>
+            <field name="model">event.event</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">event_registration_name_email_phone.report_event_attendees</field>
+            <field name="report_file">event_registration_name_email_phone.report_event_attendees</field>
+            <field name="binding_type">report</field>
+        </record>
 
     </data>
 </odoo>

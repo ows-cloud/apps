@@ -150,10 +150,10 @@ class HrPayslip(models.Model):
                         _add(-amount, credit_account, partner_id)
                         total -= amount
 
-                    if self.env.user.company_id.country_id.code == 'NO':
+                    if self.env.company.country_id.code == 'NO':
                         # TODO: move to a method in l10n_no_payroll; call the method from here (depends on def _add)
                         c_field = {}
-                        c_records = self.env.user.company_id.field_value_hr_ids
+                        c_records = self.env.company.field_value_hr_ids
                         for c_record in c_records:
                             if c_record.selection_value_id:
                                 c_field[c_record.field_code] = c_record.selection_value_id.code
