@@ -10,7 +10,7 @@ class CalendarEvent(models.Model):
             # look for date, or create date
             date = record.start.date()
 
-            record.start_date = 
+            # record.start_date = 
 
     start_date = fields.Many2one('calendar.event.date', default='_default_start_date')
 
