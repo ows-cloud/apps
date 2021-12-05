@@ -1,0 +1,56 @@
+diff --git a/odoo/models.py b/odoo/models.py
+index 37ce8d04..dd0c7dbc 100644
+--- a/odoo/models.py
++++ b/odoo/models.py
+@@ -3853,7 +3853,28 @@ Fields:
+             parent_data_list = []
+             for data in data_list:
+                 if not data['stored'].get(parent_name):
+-                    parent_data_list.append(data)
++                    # Special case if res.users _inherits company_dependent partner_id
++                    # TODO: Split the 3 conditions if this will increase the performance
++                    field = self._fields.get(parent_name)
++                    if field.company_dependent \
++                    and self._name == 'res.users' \
++                    and parent_name == 'partner_id':
++                        # update/create res.partner
++                        if 'res.partner' in data['inherited']:
++                            if 'partner_id' in data['inversed']:
++                                parent = self.env[model_name].browse(data['inversed'][parent_name])
++                                parent.write(data['inherited'][model_name])
++                            else:
++                                partner = self.env['res.partner'].create(data['inherited']['res.partner'])
++                                data['inversed']['partner_id'] = partner.id
++                        # create ir.property
++                        self.env.cr.execute("select nextval('res_users_id_seq');")
++                        id = self.env.cr.fetchone()[0]
++                        partner_id = data['inversed']['partner_id']
++                        data['stored']['id'] = id
++                        self.env['ir.property']._set_multi('partner_id', 'res.users', {id: partner_id})
++                    else:
++                        parent_data_list.append(data)
+                 elif data['inherited'][model_name]:
+                     parent = self.env[model_name].browse(data['stored'][parent_name])
+                     parent.write(data['inherited'][model_name])
+diff --git a/odoo/osv/expression.py b/odoo/osv/expression.py
+index a1589a00..fc582d29 100644
+--- a/odoo/osv/expression.py
++++ b/odoo/osv/expression.py
+@@ -656,9 +656,14 @@ class expression(object):
+             elif field.inherited:
+                 parent_model = model.env[field.related_field.model_name]
+                 parent_fname = model._inherits[parent_model._name]
+-                parent_alias = self.query.left_join(
+-                    alias, parent_fname, parent_model._table, 'id', parent_fname,
+-                )
++                if model._name == 'res.users' and parent_model._name == 'res.partner':
++                    parent_alias = model._inherits_query_left_join(self.query,
++                        alias, parent_fname, parent_model._table, 'id', parent_fname,
++                    )
++                else:
++                    parent_alias = self.query.left_join(
++                        alias, parent_fname, parent_model._table, 'id', parent_fname,
++                    )
+                 push(leaf, parent_model, parent_alias)
+ 
+             elif left == 'id' and operator in HIERARCHY_FUNCS:
