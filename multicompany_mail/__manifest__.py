@@ -8,13 +8,13 @@
     'author': 'AppsToGROW',
     'category': 'Administration',
     'data': [
-        'views/views.xml',
+        'views/mail.template.xml',
     ],
     'depends': [
         'base',
         'mail',
     ],
     'license': 'AGPL-3',
-    'version': '12.0.1.0.0',
+    'version': '14.0.1.0.0',
     'website': 'http://www.appstogrow.org',
 }

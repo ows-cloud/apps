@@ -10,8 +10,8 @@
             <field name="inherit_id" ref="mail.email_template_form"/>
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">
-                <field name="report_template" position="after">
-                    <field name="replace_mail_template"/>
+                <field name="model_id" position="before">
+                    <field name="replace_record"/>
                 </field>
             </field>
         </record>
