@@ -1,0 +1,16 @@
+diff --git a/odoo/modules/loading.py b/odoo/modules/loading.py
+index 8093f14b..b6139154 100644
+--- a/odoo/modules/loading.py
++++ b/odoo/modules/loading.py
+@@ -568,7 +568,10 @@ def load_modules(db, force_demo=False, status=None, update_module=False):
+         # is False.
+         env = api.Environment(cr, SUPERUSER_ID, {})
+         for model in env.values():
+-            model._register_hook()
++            if model._name in ('multicompany.force.config', 'multicompany.force.security'):
++                model._register_hook(update_module=update_module)
++            else:
++                model._register_hook()
+         env['base'].flush()
+ 
+         # STEP 9: save installed/updated modules for post-install tests
