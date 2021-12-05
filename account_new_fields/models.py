@@ -17,7 +17,6 @@ class AccountAccountType(models.Model):
 
 class AccountAnalyticAccount(models.Model):
     _inherit = "account.analytic.account"
-    _order = 'description'
 
     user_id = fields.Many2one('res.users', string='Manager', ondelete='restrict')
     
