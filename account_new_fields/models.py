@@ -10,8 +10,14 @@ class AccountAccount(models.Model):
     include_initial_balance = fields.Boolean("Bring Accounts Balance Forward", related="user_type_id.include_initial_balance", store=False, readonly=True)
 
 
+class AccountAccountType(models.Model):
+    _inherit = "account.account.type"
+    _order = 'note'
+
+
 class AccountAnalyticAccount(models.Model):
     _inherit = "account.analytic.account"
+    _order = 'description'
 
     user_id = fields.Many2one('res.users', string='Manager', ondelete='restrict')
     
@@ -53,3 +59,8 @@ class AccountAnalyticAccount(models.Model):
 #     price_subtotal_signed = fields.Monetary(compute='_compute_price')
 
 #     company_id = fields.Many2one(related='', default=lambda self: self.env.company)
+
+
+class AccountAnalyticGroup(models.Model):
+    _inherit = 'account.analytic.group'
+    _order = 'name'
