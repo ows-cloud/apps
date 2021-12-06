@@ -45,7 +45,7 @@
                                            options="{'no_create_edit':True}"/>
                                </group>
                                <group>
-                                    <field name="registration_products_label_ids" 
+                                    <field name="registration_products_suggested_answer_ids" 
                                            attrs="{'invisible': [('registration_products_question_id','=', False)]}"
                                            nolabel="1">
                                         <tree create="false" editable="bottom">
@@ -94,7 +94,7 @@
             <field name="groups_id" eval="[(4, ref('group_event_survey'))]"/>
     		<field name="priority" eval="20"/>
     		<field name="arch" type="xml">
-				<xpath expr="//field[@name='labels_ids']/tree" position="inside">
+				<xpath expr="//field[@name='suggested_answer_ids']/tree" position="inside">
                     <field name="product_id"/>
                     <field name="product_list_price" readonly="1"/>
 				</xpath>
@@ -136,7 +136,7 @@
             </field>
         </record>
 
-        <record model="ir.actions.act_window" id="survey.action_survey_user_input_line">
+        <record model="ir.actions.act_window" id="survey.survey_user_input_line_action">
             <field name="view_mode">tree,form,pivot</field>
         </record>
     </data>

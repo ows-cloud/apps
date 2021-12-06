@@ -18,7 +18,7 @@ class EventEvent(models.Model):
     registration_phone_question_id = fields.Many2one('survey.question', "Question: Phone", help="Single line text box.")
     registration_ticket_question_id = fields.Many2one('survey.question', "Question: Ticket", help="Multiple choice: only one answer. Mandatory answer. BUG: Creating new ticket will set this field blank.")
     registration_products_question_id = fields.Many2one('survey.question', "Question: Products", help="Multiple choice: multiple answers allowed.")
-    registration_products_label_ids = fields.One2many('survey.question.answer', 'question_id', "Question: Product Labels", related='registration_products_question_id.labels_ids')
+    registration_products_suggested_answer_ids = fields.One2many('survey.question.answer', 'question_id', "Question: Product Labels", related='registration_products_question_id.suggested_answer_ids')
     registration_validation_action_id = fields.Many2one('ir.actions.server', "Validation Action")
 
     # copied from website_event/models/event.py 12.0
