@@ -26,27 +26,45 @@ index 37ce8d04..2bcc47c8 100644
                      for record in missing
                  )),
 diff --git a/odoo/tools/safe_eval.py b/odoo/tools/safe_eval.py
-index f60bb5e9..c4921c46 100644
+index f60bb5e9..6f665285 100644
 --- a/odoo/tools/safe_eval.py
 +++ b/odoo/tools/safe_eval.py
-@@ -326,6 +326,20 @@ def safe_eval(expr, globals_dict=None, locals_dict=None, mode="eval", nocopy=Fal
+@@ -326,6 +326,38 @@ def safe_eval(expr, globals_dict=None, locals_dict=None, mode="eval", nocopy=Fal
              locals_dict = {}
          locals_dict.update(_BUILTINS)
      c = test_expr(expr, _SAFE_OPCODES, mode=mode)
-+    # Untrusted code should NOT use the database cursor to execute SQL commands!
-+    # That would bypass all the security rules!
-+    unsafe_text = [
-+        'cache',
-+        '.cr', '._cr',
-+        '.execute', '._execute',
-+        '.with', '_with',
-+        '.sql', '._sql',
-+        '.sudo', '._sudo',
-+        '__',
-+    ]
-+    for text in unsafe_text:
-+        if text in expr:
-+            raise odoo.exceptions.UserError('The code cannot have this phrase:  {}'.format(text))
++    if mode == 'exec':
++        # Untrusted code should NOT use the database cursor to execute SQL commands!
++        # That would bypass all the security rules!
++        # key = unsafe
++        # value = list of safe exceptions
++        unsafe_except = {
++            'cache': [],
++            '.cr': ['.create'], 
++            '._cr': ['._cron'],
++            '.execute': [],
++            '._execute': [],
++            '.with': [],
++            '._with': [],
++            '.sql': [],
++            '._sql': [],
++            '.sudo': [],
++            '._sudo': [],
++            '._': [],
++            '__': [],
++        }
++        if 'env' in globals_dict and globals_dict['env'].su == True:
++            # With superuser privileges, allow private methods
++            del unsafe_except['._']
++        testexpr = expr.decode() if isinstance(expr, bytes) else expr
++        for text in unsafe_except:
++            if text in testexpr:
++                count_total = expr.count(text)
++                safe_exceptions = unsafe_except[text]
++                count_safe = sum([expr.count(safe) for safe in safe_exceptions])
++                count_unsafe = count_total - count_safe
++                if count_unsafe:
++                    raise odoo.exceptions.UserError('The code cannot have this phrase:  {}'.format(text))
      try:
          return unsafe_eval(c, globals_dict, locals_dict)
      except odoo.exceptions.UserError:
