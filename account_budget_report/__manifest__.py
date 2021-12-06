@@ -14,13 +14,9 @@
     ],
     'depends': [
         'account',
-        # 'account_bank_statement_import',
-        'account_new_fields',
-        'base_field_value',
-        'sale',
     ],
     'external_dependencies': {'python': ['numpy', 'pandas']},
     'license': 'AGPL-3',
-    'version': '12.0.1.0.0',
+    'version': '14.0.1.0.0',
     'website': 'http://www.appstogrow.org',
 }

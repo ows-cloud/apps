@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from odoo import api, fields, models, _
 from odoo import tools
 from odoo.exceptions import UserError
@@ -10,6 +8,18 @@ import pandas as pd
 from io import StringIO
 
 _logger = logging.getLogger(__name__)
+
+
+class AccountAccount(models.Model):
+    _inherit = "account.account"
+
+    include_initial_balance = fields.Boolean("Bring Accounts Balance Forward", related="user_type_id.include_initial_balance", store=False, readonly=True)
+
+
+class AccountAnalyticAccount(models.Model):
+    _inherit = "account.analytic.account"
+
+    user_id = fields.Many2one('res.users', string='Manager', ondelete='restrict')
 
 
 # copied from https://github.com/odoo/odoo/blob/11.0/addons/account_budget/models/account_budget.py
