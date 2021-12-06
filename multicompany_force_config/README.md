@@ -1,6 +1,7 @@
 # Force configuration for all companies
 
 This module implements configuration for all companies.
+The support user has access to all companies.
 
 ## Why?
 

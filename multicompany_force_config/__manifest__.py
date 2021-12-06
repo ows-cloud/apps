@@ -11,8 +11,7 @@
         # 'security/ir.model.access.csv', # How come it works without this???
     ],
     'depends': [
-        'base',
-        'json_field',
+        'multicompany_base',
     ],
     'license': 'AGPL-3',
     'version': '14.0.1.0.0',

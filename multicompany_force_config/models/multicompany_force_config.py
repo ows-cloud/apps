@@ -19,28 +19,6 @@ class CompanyConfigure(models.AbstractModel):
             self._configure(companies)
             _logger.info('multicompany.force.config done')
 
-    def _main(self, company_json):
-        company_json = self._set_mail_channel_all_employees(company_json)
-        return company_json
-
-    def _set_mail_channel_all_employees(self, company_json):
-        if 'mail.channel_all_employees' not in company_json['xmlid']:
-            group_user_id = self.env.ref('base.group_user').id
-            mail_channel_all_employees = self._insert_first_record(
-                'mail.channel',
-                [('group_ids', 'in', [group_user_id])],
-                {
-                    'name': 'general',
-                    'description': 'General announcements for all employees.',
-                    'group_ids': [(4, group_user_id), 0],
-                })
-            if mail_channel_all_employees:
-                # set is_pinned for mail.channel.partner
-                company_json['xmlid']['mail.channel_all_employees'] = 'mail.channel,{}'.format(mail_channel_all_employees.id)
-        return company_json
-
-    # _configure, _insert_first_record and "blank" methods to use when returning a record(set) fails.
-
     def _configure(self, companies):
         for company in companies:
             self = self.with_user(
@@ -52,17 +30,28 @@ class CompanyConfigure(models.AbstractModel):
             self.env.company = company
             self.env.companies = company
 
-            # first
-            company_json = dict(company.json or {})
-            if not 'xmlid' in company_json:
-                company_json['xmlid'] = {}
+            # --------------------------------------------------
+            self._set_mail_channel_all_employees()
+            # --------------------------------------------------
 
-            # main
-            company_json = self._main(company_json)
+    def _set_mail_channel_all_employees(self):
+        imd_record = self.env['ir.model.data'].search([('module', '=', 'mail'), ('name', '=', 'channel_all_employees')])
+        if imd_record:
+            assert imd_record.model == 'mail.channel'
+            group_user_id = self.env.ref('base.group_user').id
+            mail_channel_all_employees = self._insert_first_record(
+                'mail.channel',
+                ['|', ('id', '=', imd_record.res_id), ('replace_record_id', '=', imd_record.res_id)],
+                {
+                    'name': 'general',
+                    'description': 'General announcements for all employees.',
+                    'group_ids': [(4, group_user_id), 0],
+                    'replace_record_id': imd_record.res_id,
+                })
 
-            # last
-            company.json = {}
-            company.json = company_json
+    #
+    # _insert_first_record and "blank" methods to use after failing to return a record(set).
+    #
 
     def _insert_first_record(self, model, domain, values, copy=False):
         '''

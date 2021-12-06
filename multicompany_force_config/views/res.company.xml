@@ -8,9 +8,8 @@
             <field name="arch" type="xml">
                 <data>
                     <notebook position="inside">
-                        <page name="json" string="JSON">
-                            <separator string="JSON"/>
-                            <field name="json"/>
+                        <page name="configure" string="Configure">
+                            <separator string="Configure"/>
                             <group string="Auto-Configure">
                                 <button string="Auto-configure company" type="object" name="configure" colspan="2" groups="base.group_no_one"/>
                             </group>
