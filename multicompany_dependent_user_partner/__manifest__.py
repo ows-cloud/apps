@@ -8,7 +8,7 @@
     'author': 'AppsToGROW',
     'category': 'Administration',
     'data': [
-        # 'views/res.users.xml',
+        'views/res.users.xml',
     ],
     'depends': [
         'base',
