@@ -6,13 +6,14 @@
     'summary': 'Custom mail templates',
 
     'author': 'AppsToGROW',
+    'auto_install': True,
     'category': 'Administration',
     'data': [
         'views/mail.template.xml',
     ],
     'depends': [
-        'base',
         'mail',
+        'multicompany_base',
     ],
     'license': 'AGPL-3',
     'version': '14.0.1.0.0',

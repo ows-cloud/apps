@@ -11,7 +11,7 @@
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">
                 <field name="model_id" position="before">
-                    <field name="replace_record"/>
+                    <field name="replace_record_id"/>
                 </field>
             </field>
         </record>
