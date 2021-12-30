@@ -8,9 +8,9 @@ _logger = logging.getLogger(__name__)
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
 
-    def test_payslip_accounting(self, context):
+    def test_payslip_accounting(self):
         self.ensure_one()
-        account_moves = self.slip_ids.test_payslip_accounting(context=context, hr_payslip_run_name=self.name)
+        account_moves = self.slip_ids.test_payslip_accounting(hr_payslip_run_name=self.name)
         return {
             'name': 'Payroll Moves',
             'type': 'ir.actions.act_window',
@@ -19,9 +19,9 @@ class HrPayslipRun(models.Model):
             "domain": [["id", "in", [move.id for move in account_moves]]],
         }
 
-    def confirm_payslip_accounting(self, context):
+    def confirm_payslip_accounting(self):
         self.ensure_one()
-        account_moves = self.slip_ids.confirm_payslip_accounting(context=context, hr_payslip_run_name=self.name)
+        account_moves = self.slip_ids.confirm_payslip_accounting(hr_payslip_run_name=self.name)
         self.write({'state': 'close'})
         return {
             'name': 'Payroll Moves',
@@ -35,7 +35,7 @@ class HrPayslipRun(models.Model):
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
-    def test_payslip_accounting(self, context, hr_payslip_run_name=None):
+    def test_payslip_accounting(self, hr_payslip_run_name=None):
         _logger.debug('hr_payslip_run_name = ' + str(hr_payslip_run_name))
         '''
         Delete unposted moves related to payslips in the batch
@@ -186,16 +186,16 @@ class HrPayslip(models.Model):
                 acc_journal = self.env['account.journal'].browse(group['journal_id'])
                 acc_id = None
                 if total > 0:
-                    acc_id = acc_journal.default_credit_account_id.id
+                    acc_id = acc_journal.default_account_id.id
                     if not acc_id:
                         raise UserError(
-                            _('The Expense Journal "%s" has not properly configured the Credit Account!') % (
+                            _('The Expense Journal "%s" has not properly configured the Default Account!') % (
                                 acc_journal.name))
                 elif total < 0:
-                    acc_id = acc_journal.default_debit_account_id.id
+                    acc_id = acc_journal.default_account_id.id
                     if not acc_id:
                         raise UserError(
-                            _('The Expense Journal "%s" has not properly configured the Debit Account!') % (
+                            _('The Expense Journal "%s" has not properly configured the Default Account!') % (
                                 acc_journal.name))
                 account_move_lines.append({
                     'name': name,
@@ -220,8 +220,8 @@ class HrPayslip(models.Model):
 
         return account_moves
 
-    def confirm_payslip_accounting(self, context, hr_payslip_run_name=None):
-        account_moves = self.test_payslip_accounting(context, hr_payslip_run_name)
+    def confirm_payslip_accounting(self, hr_payslip_run_name=None):
+        account_moves = self.test_payslip_accounting(hr_payslip_run_name)
         for move in account_moves:
             move.post()
         for slip in self:
@@ -294,9 +294,9 @@ class HrPayslip(models.Model):
                     credit_sum += credit_line[2]['credit'] - credit_line[2]['debit']
 
             if float_compare(credit_sum, debit_sum, precision_digits=precision) == -1:
-                acc_id = slip.journal_id.default_credit_account_id.id
+                acc_id = slip.journal_id.default_account_id.id
                 if not acc_id:
-                    raise UserError(_('The Expense Journal "%s" has not properly configured the Credit Account!') % (slip.journal_id.name))
+                    raise UserError(_('The Expense Journal "%s" has not properly configured the Default Account!') % (slip.journal_id.name))
                 adjust_credit = (0, 0, {
                     'name': _('Adjustment Entry'),
                     'partner_id': False,
@@ -309,9 +309,9 @@ class HrPayslip(models.Model):
                 line_ids.append(adjust_credit)
 
             elif float_compare(debit_sum, credit_sum, precision_digits=precision) == -1:
-                acc_id = slip.journal_id.default_debit_account_id.id
+                acc_id = slip.journal_id.default_account_id.id
                 if not acc_id:
-                    raise UserError(_('The Expense Journal "%s" has not properly configured the Debit Account!') % (slip.journal_id.name))
+                    raise UserError(_('The Expense Journal "%s" has not properly configured the Default Account!') % (slip.journal_id.name))
                 adjust_debit = (0, 0, {
                     'name': _('Adjustment Entry'),
                     'partner_id': False,
