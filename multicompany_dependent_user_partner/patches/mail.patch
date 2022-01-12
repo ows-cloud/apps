@@ -109,3 +109,25 @@ index bd4a3f5b..7f77d507 100644
          return write_res
  
      def unlink(self):
+diff --git a/addons/mail/models/mail_message.py b/addons/mail/models/mail_message.py
+index 8dc08777..17bf2ff6 100644
+--- a/addons/mail/models/mail_message.py
++++ b/addons/mail/models/mail_message.py
+@@ -250,6 +250,8 @@ class Message(models.Model):
+             return ids
+ 
+         pid = self.env.user.partner_id.id
++        if not pid:
++            raise UserError("For '{}' user in '{}' company, please set a partner.".format(self.env.user.login, self.env.company.name))
+         author_ids, partner_ids, channel_ids, allowed_ids = set([]), set([]), set([]), set([])
+         model_ids = {}
+ 
+@@ -316,6 +318,8 @@ class Message(models.Model):
+         return allowed_ids
+ 
+     def check_access_rule(self, operation):
++        if not self.env.user.partner_id:
++            raise UserError("For '{}' user in '{}' company, please set a partner.".format(self.env.user.login, self.env.company.name))
+         """ Access rules of mail.message:
+             - read: if
+                 - author_id == pid, uid is the author OR

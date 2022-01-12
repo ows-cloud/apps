@@ -17,7 +17,7 @@ E.g. create a mail channel for all employees of the company (if needed).
 ## How to install?
 
 To force the configuration on all companies after install/update/uninstall a module, apply the loading patch:
-- git apply /path/to/multicompany_force_config/patches/core-loading.patch
+- git apply /path/to/multicompany_base/patches/core-loading.patch
 - git commit
 
 Install the module

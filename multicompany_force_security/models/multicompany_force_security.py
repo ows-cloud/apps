@@ -14,7 +14,6 @@ EXTID_MODULE_NAME = '__multicompany_strict_security__'
 
 COMPANIES_MODEL = [
     'res.company',
-    'res.users',
 ]
 
 COMPANY_READ_SYSTEM_MODEL = [
@@ -100,14 +99,47 @@ IRREGULAR_SQL_VIEW_NAMES = {
     # 'view_name': 'model_name',
 }
 
+SECURITY_DOMAIN_WORD = {
+    '(': 'BEGIN',
+    ')': 'END',
+    'AND': "'&'",
+    'OR': "'|'",
+    'false': "('{company_id}','=',False)",
+    'allowed_companies': "('{company_id}','in',company_ids)",
+    'selected_company': "('{company_id}','=',company_id)",
+    'selected_company/parent/child': "'|',('{company_id}','=',company_id),'|',('{company_id}','parent_of',company_id),('{company_id}','child_of',company_id)",
+    'system_company': "('{company_id}','=',1)",
+}
+
+COMPANY_FIELD = {
+    'res.company': {
+        'read_if': 'id',
+        'edit_if': 'id',
+    },
+    'res.users': {
+        'read_if': 'company_ids',
+        'write_if': 'company_ids', # if not company_id, write only name & lang & partner_id (???), see res_users.py
+        'create_if': 'company_id',
+        'unlink_if': 'company_id',
+    },
+    'default': 'company_id',
+}
+
 SECURITY_RULE = {
-    'COMPANIES_MODEL': {
-        'read_if': 'allowed_companies',
+    # read user without partner
+    'RES_PARTNER_MODEL': {
+        'read_if': 'false OR ( allowed_companies AND selected_company/parent/child )',
         'edit_if': 'allowed_companies AND selected_company/parent/child',
     },
-    # read user without partner
-    'PARTNER_MODEL': {
-        'read_if': 'false OR ( allowed_companies AND selected_company/parent/child )',
+    # set user partner & language
+    'RES_USERS_MODEL': {
+        'read_if': 'allowed_companies',
+        'write_if': 'allowed_companies',
+        'create_if': 'allowed_companies AND selected_company/parent/child',
+        'unlink_if': 'allowed_companies AND selected_company/parent/child',
+    },
+    'COMPANIES_MODEL': {
+        'read_if': 'allowed_companies',
         'edit_if': 'allowed_companies AND selected_company/parent/child',
     },
     # default
@@ -146,35 +178,31 @@ SECURITY_DO_IF = {
         'perm_create': True,
         'perm_unlink': True,
     },
-}
-
-SECURITY_DOMAIN_WORD = {
-    '(': 'BEGIN',
-    ')': 'END',
-    'AND': "'&'",
-    'OR': "'|'",
-    'false': "('{company_id}','=',False)",
-    'allowed_companies': "('{company_id}','in',company_ids)",
-    'selected_company': "('{company_id}','=',company_id)",
-    'selected_company/parent/child': "'|',('{company_id}','=',company_id),'|',('{company_id}','parent_of',company_id),('{company_id}','child_of',company_id)",
-    'system_company': "('{company_id}','=',1)",
-}
-
-COMPANY_FIELD = {
-    'res.company': {
-        'read_if': 'id',
-        'edit_if': 'id',
+    'write_if': {
+        'perm_read': False,
+        'perm_write': True,
+        'perm_create': False,
+        'perm_unlink': False,
     },
-    'res.users': {
-        'read_if': 'company_ids',
-        'edit_if': 'company_id',
+    'create_if': {
+        'perm_read': False,
+        'perm_write': False,
+        'perm_create': True,
+        'perm_unlink': False,
     },
-    'default': 'company_id',
+    'unlink_if': {
+        'perm_read': False,
+        'perm_write': False,
+        'perm_create': False,
+        'perm_unlink': True,
+    },
 }
 
 def _get_security_type(model_name):
     if model_name == 'res.partner':
-        return 'PARTNER_MODEL'
+        return 'RES_PARTNER_MODEL'
+    elif model_name == 'res.users':
+        return 'RES_USERS_MODEL'
     elif model_name in NO_ACCESS_MODEL:
         return 'NO_ACCESS_MODEL'
     elif model_name in READ_SYSTEM_MODEL:
@@ -258,18 +286,21 @@ class MulticompanyForceSecurity(models.AbstractModel):
     _name = 'multicompany.force.security'
     _description = 'Force security between companies'
 
-    def _register_hook(self, update_module):
+    def _register_hook(self, update_module=False):
         if update_module:
-            self._secure()
-            _logger.info('multicompany.force.security done')
+            param = self.env['ir.config_parameter'].get_param('multicompany_base.force_config')
+            if param in ('1', 't', 'true', 'True'):
+                self._secure()
+                _logger.info('multicompany.force.security done')
 
     # main methods
 
     def _secure(self):
         # Returning an error value will be ignored (see loading.py).
         self._set_global_security_rules_on_all_models_except_ir_rule()
-        self._add_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
+        self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
         self._set_company_id_to_1_where_null()
+        self._update_rule_domains_to_1_where_false()
 
     def _set_global_security_rules_on_all_models_except_ir_rule(self):
         models = self.env['ir.model'].search([('model', '!=', 'ir.rule')])
@@ -290,7 +321,7 @@ class MulticompanyForceSecurity(models.AbstractModel):
                 )
                 self._set_record_values('ir.rule', domain, values, xmlid_name)
 
-    def _add_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule(self):
+    def _set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule(self):
         group_company_manager_id = self.env.ref('multicompany_force_security.group_company_manager').id
         models = self.env['ir.model'].search([('model', '!=', 'ir.rule')])
         for model in models:
@@ -430,6 +461,19 @@ class MulticompanyForceSecurity(models.AbstractModel):
         #             if real_record:
         #                 # company = self.env[model].browse(int(id)).company_id
         #                 record.write({'company_id': real_record.company_id.id})
+
+    def _update_rule_domains_to_1_where_false(self):
+        rules = self.env['ir.rule'].search([('domain_force', 'like', 'company%False')])
+        for rule in rules:
+            domain = rule.domain_force.strip('] [')
+            domain_list = domain.split(',')
+            for criteria in domain_list:
+                criteria = criteria.strip(') (')
+                criteria_list = criteria.split(',')
+                if len(criteria_list) == 3:
+                    key, operator, value = criteria_list
+                    if 'company' in key and 'False' in value:
+                        rule.domain_force = rule.domain_force.replace('False', '1')
 
     # TODO
     # def _get_and_fix_name_and_find_model_of_all_sql_views(self):

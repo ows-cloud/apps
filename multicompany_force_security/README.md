@@ -15,6 +15,7 @@ With very small, very similar companies, it might be easier to manage them all i
 ## How to install?
 
 Apply patches:
+- git apply /path/to/multicompany_base/patches/core-loading.patch
 - git apply /path/to/multicompany_strict_security/patches/*
 - git commit
 

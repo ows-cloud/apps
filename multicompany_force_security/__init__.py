@@ -1,2 +1,2 @@
 from . import models
-from . import hooks
+from .hooks import _WARNING_DELETE_RULES_uninstall_hook

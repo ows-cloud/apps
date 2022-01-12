@@ -1,25 +1,15 @@
 from odoo import api, fields, models
 
 
-MODELS = [
-    'mail.channel',
-    'mail.template',
-]
-
-
 class IrModelData(models.Model):
     _inherit = 'ir.model.data'
-    
-    @api.model
-    def xmlid_lookup(self, xmlid):
-        id, model, res_id = super(IrModelData, self).xmlid_lookup(xmlid)
-        if model in MODELS:
-            try:
-                # 'replace_record_id' might not exist
-                result = self.env[model].search([('replace_record_id', '=', res_id)])
-                if result:
-                    result.ensure_one()
-                    res_id = result.id
-            except:
-                pass
-        return id, model, res_id
+
+    # TODO: make sure ir.model.data has company_id when ...
+    # ... exporting records (__ensure_xml_id not running, use patch instead)
+    # ... installing modules
+    # TODO: test
+    def create(self, values):
+        if 'company_id' not in values:
+            record = self.env[values['model']].browse(values['res_id'])
+            values['company_id'] = record.company_id.id
+        super(IrModelData, self).create(values)

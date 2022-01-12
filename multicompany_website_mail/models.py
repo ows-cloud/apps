@@ -44,6 +44,9 @@ class Partner(models.Model):
         self.ensure_one()
         website = self.company_id.website_id
         if website and website.domain:
-            return 'https://' + self.company_id.website_id.domain
+            if 'localhost:' in website.domain:
+                return 'http://' + self.company_id.website_id.domain
+            else:
+                return 'https://' + self.company_id.website_id.domain
 
         return self.env['ir.config_parameter'].sudo().get_param('web.base.url')

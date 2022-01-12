@@ -1,5 +1,4 @@
 from odoo import api, fields, models
-from odoo.addons.json_field.json import JsonField
 
 
 class Company(models.Model):
@@ -11,11 +10,11 @@ class Company(models.Model):
 
         # Give access to SUPPORT USER
         get_param = self.env["ir.config_parameter"].sudo().get_param
-        user_support_ref = get_param("company_users.user_support", default="base.user_admin")
-        support_user = self.env.ref(user_support_ref)
-        support_user.sudo().write({'company_ids': [(4, new_company.id)]})
+        user_support_ref = get_param("multicompany_base.support_user")
+        if user_support_ref:
+            support_user = self.env.ref(user_support_ref)
+            support_user.sudo().write({'company_ids': [(4, new_company.id)]})
 
-        self.env['multicompany.force.config']._configure(new_company)
         return new_company
 
     def configure(self):

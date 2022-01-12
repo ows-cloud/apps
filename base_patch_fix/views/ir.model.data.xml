@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <data>
                     <tree position="inside">
-                        <field name="company_id"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
                     </tree>
                 </data>
             </field>

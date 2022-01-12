@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- IR.CONFIG_PARAMETER -->
+        
+        <record model="ir.actions.server" id="action_force_set_param">
+          <field name="name">force_set_param</field>
+          <field name="model_id" ref="model_ir_config_parameter"/>
+          <field name="state">code</field>
+          <field name="code">
+            model.force_set_param()
+          </field>
+        </record>
+        <menuitem id="menu_force_set_param" name="Force ir.config_parameter" sequence="40" parent="base.menu_security" action="action_force_set_param"/>
+
+    </data>
+</odoo>

@@ -2,16 +2,17 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': 'Multicompany force config',
-    'summary': 'Force configuration for all companies',
+    'name': 'AppsToGROW Security',
 
     'author': 'AppsToGROW',
-    'category': 'Administration',
+    'category': 'Uncategorized',
     'data': [
-        # 'security/ir.model.access.csv', # How come it works without this???
+        'server_actions.xml',
     ],
     'depends': [
-        'multicompany_base',
+        'base',
+        'product',
+        'auth_password_policy_signup',
     ],
     'license': 'AGPL-3',
     'version': '14.0.1.0.0',
