@@ -1,5 +1,5 @@
 diff --git a/odoo/models.py b/odoo/models.py
-index 5e3ce16f..a8ec6c6a 100644
+index 5e3ce16f..6965002c 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -799,7 +799,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -35,7 +35,7 @@ index 5e3ce16f..a8ec6c6a 100644
 +            in `[False, self.company_id.id]` (or `self.id` if
              :class:`~odoo.addons.base.models.res_company`).
  
-+        If multicompany_force_security is installed, replace False with 1.
++        If multicompany_force_security is installed, also accept company_id 1.
 +
          For :class:`~odoo.addons.base.models.res_users` relational fields,
          verifies record company is in `company_ids` fields.
@@ -44,9 +44,9 @@ index 5e3ce16f..a8ec6c6a 100644
              return
  
          inconsistencies = []
-+        consistent_company_id = False
++        consistent_company_ids = [False]
 +        if self.env['ir.module.module'].search([('name', '=', 'multicompany_force_security')]).state == 'installed':
-+            consistent_company_id = 1
++            consistent_company_ids.append(1)
          for record in self:
              company = record.company_id if record._name != 'res.company' else record
              # The first part of the check verifies that all records linked via relation fields are compatible
@@ -55,10 +55,10 @@ index 5e3ce16f..a8ec6c6a 100644
                  # Special case with `res.users` since an user can belong to multiple companies.
                  if corecord._name == 'res.users' and corecord.company_ids:
 -                    if not (company <= corecord.company_ids):
-+                    if not (company.id in corecord.company_ids.ids.append(consistent_company_id)):
++                    if not (company.id in corecord.company_ids.ids + consistent_company_ids):
                          inconsistencies.append((record, name, corecord))
 -                elif not (corecord.company_id <= company):
-+                elif not (corecord.company_id.id in [company.id, consistent_company_id]):
++                elif not (corecord.company_id.id in [company.id] + consistent_company_ids):
                      inconsistencies.append((record, name, corecord))
              # The second part of the check (for property / company-dependent fields) verifies that the records
              # linked via those relation fields are compatible with the company that owns the property value, i.e.
@@ -67,10 +67,10 @@ index 5e3ce16f..a8ec6c6a 100644
                  corecord = record.sudo()[name]
                  if corecord._name == 'res.users' and corecord.company_ids:
 -                    if not (company <= corecord.company_ids):
-+                    if not (company.id in corecord.company_ids.ids.append(consistent_company_id)):
++                    if not (company.id in corecord.company_ids.ids + consistent_company_ids):
                          inconsistencies.append((record, name, corecord))
 -                elif not (corecord.company_id <= company):
-+                elif not (corecord.company_id.id in [company.id, consistent_company_id]):
++                elif not (corecord.company_id.id in [company.id] + consistent_company_ids):
                      inconsistencies.append((record, name, corecord))
  
          if inconsistencies:
