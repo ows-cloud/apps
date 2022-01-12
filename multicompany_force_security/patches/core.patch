@@ -1,5 +1,5 @@
 diff --git a/odoo/models.py b/odoo/models.py
-index 37ce8d04..2bcc47c8 100644
+index 5e3ce16f..a8ec6c6a 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -799,7 +799,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -25,8 +25,57 @@ index 37ce8d04..2bcc47c8 100644
                      )
                      for record in missing
                  )),
+@@ -3251,10 +3252,12 @@ Fields:
+         """ Check the companies of the values of the given field names.
+ 
+         :param list fnames: names of relational fields to check
+-        :raises UserError: if the `company_id` of the value of any field is not
+-            in `[False, self.company_id]` (or `self` if
++        :raises UserError: if the `company_id.id` of the value of any field is not
++            in `[False, self.company_id.id]` (or `self.id` if
+             :class:`~odoo.addons.base.models.res_company`).
+ 
++        If multicompany_force_security is installed, replace False with 1.
++
+         For :class:`~odoo.addons.base.models.res_users` relational fields,
+         verifies record company is in `company_ids` fields.
+ 
+@@ -3279,6 +3282,9 @@ Fields:
+             return
+ 
+         inconsistencies = []
++        consistent_company_id = False
++        if self.env['ir.module.module'].search([('name', '=', 'multicompany_force_security')]).state == 'installed':
++            consistent_company_id = 1
+         for record in self:
+             company = record.company_id if record._name != 'res.company' else record
+             # The first part of the check verifies that all records linked via relation fields are compatible
+@@ -3287,9 +3293,9 @@ Fields:
+                 corecord = record.sudo()[name]
+                 # Special case with `res.users` since an user can belong to multiple companies.
+                 if corecord._name == 'res.users' and corecord.company_ids:
+-                    if not (company <= corecord.company_ids):
++                    if not (company.id in corecord.company_ids.ids.append(consistent_company_id)):
+                         inconsistencies.append((record, name, corecord))
+-                elif not (corecord.company_id <= company):
++                elif not (corecord.company_id.id in [company.id, consistent_company_id]):
+                     inconsistencies.append((record, name, corecord))
+             # The second part of the check (for property / company-dependent fields) verifies that the records
+             # linked via those relation fields are compatible with the company that owns the property value, i.e.
+@@ -3300,9 +3306,9 @@ Fields:
+                 # Special case with `res.users` since an user can belong to multiple companies.
+                 corecord = record.sudo()[name]
+                 if corecord._name == 'res.users' and corecord.company_ids:
+-                    if not (company <= corecord.company_ids):
++                    if not (company.id in corecord.company_ids.ids.append(consistent_company_id)):
+                         inconsistencies.append((record, name, corecord))
+-                elif not (corecord.company_id <= company):
++                elif not (corecord.company_id.id in [company.id, consistent_company_id]):
+                     inconsistencies.append((record, name, corecord))
+ 
+         if inconsistencies:
 diff --git a/odoo/tools/safe_eval.py b/odoo/tools/safe_eval.py
-index f60bb5e9..6f665285 100644
+index f60bb5e9..aaf9fda7 100644
 --- a/odoo/tools/safe_eval.py
 +++ b/odoo/tools/safe_eval.py
 @@ -326,6 +326,38 @@ def safe_eval(expr, globals_dict=None, locals_dict=None, mode="eval", nocopy=Fal
@@ -40,7 +89,7 @@ index f60bb5e9..6f665285 100644
 +        # value = list of safe exceptions
 +        unsafe_except = {
 +            'cache': [],
-+            '.cr': ['.create'], 
++            '.cr': ['.create'],
 +            '._cr': ['._cron'],
 +            '.execute': [],
 +            '._execute': [],

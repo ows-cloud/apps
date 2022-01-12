@@ -288,19 +288,22 @@ class MulticompanyForceSecurity(models.AbstractModel):
 
     def _register_hook(self, update_module=False):
         if update_module:
-            param = self.env['ir.config_parameter'].get_param('multicompany_base.force_config')
+            param = self.env['ir.config_parameter'].get_param('multicompany_force_security.force_security')
             if param in ('1', 't', 'true', 'True'):
-                self._secure()
+                self.secure()
                 _logger.info('multicompany.force.security done')
 
     # main methods
 
-    def _secure(self):
+    def secure(self):
         # Returning an error value will be ignored (see loading.py).
+        if not self.env.user.has_group('base.group_system'):
+            return False
         self._set_global_security_rules_on_all_models_except_ir_rule()
         self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
         self._set_company_id_to_1_where_null()
         self._update_rule_domains_to_1_where_false()
+        return True
 
     def _set_global_security_rules_on_all_models_except_ir_rule(self):
         models = self.env['ir.model'].search([('model', '!=', 'ir.rule')])
@@ -467,13 +470,14 @@ class MulticompanyForceSecurity(models.AbstractModel):
         for rule in rules:
             domain = rule.domain_force.strip('] [')
             domain_list = domain.split(',')
-            for criteria in domain_list:
-                criteria = criteria.strip(') (')
-                criteria_list = criteria.split(',')
-                if len(criteria_list) == 3:
-                    key, operator, value = criteria_list
-                    if 'company' in key and 'False' in value:
-                        rule.domain_force = rule.domain_force.replace('False', '1')
+            false_in_domain_list = [count for count, str in enumerate(domain_list) if 'False' in str]
+            for false_position in false_in_domain_list:
+                look_for_company = false_position - 2
+                if 'company' in domain_list[look_for_company]:
+                    domain_list[false_position] = domain_list[false_position].replace('False', '1')
+                    new_domain = "[{}]".format(', '.join(domain_list))
+                    rule.domain_force = new_domain
+
 
     # TODO
     # def _get_and_fix_name_and_find_model_of_all_sql_views(self):
