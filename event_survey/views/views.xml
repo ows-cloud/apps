@@ -78,6 +78,7 @@
     		<field name="model">event.registration</field>
             <field name="inherit_id" ref="event.view_event_registration_form"/>
     		<field name="priority" eval="20"/>
+            <field name="groups_id" eval="[(4, ref('group_event_survey'))]"/>
     		<field name="arch" type="xml">
                 <group name="event" position="inside">
                     <field name="survey_user_input_print_url" widget="url"/>
@@ -93,6 +94,7 @@
             <field name="inherit_id" ref="survey.survey_question_form"/>
             <field name="groups_id" eval="[(4, ref('group_event_survey'))]"/>
     		<field name="priority" eval="20"/>
+            <field name="groups_id" eval="[(4, ref('group_event_survey'))]"/>
     		<field name="arch" type="xml">
 				<xpath expr="//field[@name='suggested_answer_ids']/tree" position="inside">
                     <field name="product_id"/>
@@ -127,6 +129,7 @@
         <record model="ir.ui.view" id="view_survey_user_input_line_pivot">
             <field name="name">survey.user_input.line.pivot</field>
             <field name="model">survey.user_input.line</field>
+            <field name="groups_id" eval="[(4, ref('group_event_survey'))]"/>
             <field name="mode">primary</field>
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">

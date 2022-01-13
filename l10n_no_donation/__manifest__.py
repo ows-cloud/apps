@@ -19,6 +19,7 @@
         'donation',               # OCA/donation
         'partner_identification', # OCA/partner-contact
     ],
+    'development_status': 'Alpha',
     'license': 'AGPL-3',
     'website': 'http://www.appstogrow.co',
 

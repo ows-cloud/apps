@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_custom_list_group_user,custom.list,model_custom_list,base.group_user,1,1,1,1
-access_custom_list_item_group_user,custom.list.item,model_custom_list_item,base.group_user,1,1,1,1

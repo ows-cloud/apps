@@ -3,8 +3,6 @@ from odoo import api, fields, models
 MODELS_WITH_REPLACE_RECORD_ID = [
     'mail.channel',
     'mail.template',
-    'res.users',
-    'stock.location',
 ]
 
 
