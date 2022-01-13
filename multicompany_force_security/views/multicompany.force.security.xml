@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.actions.server" id="action_force_security">
+            <field name="name">Force security</field>
+            <field name="model_id" ref="model_multicompany_force_security"/>
+            <field name="state">code</field>
+            <field name="code">
+model.secure()
+            </field>
+        </record>
+        <menuitem id="menu_force_security" name="Force Security" sequence="10" parent="base.menu_security" action="action_force_security"/>
+    </data>
+</odoo>

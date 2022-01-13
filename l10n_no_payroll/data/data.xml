@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- hr.salary.rule -->
+
+        <record model="hr.salary.rule" id="hr_salary_rule_tax_deduction">
+            <field name="code">TREKK</field>
+            <field name="name">Forskuddstrekk</field>
+            <field name="category_id" ref="payroll.DED"/>
+            <field name="sequence" eval="5"/>
+            <field name="condition_select">none</field>
+            <field name="condition_python">/</field>
+            <field name="amount_select">fix</field>
+        </record>
+
+        <record model="hr.salary.rule" id="hr_salary_rule_tax_deduction_2018">
+            <field name="code">TREKK2018</field>
+            <field name="name">Forskuddstrekk 2018</field>
+            <field name="parent_rule_id" ref="hr_salary_rule_tax_deduction"/>
+            <field name="category_id" ref="payroll.DED"/>
+            <field name="sequence" eval="199"/>
+            <field name="condition_select">none</field>
+            <field name="condition_python">/</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+trekkgrunnlag = categories.BASIC + categories.ALW
+result = employee.l10n_no_get_tax_deduction(
+    year=2018,
+    trekkperiode='1', # måned
+    tabelltype='0',   # lønn
+    trekkgrunnlag=trekkgrunnlag,
+    andel_av_trekk=1, # halv skatt i desember
+)
+            </field>
+        </record>
+
+    </data>
+</odoo>
