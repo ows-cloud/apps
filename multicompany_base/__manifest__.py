@@ -14,6 +14,7 @@
     ],
     'depends': [
         'base',
+        'base_setup',
     ],
     'license': 'AGPL-3',
     'version': '14.0.1.0.0',

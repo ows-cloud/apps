@@ -4,7 +4,7 @@ from odoo import api, fields, models
 class Company(models.Model):
     _inherit = 'res.company'
 
-    only_allow_these_features = fields.Many2one('res.users')
+    # only_allow_these_features = fields.Many2one('res.users')
 
     @api.model
     def create(self, vals):

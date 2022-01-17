@@ -19,4 +19,4 @@ class Company(models.Model):
 
     def configure(self):
         companies = self
-        self.env['multicompany.force.config']._configure(companies)
+        self.env['multicompany.config']._configure(companies)

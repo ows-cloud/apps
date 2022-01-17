@@ -50,3 +50,32 @@ class Partner(models.Model):
                 return 'https://' + self.company_id.website_id.domain
 
         return self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+
+
+class Website(models.Model):
+    _inherit = 'website'
+
+    def _default_social_facebook(self):
+        return self.env.company.social_facebook
+
+    def _default_social_github(self):
+        return self.env.company.social_github
+
+    def _default_social_linkedin(self):
+        return self.env.company.social_linkedin
+
+    def _default_social_youtube(self):
+        return self.env.company.social_youtube
+
+    def _default_social_instagram(self):
+        return self.env.company.social_instagram
+
+    def _default_social_twitter(self):
+        return self.env.company.social_twitter
+
+    social_twitter = fields.Char('Twitter Account', default=_default_social_twitter)
+    social_facebook = fields.Char('Facebook Account', default=_default_social_facebook)
+    social_github = fields.Char('GitHub Account', default=_default_social_github)
+    social_linkedin = fields.Char('LinkedIn Account', default=_default_social_linkedin)
+    social_youtube = fields.Char('Youtube Account', default=_default_social_youtube)
+    social_instagram = fields.Char('Instagram Account', default=_default_social_instagram)

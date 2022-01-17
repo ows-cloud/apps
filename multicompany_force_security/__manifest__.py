@@ -11,7 +11,7 @@
         'security/ir.model.access.csv',
         'security/security.xml',
         'views/multicompany.force.security.xml',
-        'views/res.company.xml',
+        # 'views/res.company.xml',
     ],
     'depends': [
         'multicompany_base',

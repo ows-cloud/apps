@@ -302,7 +302,7 @@ class MulticompanyForceSecurity(models.AbstractModel):
         self._set_global_security_rules_on_all_models_except_ir_rule()
         self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
         self._set_company_id_to_1_where_null()
-        self._update_rule_domains_to_1_where_false()
+        self._update_rule_domains_to_1_where_false_except_partner()
         return True
 
     def _set_global_security_rules_on_all_models_except_ir_rule(self):
@@ -448,25 +448,43 @@ class MulticompanyForceSecurity(models.AbstractModel):
             sql = "UPDATE " + table[0] + " SET company_id = 1 WHERE company_id IS NULL;"
             self.env.cr.execute(sql)
 
-        # TODO: set company_id correctly, not necessarily 1 on all records!
-        #     records = env['ir.model.data'].search([('company_id', '=', None)])
-        #     for record in records:
-        #         company = record.reference.company_id
-        #         record.write({'company_id': company.id})
-        # class Rule(models.Model):
-        #     _inherit = 'ir.rule'
-        #     def post_init_hook(self):
-        #         #env = api.Environment(cr, SUPERUSER_ID, {})
-        #         records = self.env['ir.model.data'].search([('company_id', '=', None)])
-        #         for record in records:
-        #             #model, id = record.reference.split(',')
-        #             real_record = self.env[record.model].search([('id', '=', record.res_id)])
-        #             if real_record:
-        #                 # company = self.env[model].browse(int(id)).company_id
-        #                 record.write({'company_id': real_record.company_id.id})
+    # This should set company_id more correctly, but is not stable yet
+    def _set_company_id_where_null(self):
+        _logger.info('set_company_id_where_null: start')
 
-    def _update_rule_domains_to_1_where_false(self):
-        rules = self.env['ir.rule'].search([('domain_force', 'like', 'company%False')])
+        lookup_company = {
+            'ir.model.data': ('model', 'res_id'),
+            'website.menu': 'website_id',
+        }
+
+        all_models = self.env['ir.model'].search([])
+        for model in all_models:
+            if not self.env[model.model]._auto:
+                continue
+            if model.model == 'ir.model.fields':
+                sql = "UPDATE {} SET company_id = 1 WHERE company_id IS NULL;".format(model.model.replace('.','_'))
+                self.env.cr.execute(sql)
+            lookup = False
+            if model in lookup_company:
+                lookup = lookup_company[model]
+
+            records_with_no_company = self.env[model.model].sudo().search([('company_id', '=', False)])
+            for record in records_with_no_company:
+                if type(lookup) is tuple:
+                    other_model, other_field = lookup
+                    other_record = self.env[getattr(record, other_model)].search([('id', '=', getattr(record, other_field))])
+                    record.sudo().company_id = other_record.company_id
+                elif type(lookup) is str:
+                    other_field = lookup
+                    other_record = getattr(record, other_field)
+                    record.sudo().company_id = other_record.company_id
+                else:
+                    record.sudo().company_id = 1
+        _logger.info('set_company_id_where_null: done')
+
+    def _update_rule_domains_to_1_where_false_except_partner(self):
+        ir_model_contact = self.env.ref('base.model_res_partner')
+        rules = self.env['ir.rule'].search([('domain_force', 'like', 'company%False'), ('model_id', '!=', ir_model_contact.id)])
         for rule in rules:
             domain = rule.domain_force.strip('] [')
             domain_list = domain.split(',')

@@ -7,7 +7,16 @@ ADMIN_USER = 2
 
 class MulticompanyConfig(models.AbstractModel):
     _name = 'multicompany.config'
-    _description = 'Configuration of companies'
+    _description = 'Configuration of companies with forced security'
+
+    """
+    Sometimes Odoo assumes that a user has access to a specific record.
+    With forced security, the user might not have access.
+    The configuration will search for specific records, as admin user logged into one specific company.
+    The search will include all records permitted by the security rules, including inactive records and parent/child companies.
+    - Exception: Search for company website
+    If not found, create (or copy) a new record for the company.
+    """
 
     def _register_hook(self, update_module=False):
         if update_module:
@@ -15,7 +24,7 @@ class MulticompanyConfig(models.AbstractModel):
             if param in ('1', 't', 'true', 'True'):
                 companies = self.env['res.company'].sudo().search([])
                 self._configure(companies)
-                _logger.info('multicompany.force.config done')
+                _logger.info('multicompany.config done')
 
     def _prepare(self, company):
         self = self.with_user(
@@ -32,26 +41,26 @@ class MulticompanyConfig(models.AbstractModel):
         for company in companies:
             self = self._prepare(company)
             # --------------------------------------------------
-            self._create_a_general_mail_channel_for_all_employees()
+            self._create_a_company_mail_channel_for_all_employees()
             self._copy_system_sequences_with_code(company.id)
             self._create_default_user(company.id)
             public_user = self._create_public_user(company.id)
             self._create_website(company, public_user)
             # --------------------------------------------------
 
-    def _create_a_general_mail_channel_for_all_employees(self):
+    def _create_a_company_mail_channel_for_all_employees(self):
         imd_record = self._env('ir.model.data').search([('module', '=', 'mail'), ('name', '=', 'channel_all_employees')])
         if imd_record:
             assert imd_record.model == 'mail.channel'
             group_user_id = self.env.ref('base.group_user').id
             return self._insert_first_record(
                 model='mail.channel',
-                search=['|', ('id', '=', imd_record.res_id), ('replace_record_id', '=', imd_record.res_id)],
+                search=[('all_employees', '=', True)],
                 values={
                     'name': 'general',
                     'description': 'General announcements for all employees.',
                     'group_ids': [(4, group_user_id), 0],
-                    'replace_record_id': imd_record.res_id,
+                    'all_employees': True,
                 },
             )
 
@@ -76,9 +85,7 @@ class MulticompanyConfig(models.AbstractModel):
         return self._insert_first_record(
             model='res.users',
             search=[
-                ('active', '=', False),
-                ('company_ids', 'in', [company_id]),
-                ('login', '=', 'default_user_for_company_' + str(company_id)),
+                ('default_user', '=', True),
             ],
             values={
                 'company_id': company_id,
@@ -86,6 +93,7 @@ class MulticompanyConfig(models.AbstractModel):
                 'login': 'default_user_for_company_' + str(company_id),
                 'name': 'Default user for company ' + str(company_id),
                 'active': False,
+                'default_user': True,
             },
         )
 
@@ -94,7 +102,6 @@ class MulticompanyConfig(models.AbstractModel):
             model='res.users',
             search=[
                 ('groups_id', '=', self._ref('base.group_public').id),
-                ('company_ids', 'in', [company_id]),
             ],
             values={
                 'company_id': company_id,
@@ -115,7 +122,7 @@ class MulticompanyConfig(models.AbstractModel):
             return self
         self._insert_first_record(
             model='ir.default',
-            search=[('company_id', '=', company.id), ('field_id', '=', website_user_field.id)],
+            search=[('field_id', '=', website_user_field.id)],
             values={'company_id': company.id, 'field_id': website_user_field.id, 'json_value': public_user.id},
         )
         default_languages = [self.env.ref('base.lang_en').id]

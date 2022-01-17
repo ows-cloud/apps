@@ -4,7 +4,5 @@ from odoo import api, fields, models, _
 class MailChannel(models.Model):
     _inherit = 'mail.channel'
 
-    replace_record_id = fields.Many2one('mail.channel', string='Replace Record')
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.company)
-    
-    _sql_constraints = [('replace_mail_channel_uniq', 'unique(replace_record_id, company_id)', 'Replace Record must be unique per company!')]
+    all_employees = fields.Boolean('Channel for all employees')    
+    _sql_constraints = [('all_employees_uniq', 'unique(all_employees, company_id)', 'Channel for all emloyees must be unique per company!')]
