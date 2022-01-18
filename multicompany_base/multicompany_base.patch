@@ -52,33 +52,67 @@ index 8b50afad4..2fd5cbe00 100644
          # res.partner must only allow to set the company_id of a partner if it
          # is the same as the company of all users that inherit from this partner
 diff --git a/odoo/models.py b/odoo/models.py
-index 34882ef5c..c86c640c9 100644
+index 34882ef5c..23b18f3a5 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
-@@ -799,7 +799,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
-             )))
+@@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
              for r in missing
          )
--        fields = ['module', 'model', 'name', 'res_id']
-+        fields = ['module', 'model', 'name', 'res_id', 'company_id']
+         fields = ['module', 'model', 'name', 'res_id']
++        if self.env['ir.model.fields'].search([('name', '=', 'company_id')]):
++            fields.append('company_id')
  
          # disable eventual async callback / support for the extent of
          # the COPY FROM, as these are apparently incompatible
-@@ -808,11 +808,12 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
+         callback = psycopg2.extensions.get_wait_callback()
+         psycopg2.extensions.set_wait_callback(None)
          try:
-             cr.copy_from(io.StringIO(
-                 u'\n'.join(
+-            cr.copy_from(io.StringIO(
+-                u'\n'.join(
 -                    u"%s\t%s\t%s\t%d" % (
-+                    u"%s\t%s\t%s\t%d\t%d" % (
-                         modname,
-                         record._name,
-                         xids[record.id][1],
-                         record.id,
-+                        record.company_id.id,
-                     )
-                     for record in missing
-                 )),
-@@ -3251,10 +3252,12 @@ Fields:
+-                        modname,
+-                        record._name,
+-                        xids[record.id][1],
+-                        record.id,
+-                    )
+-                    for record in missing
+-                )),
+-                table='ir_model_data',
+-                columns=fields,
+-            )
++            if 'company_id' in fields:
++                cr.copy_from(io.StringIO(
++                    u'\n'.join(
++                        u"%s\t%s\t%s\t%d\t%d" % (
++                            modname,
++                            record._name,
++                            xids[record.id][1],
++                            record.id,
++                            record.company_id.id,
++                        )
++                        for record in missing
++                    )),
++                    table='ir_model_data',
++                    columns=fields,
++                )
++            else:
++                cr.copy_from(io.StringIO(
++                    u'\n'.join(
++                        u"%s\t%s\t%s\t%d" % (
++                            modname,
++                            record._name,
++                            xids[record.id][1],
++                            record.id,
++                        )
++                        for record in missing
++                    )),
++                    table='ir_model_data',
++                    columns=fields,
++                )
+         finally:
+             psycopg2.extensions.set_wait_callback(callback)
+         self.env['ir.model.data'].invalidate_cache(fnames=fields)
+@@ -3251,10 +3269,12 @@ Fields:
          """ Check the companies of the values of the given field names.
  
          :param list fnames: names of relational fields to check
@@ -93,7 +127,7 @@ index 34882ef5c..c86c640c9 100644
          For :class:`~odoo.addons.base.models.res_users` relational fields,
          verifies record company is in `company_ids` fields.
  
-@@ -3279,6 +3282,9 @@ Fields:
+@@ -3279,6 +3299,9 @@ Fields:
              return
  
          inconsistencies = []
@@ -103,7 +137,7 @@ index 34882ef5c..c86c640c9 100644
          for record in self:
              company = record.company_id if record._name != 'res.company' else record
              # The first part of the check verifies that all records linked via relation fields are compatible
-@@ -3287,9 +3293,9 @@ Fields:
+@@ -3287,9 +3310,9 @@ Fields:
                  corecord = record.sudo()[name]
                  # Special case with `res.users` since an user can belong to multiple companies.
                  if corecord._name == 'res.users' and corecord.company_ids:
@@ -115,7 +149,7 @@ index 34882ef5c..c86c640c9 100644
                      inconsistencies.append((record, name, corecord))
              # The second part of the check (for property / company-dependent fields) verifies that the records
              # linked via those relation fields are compatible with the company that owns the property value, i.e.
-@@ -3300,9 +3306,9 @@ Fields:
+@@ -3300,9 +3323,9 @@ Fields:
                  # Special case with `res.users` since an user can belong to multiple companies.
                  corecord = record.sudo()[name]
                  if corecord._name == 'res.users' and corecord.company_ids:
@@ -127,14 +161,31 @@ index 34882ef5c..c86c640c9 100644
                      inconsistencies.append((record, name, corecord))
  
          if inconsistencies:
-@@ -4652,6 +4658,7 @@ Fields:
-                     vals_list.append(vals)
-                 Translation._upsert_translations(vals_list)
+@@ -5056,6 +5079,24 @@ Fields:
+             return self
+         return self.with_env(self.env(user=user, su=False))
  
-+    # copy() in multicompany_base will replace this copy().
-     @api.returns('self', lambda value: value.id)
-     def copy(self, default=None):
-         """ copy(default=None)
++    """
++    MULTICOMPANY CONTROLLER PATCHES
++    When the active company is not the user's default company,
++    controllers may not know the company of a record,
++    and sudo() is necessary to find out.
++    In patches to fix controllers,
++    the methods .my_company() and .with_my_company() are often very useful.
++    Then sudo() is only one place here, not in every controller patch.
++    """
++
++    def my_company(self):
++        company = self.sudo().mapped('company_id')
++        assert len(company) == 1
++        return company
++
++    def with_my_company(self):
++        return self.with_company(self.my_company())
++
+     def with_company(self, company):
+         """ with_company(company)
+ 
 diff --git a/odoo/modules/loading.py b/odoo/modules/loading.py
 index 8093f14b1..039670bb9 100644
 --- a/odoo/modules/loading.py

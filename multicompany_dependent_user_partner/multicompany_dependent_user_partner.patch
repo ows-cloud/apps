@@ -295,7 +295,7 @@ index 525751302..5a8c41db3 100644
          # Ensure there is at most one active variant for each combination.
          query = """
 diff --git a/odoo/addons/base/models/res_users.py b/odoo/addons/base/models/res_users.py
-index 34f35ac82..d57f01582 100644
+index 34f35ac82..d7ae99231 100644
 --- a/odoo/addons/base/models/res_users.py
 +++ b/odoo/addons/base/models/res_users.py
 @@ -283,6 +283,7 @@ class Users(models.Model):
@@ -306,7 +306,24 @@ index 34f35ac82..d57f01582 100644
          string='Related Partner', help='Partner-related data of the user')
      login = fields.Char(required=True, help="Used to log into the system")
      password = fields.Char(
-@@ -571,11 +572,6 @@ class Users(models.Model):
+@@ -547,6 +548,16 @@ class Users(models.Model):
+             if user.partner_id.company_id:
+                 user.partner_id.company_id = user.company_id
+             user.partner_id.active = user.active
++            """
++            multicompany_dependent_user_partner
++            If the patch is installed, but the module is not installed:
++                The user should always have the same partner, regardless of company.
++            """
++            if not self.env['ir.module.module'].search([('name', '=', 'multicompany_dependent_user_partner')]).state == 'installed':
++                field = self.env['res.users']._fields['partner_id']
++                if field.company_dependent:
++                    field_record = self.env['ir.model.fields'].search([('model', '=', 'res.users'), ('name', '=', 'partner_id')]).ensure_one()
++                    self.env['ir.property'].search([('fields_id', '=', field_record.id), ('company_id', '>', 0)]).write({'company_id': False})
+         return users
+ 
+     def write(self, values):
+@@ -571,11 +582,6 @@ class Users(models.Model):
                  self = self.sudo().with_context(binary_field_real_user=self.env.user)
  
          res = super(Users, self).write(values)
@@ -318,7 +335,7 @@ index 34f35ac82..d57f01582 100644
  
          if 'company_id' in values or 'company_ids' in values:
              # Reset lazy properties `company` & `companies` on all envs
-@@ -1002,6 +998,69 @@ class Users(models.Model):
+@@ -1002,6 +1008,69 @@ class Users(models.Model):
      def _mfa_url(self):
          """ If an MFA method is enabled, returns the URL for its second step. """
          return
