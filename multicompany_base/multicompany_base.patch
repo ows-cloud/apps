@@ -1,5 +1,58 @@
+diff --git a/addons/auth_signup/models/res_users.py b/addons/auth_signup/models/res_users.py
+index d93e7c706..458aef840 100644
+--- a/addons/auth_signup/models/res_users.py
++++ b/addons/auth_signup/models/res_users.py
+@@ -194,7 +194,8 @@ class ResUsers(models.Model):
+             'partner_to': False,
+             'scheduled_date': False,
+         }
+-        template.write(template_values)
++        # template.write(template_values)
++        # ACCESS ERROR: Users cannot edit system record.
+ 
+         for user in self:
+             if not user.email:
+diff --git a/addons/base_setup/models/res_config_settings.py b/addons/base_setup/models/res_config_settings.py
+index 9ea1339f6..1932b047b 100644
+--- a/addons/base_setup/models/res_config_settings.py
++++ b/addons/base_setup/models/res_config_settings.py
+@@ -61,6 +61,7 @@ class ResConfigSettings(models.TransientModel):
+             },
+         }
+ 
++    # open_default_user() in multicompany_base will replace this open_default_user().
+     def open_default_user(self):
+         action = self.env["ir.actions.actions"]._for_xml_id("base.action_res_users")
+         if self.env.ref('base.default_user', raise_if_not_found=False):
+diff --git a/addons/mail/models/update.py b/addons/mail/models/update.py
+index edf5b4f2c..9be029ec9 100644
+--- a/addons/mail/models/update.py
++++ b/addons/mail/models/update.py
+@@ -98,6 +98,10 @@ class PublisherWarrantyContract(AbstractModel):
+             # old behavior based on res.log; now on mail.message, that is not necessarily installed
+             user = self.env['res.users'].sudo().browse(SUPERUSER_ID)
+             poster = self.sudo().env.ref('mail.channel_all_employees')
++            try:
++                poster = self.env['mail.channel'].search([('company_id', '=', self.env.company.id), ('all_employees', '=', True)])
++            except:
++                pass
+             if not (poster and poster.exists()):
+                 if not user.exists():
+                     return True
+diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
+index 8b50afad4..2fd5cbe00 100644
+--- a/odoo/addons/base/models/res_partner.py
++++ b/odoo/addons/base/models/res_partner.py
+@@ -524,6 +524,7 @@ class Partner(models.Model):
+             self.invalidate_cache(['user_ids'], self._ids)
+             for partner in self:
+                 if partner.active and partner.user_ids:
++                  if partner.user_ids[0].active:
+                     raise ValidationError(_('You cannot archive a contact linked to a portal or internal user.'))
+         # res.partner must only allow to set the company_id of a partner if it
+         # is the same as the company of all users that inherit from this partner
 diff --git a/odoo/models.py b/odoo/models.py
-index 5e3ce16f..6965002c 100644
+index 34882ef5c..c86c640c9 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -799,7 +799,7 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -74,8 +127,48 @@ index 5e3ce16f..6965002c 100644
                      inconsistencies.append((record, name, corecord))
  
          if inconsistencies:
+@@ -4652,6 +4658,7 @@ Fields:
+                     vals_list.append(vals)
+                 Translation._upsert_translations(vals_list)
+ 
++    # copy() in multicompany_base will replace this copy().
+     @api.returns('self', lambda value: value.id)
+     def copy(self, default=None):
+         """ copy(default=None)
+diff --git a/odoo/modules/loading.py b/odoo/modules/loading.py
+index 8093f14b1..039670bb9 100644
+--- a/odoo/modules/loading.py
++++ b/odoo/modules/loading.py
+@@ -568,7 +568,10 @@ def load_modules(db, force_demo=False, status=None, update_module=False):
+         # is False.
+         env = api.Environment(cr, SUPERUSER_ID, {})
+         for model in env.values():
+-            model._register_hook()
++            if model._name in ('multicompany.config', 'multicompany.force.security'):
++                model._register_hook(update_module=update_module)
++            else:
++                model._register_hook()
+         env['base'].flush()
+ 
+         # STEP 9: save installed/updated modules for post-install tests
+diff --git a/odoo/modules/registry.py b/odoo/modules/registry.py
+index d17caac09..17bbc3f93 100644
+--- a/odoo/modules/registry.py
++++ b/odoo/modules/registry.py
+@@ -282,7 +282,10 @@ class Registry(Mapping):
+         # on a fully loaded registry, and not on a registry being loaded.
+         if self.ready:
+             for model in env.values():
+-                model._register_hook()
++                if model._name in ('multicompany.config', 'multicompany.force.security'):
++                    model._register_hook(update_module=True)
++                else:
++                    model._register_hook()
+             env['base'].flush()
+ 
+     @lazy_property
 diff --git a/odoo/tools/safe_eval.py b/odoo/tools/safe_eval.py
-index f60bb5e9..aaf9fda7 100644
+index f60bb5e91..aaf9fda7f 100644
 --- a/odoo/tools/safe_eval.py
 +++ b/odoo/tools/safe_eval.py
 @@ -326,6 +326,38 @@ def safe_eval(expr, globals_dict=None, locals_dict=None, mode="eval", nocopy=Fal

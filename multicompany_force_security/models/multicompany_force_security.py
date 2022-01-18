@@ -301,7 +301,7 @@ class MulticompanyForceSecurity(models.AbstractModel):
             return False
         self._set_global_security_rules_on_all_models_except_ir_rule()
         self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
-        self._set_company_id_to_1_where_null()
+        self._set_company_id_where_null()
         self._update_rule_domains_to_1_where_false_except_partner()
         return True
 

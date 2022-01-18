@@ -10,6 +10,7 @@
     'category': 'Uncategorized',
     'data': [
         'security/ir.model.access.csv',
+        'views/ir.model.data.xml',
         'views/res.company.xml',
     ],
     'depends': [

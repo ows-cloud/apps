@@ -37,6 +37,9 @@ Do for each user:
 
 res.users temp_partner_id should be deleted. I see no method in openupgradelib to completely delete a field! (Just the db column...)
 
+In mail/models/mail_message.py check_access_rule(), I wanted to check if user partner exists, and if not, raise UserError.
+But creating a user partner will trigger this very method, then I get error because the partner does not exist.
+
 ## Roadmap
 
 Improve company_id for external IDs.
