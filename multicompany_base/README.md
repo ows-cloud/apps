@@ -1,3 +1,5 @@
+# Multicompany Base: Assign every record to a company
+
 # Force configuration for all companies
 
 This module implements configuration for all companies.

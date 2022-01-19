@@ -9,7 +9,14 @@ MODELS_WITH_REPLACE_RECORD_ID = [
 class Base(models.AbstractModel):
     _inherit = 'base'
 
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.company)
+    company_id = fields.Many2one(
+        'res.company',
+        string='Company',
+        store=True,
+        index=True,
+        # required=True,
+        default=lambda self: self.env.company,
+    )
 
     @api.returns(None, lambda value: value[0])
     def copy_data(self, default=None):

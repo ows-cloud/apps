@@ -452,11 +452,6 @@ class MulticompanyForceSecurity(models.AbstractModel):
     def _set_company_id_where_null(self):
         _logger.info('set_company_id_where_null: start')
 
-        lookup_company = {
-            'ir.model.data': ('model', 'res_id'),
-            'website.menu': 'website_id',
-        }
-
         all_models = self.env['ir.model'].search([])
         for model in all_models:
             if not self.env[model.model]._auto:
@@ -464,22 +459,11 @@ class MulticompanyForceSecurity(models.AbstractModel):
             if model.model == 'ir.model.fields':
                 sql = "UPDATE {} SET company_id = 1 WHERE company_id IS NULL;".format(model.model.replace('.','_'))
                 self.env.cr.execute(sql)
-            lookup = False
-            if model in lookup_company:
-                lookup = lookup_company[model]
+                continue
 
             records_with_no_company = self.env[model.model].sudo().search([('company_id', '=', False)])
             for record in records_with_no_company:
-                if type(lookup) is tuple:
-                    other_model, other_field = lookup
-                    other_record = self.env[getattr(record, other_model)].search([('id', '=', getattr(record, other_field))])
-                    record.sudo().company_id = other_record.company_id
-                elif type(lookup) is str:
-                    other_field = lookup
-                    other_record = getattr(record, other_field)
-                    record.sudo().company_id = other_record.company_id
-                else:
-                    record.sudo().company_id = 1
+                record.sudo().company_id = self.env[model]._get_company(record)
         _logger.info('set_company_id_where_null: done')
 
     def _update_rule_domains_to_1_where_false_except_partner(self):
