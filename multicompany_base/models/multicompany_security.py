@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 # Module name for external IDs made with python.
 # (Not in XML, so cannot be a module name.)
 # Used for company_id fields, also in hooks.py.
-EXTID_MODULE_NAME = '__multicompany_strict_security__'
+EXTID_MODULE_NAME = '__multicompany_security__'
 
 COMPANIES_MODEL = [
     'res.company',
@@ -283,20 +283,20 @@ def _recursive_order_words(words_list):
 
 
 class MulticompanyForceSecurity(models.AbstractModel):
-    _name = 'multicompany.force.security'
+    _name = 'multicompany.security'
     _description = 'Force security between companies'
 
     def _register_hook(self, update_module=False):
         if update_module:
-            param = self.env['ir.config_parameter'].get_param('multicompany_force_security.force_security')
+            param = self.env['ir.config_parameter'].get_param('multicompany_base.force_security')
             if param in ('1', 't', 'true', 'True'):
                 self.secure()
-                _logger.info('multicompany.force.security done')
+                _logger.info('multicompany.security done')
 
     # main methods
 
     def secure(self):
-        # Returning an error value will be ignored (see loading.py).
+        # Returning an error value to _register_hook will be ignored (see loading.py).
         if not self.env.user.has_group('base.group_system'):
             return False
         self._set_global_security_rules_on_all_models_except_ir_rule()
@@ -325,7 +325,7 @@ class MulticompanyForceSecurity(models.AbstractModel):
                 self._set_record_values('ir.rule', domain, values, xmlid_name)
 
     def _set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule(self):
-        group_company_manager_id = self.env.ref('multicompany_force_security.group_company_manager').id
+        group_company_manager_id = self.env.ref('multicompany_base.group_company_manager').id
         models = self.env['ir.model'].search([('model', '!=', 'ir.rule')])
         for model in models:
             # ir.model.access

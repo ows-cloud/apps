@@ -16,7 +16,7 @@ class IrConfigParameter(models.Model):
         set_param('auth_signup_with_captcha', repr(True))
         set_param('auth_login_with_captcha', repr(False))
 
-        set_param('multicompany_force_security.force_security', '1')
+        set_param('multicompany_base.force_security', '1')
         set_param('multicompany_base.force_config', '1')
         set_param('multicompany_base.support_user', '__multicompany_base__.support_user')
 

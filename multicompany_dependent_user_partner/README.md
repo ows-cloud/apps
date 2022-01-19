@@ -10,7 +10,7 @@ This could be e.g. a support user or an accountant.
 ## How to install?
 
 Apply patches:
-- git apply /path/to/multicompany_dependent_user_partner/patches/*
+- git apply /path/to/multicompany_dependent_user_partner/multicompany_dependent_user_partner.patch
 - git commit
 
 For new database: Restart Odoo, create a new database, install the module
@@ -39,12 +39,6 @@ res.users temp_partner_id should be deleted. I see no method in openupgradelib t
 
 In mail/models/mail_message.py check_access_rule(), I wanted to check if user partner exists, and if not, raise UserError.
 But creating a user partner will trigger this very method, then I get error because the partner does not exist.
-
-## Roadmap
-
-Improve company_id for external IDs.
-Import company from another database.
-Export company to another database.
 
 ## How to contribute?
 

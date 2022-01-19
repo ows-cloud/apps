@@ -53,7 +53,7 @@ index bdc3d0b1a..36463b9e8 100644
  from . import ir_model
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 000000000..0b5851eec
+index 000000000..24f2ee63e
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
 @@ -0,0 +1,74 @@
@@ -77,13 +77,13 @@ index 000000000..0b5851eec
 +
 +    def create(self, vals_list):
 +        """
-+        This code cannot be inside multicompany_force_security; then it is not active on installing/updating modules.
++        This code cannot be inside multicompany_base; then it is not active on installing/updating modules.
 +
-+        If multicompany_force_security is installed:
++        If multicompany_base is installed:
 +            Don't accept {'company_id': False}
 +            (e.g. stock.location from XML)
 +        """
-+        if self.env['ir.module.module'].search([('name', '=', 'multicompany_force_security')]).state == 'installed':
++        if self.env['ir.module.module'].search([('name', '=', 'multicompany_base')]).state == 'installed':
 +            for vals_dict in vals_list:
 +                if 'company_id' in vals_dict and not vals_dict['company_id']:
 +                    vals_dict['company_id'] = self._get_company(vals_dict).id
@@ -145,7 +145,7 @@ index 8b50afad4..2fd5cbe00 100644
          # res.partner must only allow to set the company_id of a partner if it
          # is the same as the company of all users that inherit from this partner
 diff --git a/odoo/models.py b/odoo/models.py
-index 34882ef5c..bccf68100 100644
+index 34882ef5c..606ce2119 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -215,7 +215,7 @@ index 34882ef5c..bccf68100 100644
 +            in `[False, self.company_id.id]` (or `self.id` if
              :class:`~odoo.addons.base.models.res_company`).
  
-+        If multicompany_force_security is installed, also accept company_id 1.
++        If multicompany_base is installed, also accept company_id 1.
 +
          For :class:`~odoo.addons.base.models.res_users` relational fields,
          verifies record company is in `company_ids` fields.
@@ -225,7 +225,7 @@ index 34882ef5c..bccf68100 100644
  
          inconsistencies = []
 +        consistent_company_ids = [False]
-+        if self.env['ir.module.module'].search([('name', '=', 'multicompany_force_security')]).state == 'installed':
++        if self.env['ir.module.module'].search([('name', '=', 'multicompany_base')]).state == 'installed':
 +            consistent_company_ids.append(1)
          for record in self:
              company = record.company_id if record._name != 'res.company' else record
@@ -255,7 +255,7 @@ index 34882ef5c..bccf68100 100644
  
          if inconsistencies:
 diff --git a/odoo/modules/loading.py b/odoo/modules/loading.py
-index 8093f14b1..039670bb9 100644
+index 8093f14b1..a064632db 100644
 --- a/odoo/modules/loading.py
 +++ b/odoo/modules/loading.py
 @@ -568,7 +568,10 @@ def load_modules(db, force_demo=False, status=None, update_module=False):
@@ -263,7 +263,7 @@ index 8093f14b1..039670bb9 100644
          env = api.Environment(cr, SUPERUSER_ID, {})
          for model in env.values():
 -            model._register_hook()
-+            if model._name in ('multicompany.config', 'multicompany.force.security'):
++            if model._name in ('multicompany.config', 'multicompany.security'):
 +                model._register_hook(update_module=update_module)
 +            else:
 +                model._register_hook()
@@ -271,7 +271,7 @@ index 8093f14b1..039670bb9 100644
  
          # STEP 9: save installed/updated modules for post-install tests
 diff --git a/odoo/modules/registry.py b/odoo/modules/registry.py
-index d17caac09..17bbc3f93 100644
+index d17caac09..3ab7c967e 100644
 --- a/odoo/modules/registry.py
 +++ b/odoo/modules/registry.py
 @@ -282,7 +282,10 @@ class Registry(Mapping):
@@ -279,7 +279,7 @@ index d17caac09..17bbc3f93 100644
          if self.ready:
              for model in env.values():
 -                model._register_hook()
-+                if model._name in ('multicompany.config', 'multicompany.force.security'):
++                if model._name in ('multicompany.config', 'multicompany.security'):
 +                    model._register_hook(update_module=True)
 +                else:
 +                    model._register_hook()
@@ -329,3 +329,11 @@ index f60bb5e91..aaf9fda7f 100644
      try:
          return unsafe_eval(c, globals_dict, locals_dict)
      except odoo.exceptions.UserError:
+diff --git a/start.sh b/start.sh
+new file mode 100755
+index 000000000..abb29a8a2
+--- /dev/null
++++ b/start.sh
+@@ -0,0 +1,2 @@
++#!/bin/sh
++sudo -u ag /o14/o14-server/odoo-bin --config=/etc/o14-server.conf

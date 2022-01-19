@@ -22,20 +22,14 @@ class MulticompanyConfig(models.AbstractModel):
         if update_module:
             param = self.env['ir.config_parameter'].get_param('multicompany_base.force_config')
             if param in ('1', 't', 'true', 'True'):
-                companies = self.env['res.company'].sudo().search([])
-                self._configure(companies)
+                self.configure_all_companies()
                 _logger.info('multicompany.config done')
 
-    def _prepare(self, company):
-        self = self.with_user(
-            self.env.user.browse(ADMIN_USER) # Cannot be SUPERUSER
-        ).with_context(
-            active_test=False,
-            allowed_company_ids=[company.id],
-        )
-        self.env.company = company
-        self.env.companies = company
-        return self
+    def configure_all_companies(self):
+        # Returning an error value to _register_hook will be ignored (see loading.py).
+        all_companies = self.env['res.company'].sudo().search([])
+        self._configure(all_companies)
+        return True
 
     def _configure(self, companies):
         for company in companies:
@@ -47,6 +41,17 @@ class MulticompanyConfig(models.AbstractModel):
             public_user = self._create_public_user(company.id)
             self._create_website(company, public_user)
             # --------------------------------------------------
+
+    def _prepare(self, company):
+        self = self.with_user(
+            self.env.user.browse(ADMIN_USER) # Cannot be SUPERUSER
+        ).with_context(
+            active_test=False,
+            allowed_company_ids=[company.id],
+        )
+        self.env.company = company
+        self.env.companies = company
+        return self
 
     def _create_a_company_mail_channel_for_all_employees(self):
         imd_record = self._env('ir.model.data').search([('module', '=', 'mail'), ('name', '=', 'channel_all_employees')])
