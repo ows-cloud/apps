@@ -9,6 +9,21 @@ MODELS_WITH_REPLACE_RECORD_ID = [
 class Base(models.AbstractModel):
     _inherit = 'base'
 
+    """
+    Every model will have 'company_id' field.
+    
+    Preferrably, 'company_id' should be required.
+    Becuase of:
+    - clarity
+    - later database sharding
+    Challenges:
+    - New company first creates new partner without company_id.
+    - ir.property with blank company_id applies to all (shouldn't be allowed...)
+    - ir.default
+    - res.users without partner_id needs to read res.partner where company_id is False (ir.rule)
+
+    """
+
     company_id = fields.Many2one(
         'res.company',
         string='Company',

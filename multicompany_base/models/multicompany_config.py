@@ -27,6 +27,8 @@ class MulticompanyConfig(models.AbstractModel):
 
     def configure_all_companies(self):
         # Returning an error value to _register_hook will be ignored (see loading.py).
+        if not self.env.user.has_group('base.group_system'):
+            return False
         all_companies = self.env['res.company'].sudo().search([])
         self._configure(all_companies)
         return True

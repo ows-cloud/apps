@@ -299,13 +299,14 @@ class MulticompanyForceSecurity(models.AbstractModel):
         # Returning an error value to _register_hook will be ignored (see loading.py).
         if not self.env.user.has_group('base.group_system'):
             return False
-        self._set_global_security_rules_on_all_models_except_ir_rule()
-        self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
         self._set_company_id_where_null()
         self._update_rule_domains_to_1_where_false_except_partner()
+        self._set_global_security_rules_on_all_models_except_ir_rule()
+        self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
         return True
 
     def _set_global_security_rules_on_all_models_except_ir_rule(self):
+        _logger.info('Starting _set_global_security_rules_on_all_models_except_ir_rule')
         models = self.env['ir.model'].search([('model', '!=', 'ir.rule')])
         for model in models:
             SECURITY_TYPE = _get_security_type(model.model)
@@ -325,6 +326,7 @@ class MulticompanyForceSecurity(models.AbstractModel):
                 self._set_record_values('ir.rule', domain, values, xmlid_name)
 
     def _set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule(self):
+        _logger.info('Starting _set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule')
         group_company_manager_id = self.env.ref('multicompany_base.group_company_manager').id
         models = self.env['ir.model'].search([('model', '!=', 'ir.rule')])
         for model in models:
@@ -439,18 +441,8 @@ class MulticompanyForceSecurity(models.AbstractModel):
                 'res_id': record.id
             })
 
-    def _set_company_id_to_1_where_null(self):
-        _logger.debug('set_company_id_to_1_where_null: start')
-        self.env.cr.execute("SELECT t.table_name FROM information_schema.tables t INNER JOIN information_schema.columns c ON t.table_name = c.table_name WHERE t.table_type='BASE TABLE' AND c.column_name='company_id' ORDER BY table_name;")
-        tables = self.env.cr.fetchall()
-        _logger.debug('set_company_id_to_1_where_null: tables = ' + str(tables))
-        for table in tables:
-            sql = "UPDATE " + table[0] + " SET company_id = 1 WHERE company_id IS NULL;"
-            self.env.cr.execute(sql)
-
-    # This should set company_id more correctly, but is not stable yet
     def _set_company_id_where_null(self):
-        _logger.info('set_company_id_where_null: start')
+        _logger.info('Starting _set_company_id_where_null')
 
         all_models = self.env['ir.model'].search([])
         for model in all_models:
@@ -463,10 +455,11 @@ class MulticompanyForceSecurity(models.AbstractModel):
 
             records_with_no_company = self.env[model.model].sudo().search([('company_id', '=', False)])
             for record in records_with_no_company:
-                record.sudo().company_id = self.env[model]._get_company(record)
-        _logger.info('set_company_id_where_null: done')
+                company = self.env[model.model]._get_company(record)
+                record.sudo().write({'company_id': company.id})
 
     def _update_rule_domains_to_1_where_false_except_partner(self):
+        _logger.info('Starting _update_rule_domains_to_1_where_false_except_partner')
         ir_model_contact = self.env.ref('base.model_res_partner')
         rules = self.env['ir.rule'].search([('domain_force', 'like', 'company%False'), ('model_id', '!=', ir_model_contact.id)])
         for rule in rules:
