@@ -137,17 +137,17 @@ class MulticompanyConfig(models.AbstractModel):
             model='website',
             search=[('company_id', '=', company.id)],
             values={'company_id': company.id, 'name': company.name, 'language_ids': [(6, None, default_languages)]},
-            return_existing_record_if_one=False,
         )
         if website:
-            company.write({'website_id': website.id})
+            if not company.website_id.id:
+                company.write({'website_id': website.id})
         return website
 
     #
     # _insert_first_record and "blank" methods to use after failing to return a record(set).
     #
 
-    def _insert_first_record(self, model, search, values, copy=False, return_existing_record_if_one=True):
+    def _insert_first_record(self, model, search, values, copy=False):
         '''
         model (string): the model to insert the first record
         search (list):  the search domain to see if a record already exists
@@ -166,7 +166,7 @@ class MulticompanyConfig(models.AbstractModel):
             else:
                 record = self._ref(copy).sudo().copy(values)
                 return record
-        elif return_existing_record_if_one:
+        else:
             record_count = self._env(model).with_context(active_test=False).search_count(search)
             if record_count == 1:
                 return records # Other variables might be dependent on the record

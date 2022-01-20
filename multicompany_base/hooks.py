@@ -3,6 +3,9 @@ from .models.multicompany_security import SECURITY_DO_IF
 
 def post_init_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
+    # SET DEFAULT USER
+    env.ref('base.default_user').default_user = True
+    # SET PARAMETERS
     ICP = env['ir.config_parameter'].sudo()
     default_settings = [
         ('multicompany_base.force_security', '0'),

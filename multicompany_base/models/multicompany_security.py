@@ -303,6 +303,7 @@ class MulticompanyForceSecurity(models.AbstractModel):
         self._update_rule_domains_to_1_where_false_except_partner()
         self._set_global_security_rules_on_all_models_except_ir_rule()
         self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
+        self._change_code_to_comply_with_safe_eval()
         return True
 
     def _set_global_security_rules_on_all_models_except_ir_rule(self):
@@ -455,7 +456,7 @@ class MulticompanyForceSecurity(models.AbstractModel):
 
             records_with_no_company = self.env[model.model].sudo().search([('company_id', '=', False)])
             for record in records_with_no_company:
-                company = self.env[model.model]._get_company(record)
+                company = self.env[model.model].related_company(record)
                 record.sudo().write({'company_id': company.id})
 
     def _update_rule_domains_to_1_where_false_except_partner(self):
@@ -473,6 +474,9 @@ class MulticompanyForceSecurity(models.AbstractModel):
                     new_domain = "[{}]".format(', '.join(domain_list))
                     rule.domain_force = new_domain
 
+    def _change_code_to_comply_with_safe_eval(self):
+        action = self.env.ref('website.ir_actions_server_website_google_analytics')
+        action.code = action.code.replace('.sudo()', '')
 
     # TODO
     # def _get_and_fix_name_and_find_model_of_all_sql_views(self):
