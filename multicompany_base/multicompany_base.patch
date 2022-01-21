@@ -53,10 +53,10 @@ index bdc3d0b1a..36463b9e8 100644
  from . import ir_model
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 000000000..d7dfdaad0
+index 000000000..77d07a8a3
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
-@@ -0,0 +1,78 @@
+@@ -0,0 +1,79 @@
 +from odoo import api, fields, models
 +from odoo.exceptions import UserError
 +from . import ir_model
@@ -67,6 +67,7 @@ index 000000000..d7dfdaad0
 +Value: field name to reference another record.
 +"""
 +RELATED_RECORD = {
++    'ir.default': 'user_id',
 +    'ir.model.data': 'res_id',
 +    'ir.property': 'res_id',
 +    'website.menu': 'website_id',
@@ -105,7 +106,7 @@ index 000000000..d7dfdaad0
 +
 +        field = self._fields[field_name]
 +        if field.type == 'many2one':
-+            comodel_name = _get_value(field.comodel_name)
++            comodel_name = field.comodel_name
 +            res_id = _get_value(field_name)
 +        elif field.type == 'reference':
 +            comodel_name, res_id = _get_value(field_name).split(',')

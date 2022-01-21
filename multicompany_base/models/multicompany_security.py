@@ -4,6 +4,8 @@ from openupgradelib import openupgrade
 import os
 
 from odoo import models, fields, api, exceptions, SUPERUSER_ID
+from odoo.addons.base.models.base import RELATED_RECORD
+
 
 _logger = logging.getLogger(__name__)
 
@@ -300,10 +302,10 @@ class MulticompanySecurity(models.AbstractModel):
         if not self.env.user.has_group('base.group_system'):
             return False
         self._set_company_id_where_null()
-        self._update_rule_domains_to_1_where_false_except_partner()
-        self._set_global_security_rules_on_all_models_except_ir_rule()
-        self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
-        self._change_code_to_comply_with_safe_eval()
+        #self._update_rule_domains_to_1_where_false_except_partner()
+        #self._set_global_security_rules_on_all_models_except_ir_rule()
+        #self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
+        #self._change_code_to_comply_with_safe_eval()
         return True
 
     def _set_global_security_rules_on_all_models_except_ir_rule(self):
@@ -455,9 +457,42 @@ class MulticompanySecurity(models.AbstractModel):
                 continue
 
             records_with_no_company = self.env[model.model].sudo().search([('company_id', '=', False)])
-            for record in records_with_no_company:
-                company = self.env[model.model].related_company(record)
-                record.sudo().write({'company_id': company.id})
+            if not records_with_no_company:
+                continue
+            relation_field_name = RELATED_RECORD.get(model.model)
+            if not relation_field_name:
+                records_with_no_company.sudo().write({'company_id': self.env.company.id})
+                continue
+
+            # Two ways to set company_id. What is the performance difference?
+
+            # A) For each record: write company_id
+            # for record in records_with_no_company:
+            #     company = self.env[model.model].related_company(record)
+            #     if company:
+            #         record.sudo().write({'company_id': company.id})
+
+            # B) For each group of similar records: write_company_id
+
+            relation_field = self.env[model.model]._fields[relation_field_name]
+            if relation_field.type == 'many2one_reference':
+                relation_model_names = set(records_with_no_company.mapped(relation_field.model_field))
+                for relation_model_name in relation_model_names:
+                    records_filtered_model = records_with_no_company.filtered(lambda r: getattr(r, relation_field.model_field) == relation_model_name)
+                    relation_ids = list(set(records_filtered_model.mapped(relation_field_name)))
+                    relations = self.env[relation_model_name].browse(relation_ids)
+                    for relation in relations:
+                        related_company = relation.company_id
+                        records_filtered = records_filtered_model.filtered(lambda r: getattr(r, relation_field_name) == relation.id)
+                        records_filtered.sudo().write({'company_id': related_company.id})
+            else:
+                relations = records_with_no_company.mapped(relation_field_name)
+                for relation in relations:
+                    related_company = relation.company_id
+                    records_filtered = records_with_no_company.filtered(lambda r: getattr(r, relation_field_name) == relation.id)
+                    records_filtered.sudo().write({'company_id': related_company.id})
+
+        _logger.info('Done _set_company_id_where_null')
 
     def _update_rule_domains_to_1_where_false_except_partner(self):
         _logger.info('Starting _update_rule_domains_to_1_where_false_except_partner')
