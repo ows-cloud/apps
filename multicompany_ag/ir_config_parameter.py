@@ -18,7 +18,7 @@ class IrConfigParameter(models.Model):
 
         set_param('multicompany_base.force_security', '1')
         set_param('multicompany_base.force_config', '1')
-        set_param('multicompany_base.support_user', '__multicompany_base__.support_user')
+        set_param('multicompany_base.support_user_ext_id', '__multicompany_base__.support_user')
 
         # OTHER
 
