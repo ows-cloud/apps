@@ -46,7 +46,7 @@ Finally, you may want to set these parameters in Settings - Technical - Paramete
 -- Update the security every time Odoo is loaded or a module is installed or updated.
 - multicompany_base.force_config = 1
 -- Update for the configuration of all companies every time Odoo is loaded or a module is installed or updated. It will also auto-configure a new company.
-- multicompany_base.support_user = the external ID of a user. 
+- multicompany_base.support_user_ext_id = the external ID of a user or False. 
 -- This user will get access to all new companies. The intention is to be able to give support.
 
 ## How to manually apply security & configuration?

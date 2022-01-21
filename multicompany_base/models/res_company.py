@@ -1,4 +1,8 @@
+import logging
 from odoo import api, fields, models
+from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 class Company(models.Model):
@@ -11,10 +15,15 @@ class Company(models.Model):
 
         # Give access to SUPPORT USER
         get_param = self.env["ir.config_parameter"].sudo().get_param
-        user_support_ref = get_param("multicompany_base.support_user")
-        if user_support_ref:
-            support_user = self.env.ref(user_support_ref)
-            support_user.sudo().write({'company_ids': [(4, new_company.id)]})
+        user_support_ref = get_param("multicompany_base.support_user_ext_id")
+        if user_support_ref and user_support_ref not in ('0', 'f', 'false', 'False'):
+            try:
+                support_user = self.env.ref(user_support_ref)
+                support_user.sudo().write({'company_ids': [(4, new_company.id)]})
+            except:
+                message = 'Support user {} could not be added to company {}'.format(user_support_ref, new_company.name)
+                _logger.warning(message)
+                raise UserError(message)
 
         return new_company
 

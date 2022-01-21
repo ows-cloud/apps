@@ -16,11 +16,12 @@ class Base(models.AbstractModel):
     Becuase of:
     - clarity
     - later database sharding
-    Challenges:
+    Challenges TODO:
     - New company first creates new partner without company_id.
     - ir.property with blank company_id applies to all (shouldn't be allowed...)
     - ir.default
     - res.users without partner_id needs to read res.partner where company_id is False (ir.rule)
+    - Existing records should get company_id BEFORE applying the requirement (pre_init?).
 
     """
 

@@ -10,7 +10,7 @@ def post_init_hook(cr, registry):
     default_settings = [
         ('multicompany_base.force_security', '0'),
         ('multicompany_base.force_config', '0'),
-        ('multicompany_base.support_user', '__multicompany_base__.support_user'),
+        ('multicompany_base.support_user_ext_id', 'False'),
     ]
     for key, value in default_settings:
         if not ICP.get_param(key):
