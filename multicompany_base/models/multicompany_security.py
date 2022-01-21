@@ -282,7 +282,7 @@ def _recursive_order_words(words_list):
     return ordered_words_list
 
 
-class MulticompanyForceSecurity(models.AbstractModel):
+class MulticompanySecurity(models.AbstractModel):
     _name = 'multicompany.security'
     _description = 'Force security between companies'
 
@@ -469,14 +469,24 @@ class MulticompanyForceSecurity(models.AbstractModel):
             false_in_domain_list = [count for count, str in enumerate(domain_list) if 'False' in str]
             for false_position in false_in_domain_list:
                 look_for_company = false_position - 2
-                if 'company' in domain_list[look_for_company]:
+                if "'company_id'" in domain_list[look_for_company]:
                     domain_list[false_position] = domain_list[false_position].replace('False', '1')
                     new_domain = "[{}]".format(', '.join(domain_list))
                     rule.domain_force = new_domain
 
     def _change_code_to_comply_with_safe_eval(self):
-        action = self.env.ref('website.ir_actions_server_website_google_analytics')
-        action.code = action.code.replace('.sudo()', '')
+        _logger.info('Starting _change_code_to_comply_with_safe_eval')
+        xmlid_and_code_to_remove = [
+            ('website.ir_actions_server_website_google_analytics', ['.sudo()']),
+        ]
+        for tup in xmlid_and_code_to_remove:
+            xmlid, removes = tup
+            try:
+                action = self.env.ref(xmlid)
+            except:
+                continue
+            for remove in removes:
+                action.code = action.code.replace(remove, '')
 
     # TODO
     # def _get_and_fix_name_and_find_model_of_all_sql_views(self):
