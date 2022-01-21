@@ -53,7 +53,7 @@ index bdc3d0b1a..36463b9e8 100644
  from . import ir_model
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 000000000..e23d07ba8
+index 000000000..d7dfdaad0
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
 @@ -0,0 +1,78 @@
@@ -130,12 +130,25 @@ index 000000000..e23d07ba8
 +
 +    def my_company(self):
 +        company = self.sudo().mapped('company_id')
-+        assert len(company) == 1
-+        return company
++        if len(company) == 1:
++            return company
 +
 +    def with_my_company(self):
 +        return self.with_company(self.my_company())
 \ No newline at end of file
+diff --git a/odoo/addons/base/models/res_company.py b/odoo/addons/base/models/res_company.py
+index 3b20cb9d7..854d752fe 100644
+--- a/odoo/addons/base/models/res_company.py
++++ b/odoo/addons/base/models/res_company.py
+@@ -213,7 +213,7 @@ class Company(models.Model):
+         self.clear_caches()
+         company = super(Company, self).create(vals)
+         # The write is made on the user to set it automatically in the multi company group.
+-        self.env.user.write({'company_ids': [(4, company.id)]})
++        self.env.user.sudo().write({'company_ids': [(4, company.id)]})
+ 
+         # Make sure that the selected currency is enabled
+         if vals.get('currency_id'):
 diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
 index 8b50afad4..2fd5cbe00 100644
 --- a/odoo/addons/base/models/res_partner.py
