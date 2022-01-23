@@ -2,16 +2,13 @@
 
 Base module to have one multicompany database instead of multiple databases.
 
-The company with id 1 is considered the SYSTEM company.
-
 For each model:
 - Creating company_id field (except on company model).
-- Assigning every record to a company (company_id 1 for system records).
+- Assigning (almost) every record to a company.
 - Creating security rules.
 
 For each company:
 - Creating some necessary records.
-- To let users have a different partner for each company, install company_dependent_user_partner.
 
 ## Why?
 
@@ -45,9 +42,10 @@ Finally, you may want to set these parameters in Settings - Technical - Paramete
 - multicompany_base.force_security = 1
 -- Update the security every time Odoo is loaded or a module is installed or updated.
 - multicompany_base.force_config = 1
--- Update for the configuration of all companies every time Odoo is loaded or a module is installed or updated. It will also auto-configure a new company.
-- multicompany_base.support_user_ext_id = the external ID of a user or False. 
--- This user will get access to all new companies. The intention is to be able to give support.
+-- Update for the configuration of all companies every time Odoo is loaded or a module is installed or updated. It will also auto-configure a new company. The 'Support User' has access to all companies and will do this configuration.
+
+ Hard coded:
+ - SYSTEM_COMPANY_ID = 1
 
 ## How to manually apply security & configuration?
 

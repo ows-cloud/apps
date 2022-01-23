@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <data>
+
+        <!-- res.partner & res.users -->
+
+        <record id="support_partner" model="res.partner">
+            <field name="name">Support</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="email">support@example.com</field>
+        </record>
+
+        <record id="support_user" model="res.users">
+            <field name="login">support</field>
+            <field name="partner_id" ref="support_partner"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="company_ids" eval="[(4, ref('base.main_company'))]"/>
+            <field name="groups_id" eval="[(4, ref('base.group_user')), (4, ref('multicompany_base.group_company_manager'))]"/>
+            <field name="signature"><![CDATA[<span>--<br/>Support</span>]]></field>
+        </record>
+
+    </data>
+</odoo>

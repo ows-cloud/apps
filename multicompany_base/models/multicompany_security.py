@@ -1,11 +1,12 @@
+from collections import defaultdict
 import copy
 import logging
 from openupgradelib import openupgrade
 import os
 
 from odoo import models, fields, api, exceptions, SUPERUSER_ID
-from odoo.addons.base.models.base import RELATED_RECORD
-
+from odoo.addons.base.models.base import FIELD_NAME_TO_GET_COMPANY
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -33,6 +34,7 @@ COMPANY_READ_SYSTEM_MODEL = [
     'ir.filters',
     'ir.mail.server',
     'ir.model.data',
+    'ir.module.module',
     'ir.translation',
     'ir.ui.menu',
     'ir.ui.view',
@@ -41,6 +43,7 @@ COMPANY_READ_SYSTEM_MODEL = [
     'res.field.selection_value',    # https://github.com/apps2grow/apps/tree/14.0/base_field_value
     'stock.location',
     'uom.uom',
+    'website.menu',
 ]
 
 READ_SYSTEM_MODEL = [
@@ -80,8 +83,6 @@ READ_SYSTEM_MODEL = [
     # APPS
     'account.payment.method',
     'account.tax.group',
-    'change.password.user',
-    'change.password.wizard',
     'l10n_no_payroll.tabelltrekk',
     'mail.activity.type',
     'payment.icon',
@@ -111,6 +112,7 @@ SECURITY_DOMAIN_WORD = {
     'selected_company': "('{company_id}','=',company_id)",
     'selected_company/parent/child': "'|',('{company_id}','=',company_id),'|',('{company_id}','parent_of',company_id),('{company_id}','child_of',company_id)",
     'system_company': "('{company_id}','=',1)",
+    'company_ids_is_company_id': "('company_ids','=',company_id)",
 }
 
 COMPANY_FIELD = {
@@ -120,25 +122,20 @@ COMPANY_FIELD = {
     },
     'res.users': {
         'read_if': 'company_ids',
-        'write_if': 'company_ids', # if not company_id, write only name & lang & partner_id (???), see res_users.py
-        'create_if': 'company_id',
-        'unlink_if': 'company_id',
+        'edit_if': 'company_id',
     },
     'default': 'company_id',
 }
 
 SECURITY_RULE = {
-    # read user without partner
+    # read partners of users with access to the company
     'RES_PARTNER_MODEL': {
-        'read_if': 'false OR ( allowed_companies AND selected_company/parent/child )',
+        'read_if': 'company_ids_is_company_id OR ( allowed_companies AND selected_company/parent/child )',
         'edit_if': 'allowed_companies AND selected_company/parent/child',
     },
-    # set user partner & language
     'RES_USERS_MODEL': {
         'read_if': 'allowed_companies',
-        'write_if': 'allowed_companies',
-        'create_if': 'allowed_companies AND selected_company/parent/child',
-        'unlink_if': 'allowed_companies AND selected_company/parent/child',
+        'edit_if': 'allowed_companies AND selected_company/parent/child',
     },
     'COMPANIES_MODEL': {
         'read_if': 'allowed_companies',
@@ -292,20 +289,25 @@ class MulticompanySecurity(models.AbstractModel):
         if update_module:
             param = self.env['ir.config_parameter'].get_param('multicompany_base.force_security')
             if param in ('1', 't', 'true', 'True'):
-                self.secure()
-                _logger.info('multicompany.security done')
+                self.secure(update_module=True)
 
     # main methods
 
-    def secure(self):
+    def secure(self, update_module=False):
         # Returning an error value to _register_hook will be ignored (see loading.py).
         if not self.env.user.has_group('base.group_system'):
             return False
         self._set_company_id_where_null()
-        #self._update_rule_domains_to_1_where_false_except_partner()
-        #self._set_global_security_rules_on_all_models_except_ir_rule()
-        #self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
-        #self._change_code_to_comply_with_safe_eval()
+        self._update_rule_domains_to_1_where_false_except_partner()
+        self._set_global_security_rules_on_all_models_except_ir_rule()
+        self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
+        self._update_code_to_comply_with_safe_eval()
+        self._update_system_records()
+        if update_module:
+            param = self.env['ir.config_parameter'].get_param('multicompany_base.force_config')
+            if param in ('1', 't', 'true', 'True'):
+                self.env['multicompany.config'].configure_all_companies()
+
         return True
 
     def _set_global_security_rules_on_all_models_except_ir_rule(self):
@@ -449,6 +451,7 @@ class MulticompanySecurity(models.AbstractModel):
 
         all_models = self.env['ir.model'].search([])
         for model in all_models:
+            _logger.debug(model.model)
             if not self.env[model.model]._auto:
                 continue
             if model.model == 'ir.model.fields':
@@ -456,15 +459,11 @@ class MulticompanySecurity(models.AbstractModel):
                 self.env.cr.execute(sql)
                 continue
 
-            records_with_no_company = self.env[model.model].sudo().search([('company_id', '=', False)])
+            records_with_no_company = self.env[model.model].with_context(active_test=False,).sudo().search([('company_id', '=', False)])
             if not records_with_no_company:
                 continue
-            relation_field_name = RELATED_RECORD.get(model.model)
-            if not relation_field_name:
-                records_with_no_company.sudo().write({'company_id': self.env.company.id})
-                continue
 
-            # Two ways to set company_id. What is the performance difference?
+            # WHICH WAY IS THE FASTEST?
 
             # A) For each record: write company_id
             # for record in records_with_no_company:
@@ -474,25 +473,70 @@ class MulticompanySecurity(models.AbstractModel):
 
             # B) For each group of similar records: write_company_id
 
-            relation_field = self.env[model.model]._fields[relation_field_name]
-            if relation_field.type == 'many2one_reference':
-                relation_model_names = set(records_with_no_company.mapped(relation_field.model_field))
-                for relation_model_name in relation_model_names:
-                    records_filtered_model = records_with_no_company.filtered(lambda r: getattr(r, relation_field.model_field) == relation_model_name)
-                    relation_ids = list(set(records_filtered_model.mapped(relation_field_name)))
-                    relations = self.env[relation_model_name].browse(relation_ids)
-                    for relation in relations:
-                        related_company = relation.company_id
-                        records_filtered = records_filtered_model.filtered(lambda r: getattr(r, relation_field_name) == relation.id)
-                        records_filtered.sudo().write({'company_id': related_company.id})
-            else:
-                relations = records_with_no_company.mapped(relation_field_name)
-                for relation in relations:
-                    related_company = relation.company_id
-                    records_filtered = records_with_no_company.filtered(lambda r: getattr(r, relation_field_name) == relation.id)
-                    records_filtered.sudo().write({'company_id': related_company.id})
+            # relation_field_name = RELATED_RECORD.get(model.model)
+            # if not relation_field_name:
+            #     records_with_no_company.sudo().write({'company_id': self.env.company.id})
+            #     continue
 
-        _logger.info('Done _set_company_id_where_null')
+            # relation_field = self.env[model.model]._fields[relation_field_name]
+            # if relation_field.type == 'many2one_reference':
+            #     relation_model_names = set(records_with_no_company.mapped(relation_field.model_field))
+            #     for relation_model_name in relation_model_names:
+            #         records_filtered_model = records_with_no_company.filtered(lambda r: getattr(r, relation_field.model_field) == relation_model_name)
+            #         relation_ids = list(set(records_filtered_model.mapped(relation_field_name)))
+            #         relations = self.env[relation_model_name].browse(relation_ids)
+            #         for relation in relations:
+            #             related_company = relation.company_id
+            #             records_filtered = records_filtered_model.filtered(lambda r: getattr(r, relation_field_name) == relation.id)
+            #             records_filtered.sudo().write({'company_id': related_company.id})
+            # else:
+            #     relations = records_with_no_company.mapped(relation_field_name)
+            #     for relation in relations:
+            #         related_company = relation.company_id
+            #         records_filtered = records_with_no_company.filtered(lambda r: getattr(r, relation_field_name) == relation.id)
+            #         records_filtered.sudo().write({'company_id': related_company.id})
+
+            # C) Another way to loop
+
+            related_field_name = FIELD_NAME_TO_GET_COMPANY.get(model.model)
+            if not related_field_name:
+                records_with_no_company.sudo().write({'company_id': self.env.company.id})
+                continue
+
+            related_field = self.env[model.model]._fields[related_field_name]
+            related_models_and_record_ids = defaultdict(lambda: []) # {'res.partner': [(1001, 1), (1002, 2), (1003, 3)]}
+            for record in records_with_no_company:
+                if related_field.type == 'many2one':
+                    related_model_name = related_field.comodel_name
+                    related_record_id = getattr(record, related_field_name)
+                elif related_field.type == 'reference':
+                    related_model_name, related_record_id = getattr(record, related_field_name).split(',')
+                    related_record_id = int(related_record_id)
+                elif related_field.type == 'many2one_reference':
+                    related_model_name = getattr(record, related_field.model_field)
+                    related_record_id = getattr(record, related_field_name)
+                else:
+                    raise UserError('_set_company_id_where_null error')
+                related_models_and_record_ids[related_model_name].append((record.id, related_record_id))
+
+            for related_model_name, ids in related_models_and_record_ids.items():
+
+                related_record_ids =  [tup[1] for tup in ids if tup[1]]
+                related_records = self.env[related_model_name].browse(related_record_ids)
+                related_companies = related_records.mapped('company_id')
+                for related_company in related_companies:
+                    related_records_with_this_company = related_records.filtered(lambda r: r.company_id == related_company)
+                    update_record_ids = [tup[0] for tup in ids if tup[1] in related_records_with_this_company.ids]
+                    # Option 1
+                    # records_with_no_company.filtered(lambda r: id in update_record_ids).sudo().write({'company_id': related_company.id})
+                    # Option 2
+                    self.env[model.model].sudo().browse(update_record_ids).write({'company_id': related_company.id})
+
+                record_ids_with_no_related_record = [tup[0] for tup in ids if not tup[1]]
+                # Option 1
+                # records_with_no_company.filtered(lambda r: id in record_ids_with_no_related_record).sudo().write({'company_id': self.env.company.id})
+                # Option 2
+                self.env[model.model].sudo().browse(record_ids_with_no_related_record).write({'company_id': self.env.company.id})
 
     def _update_rule_domains_to_1_where_false_except_partner(self):
         _logger.info('Starting _update_rule_domains_to_1_where_false_except_partner')
@@ -509,7 +553,7 @@ class MulticompanySecurity(models.AbstractModel):
                     new_domain = "[{}]".format(', '.join(domain_list))
                     rule.domain_force = new_domain
 
-    def _change_code_to_comply_with_safe_eval(self):
+    def _update_code_to_comply_with_safe_eval(self):
         _logger.info('Starting _change_code_to_comply_with_safe_eval')
         xmlid_and_code_to_remove = [
             ('website.ir_actions_server_website_google_analytics', ['.sudo()']),
@@ -522,6 +566,12 @@ class MulticompanySecurity(models.AbstractModel):
                 continue
             for remove in removes:
                 action.code = action.code.replace(remove, '')
+
+    def _update_system_records(self):
+        try:
+            self.env.ref('mail.channel_all_employees').all_employees = True
+        except:
+            pass
 
     # TODO
     # def _get_and_fix_name_and_find_model_of_all_sql_views(self):

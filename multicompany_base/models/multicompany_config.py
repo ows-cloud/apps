@@ -1,9 +1,9 @@
+
 from odoo import models
 import logging
 
 _logger = logging.getLogger(__name__)
-SYSTEM_COMPANY = 1
-ADMIN_USER = 2
+SYSTEM_COMPANY_ID = 1
 
 class MulticompanyConfig(models.AbstractModel):
     _name = 'multicompany.config'
@@ -20,10 +20,12 @@ class MulticompanyConfig(models.AbstractModel):
 
     def _register_hook(self, update_module=False):
         if update_module:
-            param = self.env['ir.config_parameter'].get_param('multicompany_base.force_config')
-            if param in ('1', 't', 'true', 'True'):
+            security = self.env['ir.config_parameter'].get_param('multicompany_base.force_security')
+            config = self.env['ir.config_parameter'].get_param('multicompany_base.force_config')
+            true = ('1', 't', 'true', 'True')
+            # If both security and config are true, security will call config in the end
+            if config in true and security not in true:
                 self.configure_all_companies()
-                _logger.info('multicompany.config done')
 
     def configure_all_companies(self):
         # Returning an error value to _register_hook will be ignored (see loading.py).
@@ -34,10 +36,12 @@ class MulticompanyConfig(models.AbstractModel):
         return True
 
     def _configure(self, companies):
+        _logger.info('Starting multicompany.config')
         for company in companies:
             self = self._prepare(company)
             # --------------------------------------------------
-            self._create_a_company_mail_channel_for_all_employees()
+            # General company mail.channel may be confusing in a parent/child environment. Skipping this for now.
+            # self._create_a_company_mail_channel_for_all_employees()
             self._copy_system_sequences_with_code(company.id)
             self._create_default_user(company.id)
             public_user = self._create_public_user(company.id)
@@ -46,7 +50,7 @@ class MulticompanyConfig(models.AbstractModel):
 
     def _prepare(self, company):
         self = self.with_user(
-            self.env.user.browse(ADMIN_USER) # Cannot be SUPERUSER
+            self.env.ref('multicompany_base.support_user')
         ).with_context(
             active_test=False,
             allowed_company_ids=[company.id],
@@ -60,6 +64,9 @@ class MulticompanyConfig(models.AbstractModel):
         if imd_record:
             assert imd_record.model == 'mail.channel'
             group_user_id = self.env.ref('base.group_user').id
+            all_employees = self.env['res.users'].search([('groups_id', '=', group_user_id), ('default_user', '=', False)])
+            partner_ids = all_employees.mapped('partner_id').ids
+            add_mail_channel_partners = [(0, 0, id) for id in partner_ids]
             return self._insert_first_record(
                 model='mail.channel',
                 search=[('all_employees', '=', True)],
@@ -68,11 +75,12 @@ class MulticompanyConfig(models.AbstractModel):
                     'description': 'General announcements for all employees.',
                     'group_ids': [(4, group_user_id), 0],
                     'all_employees': True,
+                    'channel_last_seen_partner_ids': add_mail_channel_partners,
                 },
             )
 
     def _copy_system_sequences_with_code(self, company_id):
-        system_sequences_with_code = self._env('ir.sequence').sudo().search([('code', 'like', '_'), ('company_id', '=', SYSTEM_COMPANY)])
+        system_sequences_with_code = self._env('ir.sequence').sudo().search([('code', 'like', '_'), ('company_id', '=', SYSTEM_COMPANY_ID)])
         sequences_with_code = []
         for sequence in system_sequences_with_code:
             sequences_with_code.append(

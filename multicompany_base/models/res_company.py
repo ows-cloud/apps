@@ -14,16 +14,13 @@ class Company(models.Model):
         new_company.sudo().partner_id.write({'company_id': new_company.id})
 
         # Give access to SUPPORT USER
-        get_param = self.env["ir.config_parameter"].sudo().get_param
-        user_support_ref = get_param("multicompany_base.support_user_ext_id")
-        if user_support_ref and user_support_ref not in ('0', 'f', 'false', 'False'):
-            try:
-                support_user = self.env.ref(user_support_ref)
-                support_user.sudo().write({'company_ids': [(4, new_company.id)]})
-            except:
-                message = 'Support user {} could not be added to company {}'.format(user_support_ref, new_company.name)
-                _logger.warning(message)
-                raise UserError(message)
+        support_user = self.env.ref('multicompany_base.support_user')
+        support_user.sudo().write({'company_ids': [(4, new_company.id)]})
+
+        # Auto-configure company
+        config = self.env['ir.config_parameter'].sudo().get_param('multicompany_base.force_config')
+        if config in ('1', 't', 'true', 'True'):
+            self.env['multicompany.config']._configure(new_company)
 
         return new_company
 
