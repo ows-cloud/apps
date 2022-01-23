@@ -113,6 +113,7 @@ SECURITY_DOMAIN_WORD = {
     'selected_company/parent/child': "'|',('{company_id}','=',company_id),'|',('{company_id}','parent_of',company_id),('{company_id}','child_of',company_id)",
     'system_company': "('{company_id}','=',1)",
     'company_ids_is_company_id': "('company_ids','=',company_id)",
+    'company_ids_in_company_ids': "('company_ids','in',company_ids)",
 }
 
 COMPANY_FIELD = {
@@ -120,21 +121,18 @@ COMPANY_FIELD = {
         'read_if': 'id',
         'edit_if': 'id',
     },
-    'res.users': {
-        'read_if': 'company_ids',
-        'edit_if': 'company_id',
-    },
     'default': 'company_id',
 }
 
 SECURITY_RULE = {
-    # read partners of users with access to the company
+    # read partners of users with access to the company, otherwise cannot read the users
     'RES_PARTNER_MODEL': {
         'read_if': 'company_ids_is_company_id OR ( allowed_companies AND selected_company/parent/child )',
         'edit_if': 'allowed_companies AND selected_company/parent/child',
     },
+    # read users with access to the company
     'RES_USERS_MODEL': {
-        'read_if': 'allowed_companies',
+        'read_if': 'company_ids_in_company_ids',
         'edit_if': 'allowed_companies AND selected_company/parent/child',
     },
     'COMPANIES_MODEL': {
