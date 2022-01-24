@@ -19,6 +19,6 @@
     ],
     'license': 'AGPL-3',
     'uninstall_hook': 'WARNING_DELETE_RULES_uninstall_hook',
-    'version': '14.0.1.0.0',
+    'version': '12.0.1.0.0',
     'website': 'http://www.appstogrow.co',
 }

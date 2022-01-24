@@ -14,6 +14,6 @@
         'base',
     ],
     'license': 'AGPL-3',
-    'version': '14.0.1.0.0',
+    'version': '12.0.1.0.0',
     'website': 'http://www.appstogrow.co',
 }
