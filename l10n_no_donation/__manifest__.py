@@ -4,7 +4,7 @@
 {
     'name': 'Skattefradrag for gaver',
     'summary': '',
-    'version': '0.1',
+    'version': '13.0.1.0.0',
 
 
     'author': 'AppsToGROW',
