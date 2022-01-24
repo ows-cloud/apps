@@ -16,6 +16,6 @@
     ],
     'depends': ['event'],
     'license': 'AGPL-3',
-    'version': '12.0.1.0.0',
-    'website': 'http://www.appstogrow.org',
+    'version': '14.0.1.0.0',
+    'website': 'http://www.appstogrow.co',
 }
