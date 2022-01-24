@@ -22,7 +22,7 @@ class Amelding(models.Model):
     def _compute_amelding_xml(self):
         self.amelding_xml = base64.b64encode(bytes(self.amelding, 'utf-8'))
 
-    company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.user.company_id)
     meldingsId = fields.Integer(readonly=True)
     erstatterMeldingsId = fields.Integer(readonly=True)
     kalendermaaned = fields.Char()
@@ -49,7 +49,7 @@ class AmeldingWizard(models.TransientModel):
             raise UserError(_('The period should have this format: yyyy-mm'))
 
         # Look for existing amelding record
-        company_id = self.env.company.id
+        company_id = self.env.user.company_id.id
         record = self.env['l10n_no_payroll.amelding'].search([
             ('kalendermaaned','=',self.kalendermaaned),('company_id','=',company_id)], order='id desc', limit=1)
         if record and record.state == 'new':

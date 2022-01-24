@@ -1,0 +1,15 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="hr_payslip_line_view_search">
+            <field name="name">hr.payslip.line.search.hr_new_fields</field>
+            <field name="model">hr.payslip.line</field>
+            <field name="inherit_id" ref="hr_payroll.view_hr_payslip_line_filter"/>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <search position="inside">
+                    <field name="payslip_run_id"/>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>

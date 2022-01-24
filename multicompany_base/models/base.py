@@ -9,7 +9,7 @@ MODELS_WITH_REPLACE_RECORD_ID = [
 class Base(models.AbstractModel):
     _inherit = 'base'
 
-    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', string='Company', store=True, index=True, default=lambda self: self.env.user.company_id)
 
     """
     XMLID FOR MULTICOMPANY

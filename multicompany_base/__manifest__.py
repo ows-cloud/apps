@@ -9,8 +9,6 @@
     'auto_install': False,
     'category': 'Uncategorized',
     'data': [
-        'security/ir.model.access.csv',
-        'views/res.company.xml',
     ],
     'depends': [
         'base',

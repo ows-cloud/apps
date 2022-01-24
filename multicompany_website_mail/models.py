@@ -10,9 +10,9 @@ class IrConfigParameter(models.Model):
     @api.model
     def get_param(self, key, default=False):
         if key == 'web.base.url':
-            website = self.env.company.website_id
+            website = self.env.user.company_id.website_id
             if website and website.domain:
-                return 'http://' + str(self.env.company.website_id.domain)
+                return 'http://' + str(self.env.user.company_id.website_id.domain)
 
         return super(IrConfigParameter, self).get_param(key, default)
 
@@ -22,10 +22,10 @@ class MailThread(models.AbstractModel):
 
     def _replace_local_links(self, html, base_url=None):
         if not base_url:
-            website = self.env.company.website_id
+            website = self.env.user.company_id.website_id
             if website and website.domain:
                 base_url = 'http://' + str(
-                    self.env.company.website_id.domain)
+                    self.env.user.company_id.website_id.domain)
 
         return super(MailThread, self)._replace_local_links(html, base_url)
 

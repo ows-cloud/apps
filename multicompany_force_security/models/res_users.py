@@ -27,7 +27,7 @@ class Users(models.Model):
         return vals
 
     def _only_allow_adding_these_features(self, vals):
-        compare_user = self.env.company.only_allow_these_features
+        compare_user = self.env.user.company_id.only_allow_these_features
         if compare_user:
             for key in vals:
                 if 'in_group_' in key or 'sel_groups_' in key:
@@ -75,7 +75,7 @@ class Users(models.Model):
     def _if_other_company_set_only_name_lang_partner(self, vals):
         set_only = False
         for user in self:
-            if not user.company_id.id == self.env.company.id:
+            if not user.company_id.id == self.env.user.company_id.id:
                 set_only = True
         if set_only:
             for key in vals.copy():

@@ -105,9 +105,9 @@ SECURITY_DOMAIN_WORD = {
     'AND': "'&'",
     'OR': "'|'",
     'false': "('{company_id}','=',False)",
-    'allowed_companies': "('{company_id}','in',company_ids)",
-    'selected_company': "('{company_id}','=',company_id)",
-    'selected_company/parent/child': "'|',('{company_id}','=',company_id),'|',('{company_id}','parent_of',company_id),('{company_id}','child_of',company_id)",
+    'allowed_companies': "('{company_id}','in',[c.id for c in user.company_ids])",
+    'selected_company': "('{company_id}','=',user.company_id.id)",
+    'selected_company/parent/child': "'|',('{company_id}','=',user.company_id.id),'|',('{company_id}','parent_of',user.company_id.id),('{company_id}','child_of',user.company_id.id)",
     'system_company': "('{company_id}','=',1)",
 }
 
@@ -306,7 +306,7 @@ class MulticompanyForceSecurity(models.AbstractModel):
         return True
 
     def _set_global_security_rules_on_all_models_except_ir_rule(self):
-        models = self.env['ir.model'].search([('model', '!=', 'ir.rule')])
+        models = self.env['ir.model'].search([('model', '!=', 'ir.rule'), ('transient', '=', False)])
         for model in models:
             SECURITY_TYPE = _get_security_type(model.model)
             for do_if, domain_words in SECURITY_RULE[SECURITY_TYPE].items():
@@ -326,7 +326,7 @@ class MulticompanyForceSecurity(models.AbstractModel):
 
     def _set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule(self):
         group_company_manager_id = self.env.ref('multicompany_force_security.group_company_manager').id
-        models = self.env['ir.model'].search([('model', '!=', 'ir.rule')])
+        models = self.env['ir.model'].search([('model', '!=', 'ir.rule'), ('transient', '=', False)])
         for model in models:
             # ir.model.access
             values = copy.deepcopy(SECURITY_DO_IF['read_and_edit_if'])

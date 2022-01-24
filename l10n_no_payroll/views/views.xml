@@ -127,7 +127,7 @@
 
         <record model="ir.actions.server" id="action_l10n_no_feriepenger">
             <field name="name">Vis feriepenger</field>
-            <field name="model_id" ref="payroll.model_hr_payslip_line"/>
+            <field name="model_id" ref="hr_payroll.model_hr_payslip_line"/>
             <field name="state">code</field>
             <field name="code">env['hr.payslip.line'].l10n_no_feriepenger()</field>
         </record>
@@ -143,12 +143,12 @@
 
         <!-- menu -->
 
-        <menuitem id="menu_payroll_norway" name="Norge" sequence="20" parent="payroll.payroll_menu_root"/>
+        <menuitem id="menu_payroll_norway" name="Norge" sequence="20" parent="hr_payroll.menu_hr_payroll_root"/>
         <menuitem id="menu_payroll_norway_lag_amelding"
                   name="Lag A-melding"
                   sequence="20"
                   parent="menu_payroll_norway"
-                  groups="payroll.group_payroll_manager"
+                  groups="hr_payroll.group_hr_payroll_manager"
                   action="action_l10n_no_payroll_amelding_wizard_form"/>
         <menuitem id="menu_payroll_norway_amelding"
                   name="A-melding"
