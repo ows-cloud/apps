@@ -33,7 +33,7 @@ class EventSurveyController(http.Controller):
     def _get_attendees(self, event, **post):
 
         Input = request.env['survey.user_input']
-        InputLine = request.env['survey.user_input.line']
+        InputLine = request.env['survey.user_input_line']
         EventTicket = request.env['event.event.ticket']
 
         order = request.website.sale_get_order()
@@ -108,7 +108,7 @@ class EventSurveyController(http.Controller):
         # delete previously registered attendees on this sales order, and event-related products in the shopping cart
         Registration.sudo().search([('sale_order_id','=',order.id)]).unlink()
         tickets = event.event_ticket_ids
-        labels = request.env['survey.question.answer'].search([]).filtered(lambda l: l.question_id.page_id.survey_id.event_id == event and l.product_id)
+        labels = request.env['survey.label'].search([]).filtered(lambda l: l.question_id.page_id.survey_id.event_id == event and l.product_id)
         product_ids = [t.product_id.id for t in tickets] + [l.product_id.id for l in labels]
         OrderLine.sudo().search([('order_id','=',order.id), ('product_id','in',product_ids)]).unlink()
 

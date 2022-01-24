@@ -96,7 +96,7 @@
     		<field name="priority" eval="20"/>
             <field name="groups_id" eval="[(4, ref('group_event_survey'))]"/>
     		<field name="arch" type="xml">
-				<xpath expr="//field[@name='suggested_answer_ids']/tree" position="inside">
+				<xpath expr="//field[@name='labels_ids']/tree" position="inside">
                     <field name="product_id"/>
                     <field name="product_list_price" readonly="1"/>
 				</xpath>
@@ -124,11 +124,11 @@
     		</field>
 		</record>
 
-        <!-- survey.user_input.line (move to module that only depends on survey) -->
+        <!-- survey.user_input_line (move to module that only depends on survey) -->
 
         <record model="ir.ui.view" id="view_survey_user_input_line_pivot">
-            <field name="name">survey.user_input.line.pivot</field>
-            <field name="model">survey.user_input.line</field>
+            <field name="name">survey.user_input_line.pivot</field>
+            <field name="model">survey.user_input_line</field>
             <field name="groups_id" eval="[(4, ref('group_event_survey'))]"/>
             <field name="mode">primary</field>
             <field name="priority" eval="20"/>
@@ -139,8 +139,10 @@
             </field>
         </record>
 
+        <!--
         <record model="ir.actions.act_window" id="survey.survey_user_input_line_action">
             <field name="view_mode">tree,form,pivot</field>
         </record>
+        -->
     </data>
 </odoo>

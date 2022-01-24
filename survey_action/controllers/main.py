@@ -41,7 +41,7 @@ class SurveyController2(SurveyController):
 
             for question in questions:
                 answer_tag = "%s_%s_%s" % (survey.id, page_id, question.id)
-                request.env['survey.user_input.line'].sudo(user=user_id).save_lines(user_input.id, question, post, answer_tag)
+                request.env['survey.user_input_line'].sudo(user=user_id).save_lines(user_input.id, question, post, answer_tag)
 
             go_back = post['button_submit'] == 'previous'
             next_page, _, last = request.env['survey.survey'].next_page(user_input, page_id, go_back=go_back)
