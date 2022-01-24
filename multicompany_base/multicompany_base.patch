@@ -1,8 +1,8 @@
 diff --git a/addons/auth_signup/models/res_users.py b/addons/auth_signup/models/res_users.py
-index d93e7c706..458aef840 100644
+index a75c621b..b26f5c31 100644
 --- a/addons/auth_signup/models/res_users.py
 +++ b/addons/auth_signup/models/res_users.py
-@@ -194,7 +194,8 @@ class ResUsers(models.Model):
+@@ -190,7 +190,8 @@ class ResUsers(models.Model):
              'partner_to': False,
              'scheduled_date': False,
          }
@@ -13,7 +13,7 @@ index d93e7c706..458aef840 100644
          for user in self:
              if not user.email:
 diff --git a/addons/mail/models/update.py b/addons/mail/models/update.py
-index edf5b4f2c..9be029ec9 100644
+index 573709a1..2f7bce3e 100644
 --- a/addons/mail/models/update.py
 +++ b/addons/mail/models/update.py
 @@ -98,6 +98,10 @@ class PublisherWarrantyContract(AbstractModel):
@@ -28,7 +28,7 @@ index edf5b4f2c..9be029ec9 100644
                  if not user.exists():
                      return True
 diff --git a/odoo/addons/base/models/__init__.py b/odoo/addons/base/models/__init__.py
-index bdc3d0b1a..36463b9e8 100644
+index bdc3d0b1..36463b9e 100644
 --- a/odoo/addons/base/models/__init__.py
 +++ b/odoo/addons/base/models/__init__.py
 @@ -2,6 +2,7 @@
@@ -41,10 +41,10 @@ index bdc3d0b1a..36463b9e8 100644
  from . import ir_model
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 000000000..c5a34a2a7
+index 00000000..90982be5
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
-@@ -0,0 +1,79 @@
+@@ -0,0 +1,81 @@
 +from odoo import api, fields, models
 +from odoo.exceptions import UserError
 +from . import ir_model
@@ -72,6 +72,8 @@ index 000000000..c5a34a2a7
 +            Don't accept {'company_id': False}
 +            (e.g. stock.location from XML)
 +        """
++        if type(vals_list) is dict:
++            vals_list = [vals_list]
 +        for vals_dict in vals_list:
 +            if 'company_id' in vals_dict and not vals_dict['company_id']:
 +                if self.env['ir.module.module'].search([('name', '=', 'multicompany_base')]).state == 'installed':
@@ -126,10 +128,10 @@ index 000000000..c5a34a2a7
 +        return self.with_company(self.my_company())
 \ No newline at end of file
 diff --git a/odoo/addons/base/models/res_company.py b/odoo/addons/base/models/res_company.py
-index 3b20cb9d7..854d752fe 100644
+index c3ef9a97..03d6934e 100644
 --- a/odoo/addons/base/models/res_company.py
 +++ b/odoo/addons/base/models/res_company.py
-@@ -213,7 +213,7 @@ class Company(models.Model):
+@@ -232,7 +232,7 @@ class Company(models.Model):
          self.clear_caches()
          company = super(Company, self).create(vals)
          # The write is made on the user to set it automatically in the multi company group.
@@ -139,10 +141,10 @@ index 3b20cb9d7..854d752fe 100644
          # Make sure that the selected currency is enabled
          if vals.get('currency_id'):
 diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
-index 8b50afad4..2fd5cbe00 100644
+index f8298c59..d00b5a0a 100644
 --- a/odoo/addons/base/models/res_partner.py
 +++ b/odoo/addons/base/models/res_partner.py
-@@ -524,6 +524,7 @@ class Partner(models.Model):
+@@ -499,6 +499,7 @@ class Partner(models.Model):
              self.invalidate_cache(['user_ids'], self._ids)
              for partner in self:
                  if partner.active and partner.user_ids:
@@ -151,10 +153,10 @@ index 8b50afad4..2fd5cbe00 100644
          # res.partner must only allow to set the company_id of a partner if it
          # is the same as the company of all users that inherit from this partner
 diff --git a/odoo/addons/base/models/res_users.py b/odoo/addons/base/models/res_users.py
-index 34f35ac82..61cefe775 100644
+index 50258a93..07375fb7 100644
 --- a/odoo/addons/base/models/res_users.py
 +++ b/odoo/addons/base/models/res_users.py
-@@ -659,6 +659,7 @@ class Users(models.Model):
+@@ -591,6 +591,7 @@ class Users(models.Model):
      def check_super(self, passwd):
          return check_super(passwd)
  
@@ -163,10 +165,10 @@ index 34f35ac82..61cefe775 100644
      def _update_last_login(self):
          # only create new records to avoid any side-effect on concurrent transactions
 diff --git a/odoo/models.py b/odoo/models.py
-index 34882ef5c..606ce2119 100644
+index 36e4c637..b89b4715 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
-@@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
+@@ -787,25 +787,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
              for r in missing
          )
          fields = ['module', 'model', 'name', 'res_id']
@@ -223,7 +225,7 @@ index 34882ef5c..606ce2119 100644
          finally:
              psycopg2.extensions.set_wait_callback(callback)
          self.env['ir.model.data'].invalidate_cache(fnames=fields)
-@@ -3251,10 +3269,12 @@ Fields:
+@@ -3187,10 +3205,12 @@ Fields:
          """ Check the companies of the values of the given field names.
  
          :param list fnames: names of relational fields to check
@@ -238,7 +240,7 @@ index 34882ef5c..606ce2119 100644
          For :class:`~odoo.addons.base.models.res_users` relational fields,
          verifies record company is in `company_ids` fields.
  
-@@ -3279,6 +3299,9 @@ Fields:
+@@ -3215,6 +3235,9 @@ Fields:
              return
  
          inconsistencies = []
@@ -248,7 +250,7 @@ index 34882ef5c..606ce2119 100644
          for record in self:
              company = record.company_id if record._name != 'res.company' else record
              # The first part of the check verifies that all records linked via relation fields are compatible
-@@ -3287,9 +3310,9 @@ Fields:
+@@ -3223,9 +3246,9 @@ Fields:
                  corecord = record.sudo()[name]
                  # Special case with `res.users` since an user can belong to multiple companies.
                  if corecord._name == 'res.users' and corecord.company_ids:
@@ -260,7 +262,7 @@ index 34882ef5c..606ce2119 100644
                      inconsistencies.append((record, name, corecord))
              # The second part of the check (for property / company-dependent fields) verifies that the records
              # linked via those relation fields are compatible with the company that owns the property value, i.e.
-@@ -3300,9 +3323,9 @@ Fields:
+@@ -3239,9 +3262,9 @@ Fields:
                  # Special case with `res.users` since an user can belong to multiple companies.
                  corecord = record.sudo()[name]
                  if corecord._name == 'res.users' and corecord.company_ids:
@@ -273,10 +275,10 @@ index 34882ef5c..606ce2119 100644
  
          if inconsistencies:
 diff --git a/odoo/modules/loading.py b/odoo/modules/loading.py
-index 8093f14b1..a064632db 100644
+index a8c79f79..bacf6390 100644
 --- a/odoo/modules/loading.py
 +++ b/odoo/modules/loading.py
-@@ -568,7 +568,10 @@ def load_modules(db, force_demo=False, status=None, update_module=False):
+@@ -541,7 +541,10 @@ def load_modules(db, force_demo=False, status=None, update_module=False):
          # is False.
          env = api.Environment(cr, SUPERUSER_ID, {})
          for model in env.values():
@@ -289,10 +291,10 @@ index 8093f14b1..a064632db 100644
  
          # STEP 9: save installed/updated modules for post-install tests
 diff --git a/odoo/modules/registry.py b/odoo/modules/registry.py
-index d17caac09..3ab7c967e 100644
+index b18a59d6..f5752c66 100644
 --- a/odoo/modules/registry.py
 +++ b/odoo/modules/registry.py
-@@ -282,7 +282,10 @@ class Registry(Mapping):
+@@ -310,7 +310,10 @@ class Registry(Mapping):
          # on a fully loaded registry, and not on a registry being loaded.
          if self.ready:
              for model in env.values():
@@ -305,10 +307,10 @@ index d17caac09..3ab7c967e 100644
  
      def post_init(self, func, *args, **kwargs):
 diff --git a/odoo/tools/safe_eval.py b/odoo/tools/safe_eval.py
-index f60bb5e91..ae6bbc93c 100644
+index 72ad2ae9..0209b30c 100644
 --- a/odoo/tools/safe_eval.py
 +++ b/odoo/tools/safe_eval.py
-@@ -326,6 +326,38 @@ def safe_eval(expr, globals_dict=None, locals_dict=None, mode="eval", nocopy=Fal
+@@ -356,6 +356,38 @@ def safe_eval(expr, globals_dict=None, locals_dict=None, mode="eval", nocopy=Fal
              locals_dict = {}
          locals_dict.update(_BUILTINS)
      c = test_expr(expr, _SAFE_OPCODES, mode=mode)

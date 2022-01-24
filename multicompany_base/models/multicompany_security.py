@@ -310,7 +310,7 @@ class MulticompanySecurity(models.AbstractModel):
 
     def _set_global_security_rules_on_all_models_except_ir_rule(self):
         _logger.info('Starting _set_global_security_rules_on_all_models_except_ir_rule')
-        models = self.env['ir.model'].search([('model', '!=', 'ir.rule')])
+        models = self.env['ir.model'].search([('model', '!=', 'ir.rule'), ('transient', '=', False)])
         for model in models:
             SECURITY_TYPE = _get_security_type(model.model)
             for do_if, domain_words in SECURITY_RULE[SECURITY_TYPE].items():
@@ -331,7 +331,7 @@ class MulticompanySecurity(models.AbstractModel):
     def _set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule(self):
         _logger.info('Starting _set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule')
         group_company_manager_id = self.env.ref('multicompany_base.group_company_manager').id
-        models = self.env['ir.model'].search([('model', '!=', 'ir.rule')])
+        models = self.env['ir.model'].search([('model', '!=', 'ir.rule'), ('transient', '=', False)])
         for model in models:
             # ir.model.access
             values = copy.deepcopy(SECURITY_DO_IF['read_and_edit_if'])
@@ -447,7 +447,7 @@ class MulticompanySecurity(models.AbstractModel):
     def _set_company_id_where_null(self):
         _logger.info('Starting _set_company_id_where_null')
 
-        all_models = self.env['ir.model'].search([])
+        all_models = self.env['ir.model'].search([('transient', '=', False)])
         for model in all_models:
             _logger.debug(model.model)
             if not self.env[model.model]._auto:
@@ -513,8 +513,11 @@ class MulticompanySecurity(models.AbstractModel):
                 elif related_field.type == 'many2one_reference':
                     related_model_name = getattr(record, related_field.model_field)
                     related_record_id = getattr(record, related_field_name)
+                elif related_field.model_name == 'ir.model.data':
+                    related_model_name = getattr(record, 'model')
+                    related_record_id = getattr(record, related_field_name)
                 else:
-                    raise UserError('_set_company_id_where_null error')
+                    raise UserError(' ERROR in multicompany.security _set_company_id_where_null() \n model_name = {} \n related_field_name = {} \n related_field.type = {}'.format(related_field.model_name, related_field_name, related_field.type))
                 related_models_and_record_ids[related_model_name].append((record.id, related_record_id))
 
             for related_model_name, ids in related_models_and_record_ids.items():
