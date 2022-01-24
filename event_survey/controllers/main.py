@@ -15,7 +15,7 @@ _logger = logging.getLogger(__name__)
 class SurveyController2(SurveyController):
 
     @http.route()
-    def start_survey(self, survey, token=None, **post):
+    def survey_start(self, survey, token=None, **post):
 
         if survey.event_id:
 
