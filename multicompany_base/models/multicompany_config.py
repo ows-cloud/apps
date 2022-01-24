@@ -50,7 +50,7 @@ class MulticompanyConfig(models.AbstractModel):
 
     def _prepare(self, company):
         self = self.with_user(
-            self.env.ref('multicompany_base.support_user')
+            self.env.ref('__multicompany_base__.support_user')
         ).with_context(
             active_test=False,
             allowed_company_ids=[company.id],

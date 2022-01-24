@@ -14,7 +14,7 @@ class Company(models.Model):
         new_company.sudo().partner_id.write({'company_id': new_company.id})
 
         # Give access to SUPPORT USER
-        support_user = self.env.ref('multicompany_base.support_user')
+        support_user = self.env.ref('__multicompany_base__.support_user')
         support_user.sudo().write({'company_ids': [(4, new_company.id)]})
 
         # Auto-configure company

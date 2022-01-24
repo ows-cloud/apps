@@ -10,7 +10,7 @@
     'data': [
         'security/ir.model.access.csv',
         'security/security.xml',
-        'data/support_user.xml', # after security
+        # 'data/support_user.xml', # after security
         'views/ir.actions.server.xml',
         'views/ir.model.data.xml',
         'views/res.company.xml',
@@ -23,6 +23,6 @@
     'post_init_hook': 'post_init_hook',
     'license': 'AGPL-3',
     'uninstall_hook': 'WARNING_DELETE_RULES_uninstall_hook',
-    'version': '13.0.1.0.0',
+    'version': '13.0.1.0.3',
     'website': 'http://www.appstogrow.co',
 }
