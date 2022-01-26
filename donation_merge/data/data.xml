@@ -228,8 +228,8 @@
             <field name="report_file">donation_merge.report_donation_tax_receipt</field>
             <field name="paperformat_id" ref="donation_merge.paperformat_a5"/>
             <field name="binding_type">report</field>
-            <field name="attachment">Receipt to '+(object.partner_id.name)+'.pdf</field>
-            <!-- English only attachment name? -->
+            <!-- <field name="attachment">Receipt to '+(object.partner_id.name)+'.pdf</field>
+            English only attachment name? -->
         </record>
 
         <record id="mail_template_donation_tax_receipt_english" model="mail.template">
@@ -284,24 +284,21 @@
             <field name="name">Send English Donation Receipts on Email</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">mail.compose.message</field>
-            <field name="src_model">donation.tax.receipt</field>
             <field name="target">new</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="mail.email_compose_message_wizard_form"/>
-            <field name="context">{'default_composition_mode': 'mass_mail', 'default_template_id': %('donation_merge.mail_template_donation_tax_receipt_english')s, 'default_use_template': True}</field>
-            <!-- ref('') ? -->
+            <field name="binding_model_id" ref="donation_base.model_donation_tax_receipt"/>
+            <field name="context" eval="{'default_composition_mode': 'mass_mail', 'default_template_id': ref('donation_merge.mail_template_donation_tax_receipt_english'), 'default_use_template': True}"/>
         </record>
         <record id="action_donation_tax_receipt_norwegian" model="ir.actions.act_window">
             <field name="name">Send Norwegian Donation Receipts on Email</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">mail.compose.message</field>
-            <field name="src_model">donation.tax.receipt</field>
             <field name="target">new</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="mail.email_compose_message_wizard_form"/>
-            <field name="context">{'default_composition_mode': 'mass_mail', 'default_template_id': %('donation_merge.mail_template_donation_tax_receipt_norwegian')s, 'default_use_template': True}</field>
-            <!-- ref('') ? -->
+            <field name="binding_model_id" ref="donation_base.model_donation_tax_receipt"/>
+            <field name="context" eval="{'default_composition_mode': 'mass_mail', 'default_template_id': ref('donation_merge.mail_template_donation_tax_receipt_norwegian'), 'default_use_template': True}"/>
         </record>
-        <!-- Context: Cannot get %('donation_merge.mail_template_donation_tax_receipt_english')s to database-id. -->
     </data>
 </odoo>
