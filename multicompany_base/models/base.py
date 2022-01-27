@@ -36,7 +36,8 @@ class Base(models.AbstractModel):
 
     @api.returns(None, lambda value: value[0])
     def copy_data(self, default=None):
-        default['company_id'] = self.env.company.id
+        if 'company_id' not in default:
+            default['company_id'] = self.env.company.id
         return super(Base, self).copy_data(default)
 
     """

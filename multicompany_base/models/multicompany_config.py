@@ -19,24 +19,78 @@ class MulticompanyConfig(models.AbstractModel):
     """
 
     def _register_hook(self, update_module=False):
-        if update_module:
-            security = self.env['ir.config_parameter'].get_param('multicompany_base.force_security')
-            config = self.env['ir.config_parameter'].get_param('multicompany_base.force_config')
-            true = ('1', 't', 'true', 'True')
-            # If both security and config are true, security will call config in the end
-            if config in true and security not in true:
-                self.configure_all_companies()
+        pass # using multicompany.security
 
-    def configure_all_companies(self):
+    def configure_system_and_all_companies(self):
         # Returning an error value to _register_hook will be ignored (see loading.py).
         if not self.env.user.has_group('base.group_system'):
             return False
-        all_companies = self.env['res.company'].sudo().search([])
-        self._configure(all_companies)
-        return True
 
-    def _configure(self, companies):
-        _logger.info('Starting multicompany.config')
+        _logger.info('Starting multicompany.config configure_system_and_all_companies')
+
+        self._configure_system()
+
+        all_companies = self.env['res.company'].sudo().search([])
+        self._configure_companies(all_companies)
+        return 
+
+    def _configure_system(self):
+
+        # The system pricelist should be archived, so that websites will get the company's pricelist.
+        # product_list = self.env.ref('product.list0', raise_if_not_found=False)
+        # if product_list:
+        #     product_list.active = False
+
+        # If active, new websites will get default crm.team which is not accessable.
+        # EDIT: Patch will check if multicompany_base is installed.
+        # website_salesteam = self.env.ref('sales_team.salesteam_website_sales', raise_if_not_found=False)
+        # if website_salesteam:
+        #     website_salesteam.active = False
+
+        def _set(xmlid, values):
+            record = self.env.ref(xmlid)
+            if record:
+                models.Model.write(record, values)
+                #record.sudo().write(values)
+
+        # Give access rights to company managers (including the Support User)
+        company_manager = self.env.ref('multicompany_base.group_company_manager')
+        erp_manager = self.env.ref('base.group_erp_manager')
+
+        # Field access to create users
+        _set('auth_signup.field_res_partner__signup_expiration', {'groups': [(4, company_manager.id, 0), (4, erp_manager.id, 0)]})
+        _set('auth_signup.field_res_partner__signup_token', {'groups': [(4, company_manager.id, 0), (4, erp_manager.id, 0)]})
+        _set('auth_signup.field_res_partner__signup_type', {'groups': [(4, company_manager.id, 0), (4, erp_manager.id, 0)]})
+
+        # Access to change password
+        _set('base.change_password_wizard_action', {'groups_id': [(4, company_manager.id, 0)]})
+
+        #
+        # Menu
+        #
+        # Website
+        _set('website.menu_website_configuration', {'groups_id': [
+            (3, self.env.ref('base.group_user').id, 0),
+            (4, self.env.ref('website.group_website_publisher').id, 0),
+        ]})
+        # Employees
+        _set('hr.menu_hr_root', {'groups_id': [
+            (3, self.env.ref('base.group_user').id, 0),
+            #(4, self.env.ref('hr.group_hr_user').id, 0),
+        ]})
+        # Settings
+        _set('base.menu_administration', {'groups_id': [
+            (4, company_manager.id, 0),
+        ]})
+
+        # Internal User
+        _set('base.group_user', {'implied_ids': [
+            (3, self.env.ref('sale.group_delivery_invoice_address').id, 0),
+            (3, self.env.ref('analytic.group_analytic_accounting').id, 0),
+            (3, self.env.ref('website.group_multi_website').id, 0),
+        ]})
+
+    def _configure_companies(self, companies):
         for company in companies:
             self = self._prepare(company)
             # --------------------------------------------------
@@ -50,7 +104,7 @@ class MulticompanyConfig(models.AbstractModel):
 
     def _prepare(self, company):
         self = self.with_user(
-            self.env.ref('multicompany_base.support_user')
+            self.env.ref('__multicompany_base__.support_user')
         ).with_context(
             active_test=False,
             allowed_company_ids=[company.id],

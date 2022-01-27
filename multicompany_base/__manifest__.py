@@ -10,7 +10,6 @@
     'data': [
         'security/ir.model.access.csv',
         'security/security.xml',
-        'data/support_user.xml', # after security
         'views/ir.actions.server.xml',
         'views/ir.model.data.xml',
         'views/res.company.xml',

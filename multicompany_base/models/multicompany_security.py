@@ -17,6 +17,7 @@ EXTID_MODULE_NAME = '__multicompany_security__'
 
 COMPANIES_MODEL = [
     'res.company',
+    'website',
 ]
 
 COMPANY_READ_SYSTEM_MODEL = [
@@ -285,13 +286,18 @@ class MulticompanySecurity(models.AbstractModel):
 
     def _register_hook(self, update_module=False):
         if update_module:
+            true = ('1', 't', 'true', 'True')
             param = self.env['ir.config_parameter'].get_param('multicompany_base.force_security')
-            if param in ('1', 't', 'true', 'True'):
-                self.secure(update_module=True)
+            if param in true:
+                self.secure()
+            # secure before configure
+            param = self.env['ir.config_parameter'].get_param('multicompany_base.force_config')
+            if param in true:
+                self.env['multicompany.config'].configure_system_and_all_companies()
 
     # main methods
 
-    def secure(self, update_module=False):
+    def secure(self):
         # Returning an error value to _register_hook will be ignored (see loading.py).
         if not self.env.user.has_group('base.group_system'):
             return False
@@ -301,11 +307,6 @@ class MulticompanySecurity(models.AbstractModel):
         self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
         self._update_code_to_comply_with_safe_eval()
         self._update_system_records()
-        if update_module:
-            param = self.env['ir.config_parameter'].get_param('multicompany_base.force_config')
-            if param in ('1', 't', 'true', 'True'):
-                self.env['multicompany.config'].configure_all_companies()
-
         return True
 
     def _set_global_security_rules_on_all_models_except_ir_rule(self):

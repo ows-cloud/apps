@@ -16,7 +16,7 @@ model.secure()
             <field name="model_id" ref="model_multicompany_config"/>
             <field name="state">code</field>
             <field name="code">
-model.configure_all_companies()
+model.configure_system_and_all_companies()
             </field>
         </record>
         <menuitem id="menu_force_config" name="Force configure all companies" sequence="10" parent="base.menu_security" action="action_force_configure_all_companies"/>
