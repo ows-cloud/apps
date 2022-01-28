@@ -71,9 +71,6 @@ READ_SYSTEM_MODEL = [
     'ir.rule',
     'ir.server.object.lines',
     'res.bank',
-    'res.config',
-    'res.config.installer',
-    'res.config.settings',
     'res.country',
     'res.country.state',
     'res.currency',
@@ -96,6 +93,9 @@ READ_SYSTEM_MODEL = [
 
 NO_ACCESS_MODEL = [
     'ir.config_parameter',
+    'res.config',
+    'res.config.installer',
+    'res.config.settings',
 ]
 
 # TODO: _get_and_fix_name_and_find_model_of_all_sql_views (see code in the bottom)

@@ -47,48 +47,72 @@ class MulticompanyConfig(models.AbstractModel):
         # if website_salesteam:
         #     website_salesteam.active = False
 
-        def _set(xmlid, values):
-            record = self.env.ref(xmlid)
+        def _ref(xmlid):
+            return self.env.ref(xmlid, raise_if_not_found=False)
+
+        def _id(record):
+            if record:
+                return record.id
+
+        def _set(record, values):
             if record:
                 models.Model.write(record, values)
-                #record.sudo().write(values)
 
         # Give access rights to company managers (including the Support User)
         company_manager = self.env.ref('multicompany_base.group_company_manager')
         erp_manager = self.env.ref('base.group_erp_manager')
 
         # Field access to create users
-        _set('auth_signup.field_res_partner__signup_expiration', {'groups': [(4, company_manager.id, 0), (4, erp_manager.id, 0)]})
-        _set('auth_signup.field_res_partner__signup_token', {'groups': [(4, company_manager.id, 0), (4, erp_manager.id, 0)]})
-        _set('auth_signup.field_res_partner__signup_type', {'groups': [(4, company_manager.id, 0), (4, erp_manager.id, 0)]})
+        _set(_ref('auth_signup.field_res_partner__signup_expiration'), {'groups': [(4, company_manager.id, 0), (4, erp_manager.id, 0)]})
+        _set(_ref('auth_signup.field_res_partner__signup_token'), {'groups': [(4, company_manager.id, 0), (4, erp_manager.id, 0)]})
+        _set(_ref('auth_signup.field_res_partner__signup_type'), {'groups': [(4, company_manager.id, 0), (4, erp_manager.id, 0)]})
 
         # Access to change password
-        _set('base.change_password_wizard_action', {'groups_id': [(4, company_manager.id, 0)]})
+        _set(_ref('base.change_password_wizard_action'), {'groups_id': [(4, company_manager.id, 0)]})
 
         #
-        # Menu
+        # Menu (move to multicompany_ag?)
         #
         # Website
-        _set('website.menu_website_configuration', {'groups_id': [
-            (3, self.env.ref('base.group_user').id, 0),
-            (4, self.env.ref('website.group_website_publisher').id, 0),
+        _set(_ref('website.menu_website_configuration'), {'groups_id': [
+            (3, _id(_ref('base.group_user')), 0),
+            (4, _id(_ref('website.group_website_publisher')), 0),
         ]})
         # Employees
-        _set('hr.menu_hr_root', {'groups_id': [
-            (3, self.env.ref('base.group_user').id, 0),
-            #(4, self.env.ref('hr.group_hr_user').id, 0),
+        _set(_ref('hr.menu_hr_root'), {'groups_id': [
+            (3, _id(_ref('base.group_user')), 0),
+            #(4, _id(_ref('hr.group_hr_user')), 0),
         ]})
         # Settings
-        _set('base.menu_administration', {'groups_id': [
+        _set(_ref('base.menu_administration'), {'groups_id': [
             (4, company_manager.id, 0),
         ]})
 
         # Internal User
-        _set('base.group_user', {'implied_ids': [
-            (3, self.env.ref('sale.group_delivery_invoice_address').id, 0),
-            (3, self.env.ref('analytic.group_analytic_accounting').id, 0),
-            (3, self.env.ref('website.group_multi_website').id, 0),
+        _set(_ref('base.group_user'), {'implied_ids': [
+            (3, _id(_ref('sale.group_delivery_invoice_address')), 0),
+            (3, _id(_ref('analytic.group_analytic_accounting')), 0),
+            (3, _id(_ref('website.group_multi_website')), 0),
         ]})
+
+        # Support User
+        support_user = self.env.ref('__multicompany_base__.support_user', raise_if_not_found=False)
+        if not support_user:
+            companies = self.env['res.company'].sudo().search([])
+            company_ids = companies.ids
+            support_user = self.env['res.users'].sudo().create({
+                'login': 'support',
+                'lang': 'en_US',
+                'name': 'Support User',
+                'company_ids': [(6, 0, companies.ids)],
+            })
+            xmlid = self.env['ir.model.data'].create({
+                'module': '__multicompany_base__',
+                'name': 'support_user',
+                'model': 'res.users',
+                'res_id': support_user.id,
+            })
+        support_user.write({'groups_id': [(4, company_manager.id, 0)]})
 
     def _configure_companies(self, companies):
         for company in companies:
@@ -151,7 +175,7 @@ class MulticompanyConfig(models.AbstractModel):
         return sequences_with_code
 
     def _create_default_user(self, company_id):
-        return self._insert_first_record(
+        default_user = self._insert_first_record(
             model='res.users',
             search=[
                 ('default_user', '=', True),
@@ -165,9 +189,10 @@ class MulticompanyConfig(models.AbstractModel):
                 'default_user': True,
             },
         )
+        return default_user
 
     def _create_public_user(self, company_id):
-        return self._insert_first_record(
+        public_user = self._insert_first_record(
             model='res.users',
             search=[
                 ('groups_id', '=', self._ref('base.group_public').id),
@@ -184,6 +209,7 @@ class MulticompanyConfig(models.AbstractModel):
                 # <field name="partner_id" ref="public_partner"/>
             },
         )
+        return public_user
 
     def _create_website(self, company, public_user):
         website_user_field = self._ref('website.field_website__user_id')
