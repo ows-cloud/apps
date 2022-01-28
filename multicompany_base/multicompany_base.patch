@@ -372,11 +372,3 @@ index f60bb5e91..ae6bbc93c 100644
      try:
          return unsafe_eval(c, globals_dict, locals_dict)
      except odoo.exceptions.UserError:
-diff --git a/start.sh b/start.sh
-new file mode 100755
-index 000000000..abb29a8a2
---- /dev/null
-+++ b/start.sh
-@@ -0,0 +1,2 @@
-+#!/bin/sh
-+sudo -u ag /o14/o14-server/odoo-bin --config=/etc/o14-server.conf
