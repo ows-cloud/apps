@@ -15,9 +15,9 @@ class MulticompanyConfig(models.AbstractModel):
             return False
 
         # after 14.0
-        self._special_website()
-        self._special_default_user()
-        self._special_support_user()
+        # self._special_website()
+        # self._special_default_user()
+        # self._special_support_user()
         
         # before 14.0
         # self._special_uom()
@@ -84,7 +84,7 @@ class MulticompanyConfig(models.AbstractModel):
         """
         T = self.env['account.chart.template']
         template_list = [
-            ('DK', 'Empty template for Denmark', 4),
+            # ('DK', 'Empty template for Denmark', 4),
             ('NO', 'Empty template for Norway', 4),
             ('', 'Empty template', 4),
         ]
