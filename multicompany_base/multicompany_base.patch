@@ -39,6 +39,110 @@ index edf5b4f2c..9be029ec9 100644
              if not (poster and poster.exists()):
                  if not user.exists():
                      return True
+diff --git a/addons/payment/__manifest__.py b/addons/payment/__manifest__.py
+index 6626200bc..783b2e9c0 100644
+--- a/addons/payment/__manifest__.py
++++ b/addons/payment/__manifest__.py
+@@ -11,7 +11,7 @@
+     'data': [
+         'data/account_data.xml',
+         'data/payment_icon_data.xml',
+-        'data/payment_acquirer_data.xml',
++        'data/payment_acquirer_data_ag.xml',
+         'data/payment_cron.xml',
+         'views/payment_views.xml',
+         'views/account_payment_views.xml',
+diff --git a/addons/payment/data/payment_acquirer_data_ag.xml b/addons/payment/data/payment_acquirer_data_ag.xml
+new file mode 100644
+index 000000000..117ef56af
+--- /dev/null
++++ b/addons/payment/data/payment_acquirer_data_ag.xml
+@@ -0,0 +1,85 @@
++<?xml version="1.0" encoding="utf-8"?>
++<odoo noupdate="1">
++
++    <template id="default_acquirer_button">
++        <input type="hidden" name="data_set" t-att-data-action-url="tx_url"/>
++        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
++        <t t-if="return_url">
++            <input type="hidden" name="return_url" t-att-value="return_url"/>
++        </t>
++        <input type="hidden" name="reference" t-att-value="reference"/>
++        <input type="hidden" name="amount" t-att-value="amount"/>
++        <input type="hidden" name="currency" t-att-value="currency.name"/>
++    </template>
++
++    <record id="payment_acquirer_transfer" model="payment.acquirer">
++        <field name="name">Wire Transfer</field>
++        <field name="sequence">2</field>
++        <field name="view_template_id" ref="default_acquirer_button"/>
++        <field name="image_128" type="base64" file="payment_transfer/static/src/img/transfer_icon.png"/>
++        <field name="module_id" ref="base.module_payment_transfer"/>
++        <field name="pending_msg">&lt;i&gt;Pending&lt;/i&gt;... The order will be validated after the payment.</field>
++        <field name="description" type="html">
++            <p>
++                Provide instructions to customers so that they can pay their orders manually.
++            </p>
++        </field>
++    </record>
++
++    <record id="payment_acquirer_paypal" model="payment.acquirer">
++        <field name="name">PayPal</field>
++        <field name="sequence">1</field>
++        <field name="view_template_id" ref="default_acquirer_button"/>
++        <field name="image_128" type="base64" file="payment_paypal/static/src/img/paypal_icon.png"/>
++        <field name="module_id" ref="base.module_payment_paypal"/>
++        <field name="description" type="html">
++            <p>
++                PayPal is the easiest way to accept payments via Paypal or credit cards.
++            </p>
++            <ul class="list-inline">
++                <li class="list-inline-item"><i class="fa fa-check"/>Online Payment</li>
++                <li class="list-inline-item"><i class="fa fa-check"/>Payment Status Tracking</li>
++            </ul>
++        </field>
++        <!-- https://www.paypal.com/us/selfhelp/article/Which-credit-cards-can-I-accept-with-PayPal-Merchant-Services-FAQ1525#business -->
++        <field name="payment_icon_ids" eval='[(6, 0, [ref("payment.payment_icon_cc_maestro"),
++                                                        ref("payment.payment_icon_cc_mastercard"),
++                                                        ref("payment.payment_icon_cc_discover"),
++                                                        ref("payment.payment_icon_cc_diners_club_intl"),
++                                                        ref("payment.payment_icon_cc_jcb"),
++                                                        ref("payment.payment_icon_cc_american_express"),
++                                                        ref("payment.payment_icon_cc_unionpay"),
++                                                        ref("payment.payment_icon_cc_visa")])]'/>
++    </record>
++
++    <record id="payment_acquirer_stripe" model="payment.acquirer">
++        <field name="name">Stripe</field>
++        <field name="display_as">Credit Card (powered by Stripe)</field>
++        <field name="view_template_id" ref="default_acquirer_button"/>
++        <field name="image_128" type="base64" file="payment_stripe/static/src/img/stripe_icon.png"/>
++        <field name="module_id" ref="base.module_payment_stripe"/>
++        <field name="description" type="html">
++            <p>
++                A payment gateway to accept online payments via credit cards.
++            </p>
++            <ul class="list-inline">
++                <li class="list-inline-item"><i class="fa fa-check"/>Online Payment</li>
++                <li class="list-inline-item"><i class="fa fa-check"/>Payment Status Tracking</li>
++                <li class="list-inline-item"><i class="fa fa-check"/>Subscriptions</li>
++                <li class="list-inline-item"><i class="fa fa-check"/>Save Cards</li>
++            </ul>
++        </field>
++        <!--
++            https://stripe.com/payments/payment-methods-guide
++            https://support.goteamup.com/hc/en-us/articles/115002089349-Which-cards-and-payment-types-can-I-accept-with-Stripe-
++        -->
++        <field name="payment_icon_ids" eval='[(6, 0, [ref("payment.payment_icon_cc_maestro"),
++                                                        ref("payment.payment_icon_cc_mastercard"),
++                                                        ref("payment.payment_icon_cc_discover"),
++                                                        ref("payment.payment_icon_cc_diners_club_intl"),
++                                                        ref("payment.payment_icon_cc_jcb"),
++                                                        ref("payment.payment_icon_cc_american_express"),
++                                                        ref("payment.payment_icon_cc_visa")])]'/>
++    </record>
++
++</odoo>
 diff --git a/addons/website_sale/models/website.py b/addons/website_sale/models/website.py
 index 007325f9c..b015f6ef2 100644
 --- a/addons/website_sale/models/website.py
