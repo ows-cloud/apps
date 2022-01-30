@@ -232,7 +232,7 @@ class ResCompany(models.Model):
     def _compute_default_field_value_ids(self):
         result = []
         records = self.env['res.field'].search([('model','=','res.company'),('auto_create','=',True),
-            '|',('country_id','=',False),('country_id','=',self.env.company.country_id.id)])
+            '|',('country_id','=',False),('country_id','=',self.env.company.partner_id.country_id.id)])
         for record in records:
             result.append((0, 0, {'model': 'res.company', 'company_id': self.env.company.id, 
                 'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
@@ -248,7 +248,7 @@ class ResUsers(models.Model):
     def _compute_default_field_value_ids(self):
         result = []
         records = self.env['res.field'].search([('model','=','res.users'),('auto_create','=',True),
-            '|',('country_id','=',False),('country_id','=',self.env.company.country_id.id)])
+            '|',('country_id','=',False),('country_id','=',self.env.company.partner_id.country_id.id)])
         for record in records:
             result.append((0, 0, {'model': 'res.users', 'company_id': self.env.company.id, 
                 'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
