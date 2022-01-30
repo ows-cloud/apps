@@ -8,6 +8,7 @@ _logger = logging.getLogger(__name__)
 
 class Tabelltrekk(models.Model):
     _name = 'l10n_no_payroll.tabelltrekk'
+    _description = 'Tabelltrekk fra skattetabeller'
     
     year = fields.Integer('Year')
     tabellnummer = fields.Char('Tabellnummer', size=4)

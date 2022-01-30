@@ -11,6 +11,7 @@ pyxb.RequireValidWhenGenerating(True)
 
 class Amelding(models.Model):
     _name = 'l10n_no_payroll.amelding'
+    _description = 'A-melding'
 
     @api.depends('meldingsId', 'kalendermaaned')
     def _compute_amelding_filename(self):
@@ -38,6 +39,7 @@ class Amelding(models.Model):
 
 class AmeldingWizard(models.TransientModel):
     _name = 'l10n_no_payroll.amelding.wizard'
+    _description = 'Lag A-melding'
 
     kalendermaaned = fields.Char()
 
