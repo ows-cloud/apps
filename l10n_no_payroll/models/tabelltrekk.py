@@ -1,7 +1,7 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
-from .tabelltrekk2021 import tabelltrekk2021 as tabelltrekk20xx
-YEAR = 2021
+from .tabelltrekk2022 import tabelltrekk2022 as tabelltrekk20xx
+YEAR = 2022
 
 import logging
 _logger = logging.getLogger(__name__)
