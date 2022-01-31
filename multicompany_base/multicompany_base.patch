@@ -143,15 +143,33 @@ index 000000000..117ef56af
 +    </record>
 +
 +</odoo>
+diff --git a/addons/website/models/ir_rule.py b/addons/website/models/ir_rule.py
+index a11ddef1e..f0b883e03 100644
+--- a/addons/website/models/ir_rule.py
++++ b/addons/website/models/ir_rule.py
+@@ -16,6 +16,13 @@ class IrRule(models.Model):
+         # in backend (if domain set & match)..
+         is_frontend = ir_http.get_request_website()
+         Website = self.env['website']
++
++        # Problem: loop when website has ir.rule:
++        # _eval_context() > get_current_website() > _compute_domain() > _eval_context()
++        if self.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
++            res['website'] = is_frontend
++            return res
++
+         res['website'] = is_frontend and Website.get_current_website() or Website
+         return res
+ 
 diff --git a/addons/website_sale/models/website.py b/addons/website_sale/models/website.py
-index 007325f9c..b015f6ef2 100644
+index 007325f9c..27c1af3b3 100644
 --- a/addons/website_sale/models/website.py
 +++ b/addons/website_sale/models/website.py
 @@ -22,6 +22,8 @@ class Website(models.Model):
      salesperson_id = fields.Many2one('res.users', string='Salesperson')
  
      def _get_default_website_team(self):
-+        if self.env['ir.module.module'].search([('name', '=', 'multicompany_base')]).state == 'installed':
++        if self.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
 +            return None
          try:
              team = self.env.ref('sales_team.salesteam_website_sales')
@@ -170,7 +188,7 @@ index bdc3d0b1a..36463b9e8 100644
  from . import ir_model
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 000000000..c5a34a2a7
+index 000000000..38b956090
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
 @@ -0,0 +1,79 @@
@@ -203,7 +221,7 @@ index 000000000..c5a34a2a7
 +        """
 +        for vals_dict in vals_list:
 +            if 'company_id' in vals_dict and not vals_dict['company_id']:
-+                if self.env['ir.module.module'].search([('name', '=', 'multicompany_base')]).state == 'installed':
++                if self.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
 +                    vals_dict['company_id'] = self.related_company(vals_dict).id
 +        return super(Base, self).create(vals_list)
 +
@@ -292,7 +310,7 @@ index 34f35ac82..61cefe775 100644
      def _update_last_login(self):
          # only create new records to avoid any side-effect on concurrent transactions
 diff --git a/odoo/models.py b/odoo/models.py
-index 34882ef5c..606ce2119 100644
+index 34882ef5c..25d4ef274 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -372,7 +390,7 @@ index 34882ef5c..606ce2119 100644
  
          inconsistencies = []
 +        consistent_company_ids = [False]
-+        if self.env['ir.module.module'].search([('name', '=', 'multicompany_base')]).state == 'installed':
++        if self.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
 +            consistent_company_ids.append(1)
          for record in self:
              company = record.company_id if record._name != 'res.company' else record

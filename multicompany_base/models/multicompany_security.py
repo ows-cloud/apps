@@ -47,7 +47,7 @@ COMPANY_READ_SYSTEM_MODEL = [
     'website.menu',
 ]
 
-READ_SYSTEM_MODEL = [
+NO_EDIT_MODEL = [
     # BASE, IR, RES
     'base.language.export',
     'base.language.import',
@@ -73,6 +73,9 @@ READ_SYSTEM_MODEL = [
     'res.bank',
     'res.country',
     'res.country.state',
+    # 14.0 res.country.group cannot have read rule, will cause a loop when website is installed
+    # get_current_website() > _compute_domain() > _eval_context() > get_current_website_id()
+    'res.country.group',
     'res.currency',
     'res.groups',
     'res.lang',
@@ -109,12 +112,15 @@ SECURITY_DOMAIN_WORD = {
     'AND': "'&'",
     'OR': "'|'",
     'false': "('{company_id}','=',False)",
-    'allowed_companies': "('{company_id}','in',company_ids)",
+    # multicompany_from_website_url: The url decides the company_id. The user access MUST be defined in company_ids, NOT in company_id.
+    # Then parent/child access must compare with company_ids.
+    'allowed_companies/parent/child': "'|',('{company_id}','in',company_ids),'|',('{company_id}','parent_of',company_ids),('{company_id}','child_of',company_ids)",
     'selected_company': "('{company_id}','=',company_id)",
     'selected_company/parent/child': "'|',('{company_id}','=',company_id),'|',('{company_id}','parent_of',company_id),('{company_id}','child_of',company_id)",
     'system_company': "('{company_id}','=',1)",
     'company_ids_is_company_id': "('company_ids','=',company_id)",
     'company_ids_in_company_ids': "('company_ids','in',company_ids)",
+    'user_id': "('user_id','=', user.id)",
 }
 
 COMPANY_FIELD = {
@@ -126,34 +132,36 @@ COMPANY_FIELD = {
 }
 
 SECURITY_RULE = {
+    'BUS_PRESENCE_MODEL': {
+        'edit_if': 'user_id',
+    },
     # read partners of users with access to the company, otherwise cannot read the users
     'RES_PARTNER_MODEL': {
-        'read_if': 'company_ids_is_company_id OR ( allowed_companies AND selected_company/parent/child )',
-        'edit_if': 'allowed_companies AND selected_company/parent/child',
+        'read_if': 'company_ids_is_company_id OR ( allowed_companies/parent/child AND selected_company/parent/child )',
+        'edit_if': 'allowed_companies/parent/child AND selected_company/parent/child',
     },
     # read users with access to the company
     'RES_USERS_MODEL': {
         'read_if': 'company_ids_in_company_ids',
-        'edit_if': 'allowed_companies AND selected_company/parent/child',
+        'edit_if': 'allowed_companies/parent/child AND selected_company/parent/child',
     },
     'COMPANIES_MODEL': {
-        'read_if': 'allowed_companies',
-        'edit_if': 'allowed_companies AND selected_company/parent/child',
+        'read_if': 'allowed_companies/parent/child',
+        'edit_if': 'allowed_companies/parent/child AND selected_company/parent/child',
     },
     # default
     'COMPANY_MODEL': {
-        'read_and_edit_if': 'allowed_companies AND selected_company/parent/child',
+        'read_and_edit_if': 'allowed_companies/parent/child AND selected_company/parent/child',
     },
     'COMPANY_READ_SYSTEM_MODEL': {
-        'read_if': 'system_company OR ( allowed_companies AND selected_company/parent/child )',
-        'edit_if': 'allowed_companies AND selected_company/parent/child',
+        'read_if': 'system_company OR ( allowed_companies/parent/child AND selected_company/parent/child )',
+        'edit_if': 'allowed_companies/parent/child AND selected_company/parent/child',
     },
-    'READ_SYSTEM_MODEL': {
-        'read_if': 'system_company',
-        'edit_if': 'system_company AND ( allowed_companies AND selected_company )',
+    'NO_EDIT_MODEL': {
+        'edit_if': 'system_company AND ( selected_company AND allowed_companies/parent/child )',
     },
     'NO_ACCESS_MODEL': {
-        'read_and_edit_if': 'system_company AND ( allowed_companies AND selected_company )',
+        'read_and_edit_if': 'system_company AND ( selected_company AND allowed_companies/parent/child )',
     },
 }
 
@@ -197,14 +205,16 @@ SECURITY_DO_IF = {
 }
 
 def _get_security_type(model_name):
-    if model_name == 'res.partner':
+    if model_name == 'bus.presence':
+        return 'BUS_PRESENCE_MODEL'
+    elif model_name == 'res.partner':
         return 'RES_PARTNER_MODEL'
     elif model_name == 'res.users':
         return 'RES_USERS_MODEL'
     elif model_name in NO_ACCESS_MODEL:
         return 'NO_ACCESS_MODEL'
-    elif model_name in READ_SYSTEM_MODEL:
-        return 'READ_SYSTEM_MODEL'
+    elif model_name in NO_EDIT_MODEL:
+        return 'NO_EDIT_MODEL'
     elif model_name in COMPANY_READ_SYSTEM_MODEL:
         return 'COMPANY_READ_SYSTEM_MODEL'
     elif model_name in COMPANIES_MODEL:
@@ -304,7 +314,7 @@ class MulticompanySecurity(models.AbstractModel):
         self._set_company_id_where_null()
         self._update_rule_domains_to_1_where_false_except_partner()
         self._set_global_security_rules_on_all_models_except_ir_rule()
-        self._set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule()
+        self._set_read_and_edit_access_to_company_manager_on_models_with_company_data()
         self._update_code_to_comply_with_safe_eval()
         self._update_system_records()
         return True
@@ -329,10 +339,11 @@ class MulticompanySecurity(models.AbstractModel):
                 )
                 self._set_record_values('ir.rule', domain, values, xmlid_name)
 
-    def _set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule(self):
-        _logger.info('Starting _set_read_and_edit_access_to_company_manager_on_all_models_except_ir_rule')
+    def _set_read_and_edit_access_to_company_manager_on_models_with_company_data(self):
+        _logger.info('Starting _set_read_and_edit_access_to_company_manager_on_models_with_company_data')
         group_company_manager_id = self.env.ref('multicompany_base.group_company_manager').id
-        models = self.env['ir.model'].search([('model', '!=', 'ir.rule')])
+        models_to_exclude = NO_EDIT_MODEL + NO_ACCESS_MODEL + ['ir.rule']
+        models = self.env['ir.model'].search([('model', 'not in', models_to_exclude)])
         for model in models:
             # ir.model.access
             values = copy.deepcopy(SECURITY_DO_IF['read_and_edit_if'])
