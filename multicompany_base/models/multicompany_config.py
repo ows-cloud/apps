@@ -125,7 +125,8 @@ class MulticompanyConfig(models.AbstractModel):
             # --------------------------------------------------
             # General company mail.channel may be confusing in a parent/child environment. Skipping this for now.
             # self._create_a_company_mail_channel_for_all_employees()
-            self._copy_system_sequences_with_code(company.id)
+            # Bad idea to copy all system sequences with code
+            # self._copy_system_sequences_with_code(company.id)
             self._create_default_user(company.id)
             public_user = self._create_public_user(company.id)
             self._create_website(company, public_user)
@@ -167,6 +168,7 @@ class MulticompanyConfig(models.AbstractModel):
         sequences_with_code = []
         for sequence in system_sequences_with_code:
             sequences_with_code.append(
+                # self.sudo() ?
                 self._insert_first_record(
                     model='ir.sequence',
                     search=[('code', '=', sequence.code)],
