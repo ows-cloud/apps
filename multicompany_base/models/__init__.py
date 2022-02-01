@@ -1,5 +1,6 @@
 from . import base
 from . import base_partner_merge_automatic_wizard
+from . import ir_attachment
 from . import ir_model_data
 from . import ir_ui_view
 from . import multicompany_config
