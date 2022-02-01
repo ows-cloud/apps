@@ -24,6 +24,44 @@ index 9ea1339f6..1932b047b 100644
      def open_default_user(self):
          action = self.env["ir.actions.actions"]._for_xml_id("base.action_res_users")
          if self.env.ref('base.default_user', raise_if_not_found=False):
+diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
+index 4ecd87d3d..297113900 100644
+--- a/addons/mail/controllers/main.py
++++ b/addons/mail/controllers/main.py
+@@ -128,10 +128,12 @@ class MailController(http.Controller):
+ 
+     @http.route('/mail/read_followers', type='json', auth='user')
+     def read_followers(self, res_model, res_id):
++        record = request.env[res_model].browse(res_id)
++        company = record.my_company()
+         request.env['mail.followers'].check_access_rights("read")
+-        request.env[res_model].check_access_rights("read")
+-        request.env[res_model].browse(res_id).check_access_rule("read")
+-        follower_recs = request.env['mail.followers'].search([('res_model', '=', res_model), ('res_id', '=', res_id)])
++        record.check_access_rights("read")
++        record.with_my_company().check_access_rule("read")
++        follower_recs = request.env['mail.followers'].with_company(company).search([('res_model', '=', res_model), ('res_id', '=', res_id)])
+ 
+         followers = []
+         follower_id = None
+@@ -164,7 +166,7 @@ class MailController(http.Controller):
+         follower = request.env['mail.followers'].sudo().browse(follower_id)
+         follower.ensure_one()
+         request.env[follower.res_model].check_access_rights("read")
+-        request.env[follower.res_model].browse(follower.res_id).check_access_rule("read")
++        request.env[follower.res_model].browse(follower.res_id).with_my_company().check_access_rule("read")
+ 
+         # find current model subtypes, add them to a dictionary
+         subtypes = request.env['mail.message.subtype'].search([
+@@ -287,7 +289,7 @@ class MailController(http.Controller):
+ 
+     @http.route('/mail/get_suggested_recipients', type='json', auth='user')
+     def message_get_suggested_recipients(self, model, res_ids):
+-        records = request.env[model].browse(res_ids)
++        records = request.env[model].browse(res_ids).with_my_company()
+         try:
+             records.check_access_rule('read')
+             records.check_access_rights('read')
 diff --git a/addons/mail/models/update.py b/addons/mail/models/update.py
 index edf5b4f2c..9be029ec9 100644
 --- a/addons/mail/models/update.py
@@ -188,10 +226,10 @@ index bdc3d0b1a..36463b9e8 100644
  from . import ir_model
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 000000000..38b956090
+index 000000000..762a462aa
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
-@@ -0,0 +1,79 @@
+@@ -0,0 +1,80 @@
 +from odoo import api, fields, models
 +from odoo.exceptions import UserError
 +from . import ir_model
@@ -267,7 +305,8 @@ index 000000000..38b956090
 +    def my_company(self):
 +        company = self.sudo().mapped('company_id')
 +        if len(company) == 1:
-+            return company
++            if company in self.env.user.company_ids:
++                return company
 +
 +    def with_my_company(self):
 +        return self.with_company(self.my_company())

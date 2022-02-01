@@ -73,8 +73,6 @@ NO_EDIT_MODEL = [
     'res.bank',
     'res.country',
     'res.country.state',
-    # 14.0 res.country.group cannot have read rule, will cause a loop when website is installed
-    # get_current_website() > _compute_domain() > _eval_context() > get_current_website_id()
     'res.country.group',
     'res.currency',
     'res.groups',
@@ -112,8 +110,7 @@ SECURITY_DOMAIN_WORD = {
     'AND': "'&'",
     'OR': "'|'",
     'false': "('{company_id}','=',False)",
-    # multicompany_from_website_url: The url decides the company_id. The user access MUST be defined in company_ids, NOT in company_id.
-    # Then parent/child access must compare with company_ids.
+    'allowed_companies': "('{company_id}','in',company_ids)",
     'allowed_companies/parent/child': "'|',('{company_id}','in',company_ids),'|',('{company_id}','parent_of',company_ids),('{company_id}','child_of',company_ids)",
     'selected_company': "('{company_id}','=',company_id)",
     'selected_company/parent/child': "'|',('{company_id}','=',company_id),'|',('{company_id}','parent_of',company_id),('{company_id}','child_of',company_id)",
@@ -132,36 +129,45 @@ COMPANY_FIELD = {
 }
 
 SECURITY_RULE = {
+    """
+    'allowed_companies' should not be necessary to combine with 'selected_company',
+    since a user's company should always be one of the user's companies.
+    But it feels safer to have both.
+    Only res.partner allows to read user partners not in the user's companies.
+    A test will be written to check that these are users who can access the user's company.
+    """
+
     'BUS_PRESENCE_MODEL': {
         'edit_if': 'user_id',
     },
     # read partners of users with access to the company, otherwise cannot read the users
     'RES_PARTNER_MODEL': {
-        'read_if': 'company_ids_is_company_id OR ( allowed_companies/parent/child AND selected_company/parent/child )',
-        'edit_if': 'allowed_companies/parent/child AND selected_company/parent/child',
+        'read_if': 'company_ids_is_company_id OR allowed_companies/parent/child',
+        'edit_if': 'selected_company AND allowed_companies',
     },
     # read users with access to the company
     'RES_USERS_MODEL': {
         'read_if': 'company_ids_in_company_ids',
-        'edit_if': 'allowed_companies/parent/child AND selected_company/parent/child',
+        'edit_if': 'selected_company AND allowed_companies',
     },
     'COMPANIES_MODEL': {
         'read_if': 'allowed_companies/parent/child',
-        'edit_if': 'allowed_companies/parent/child AND selected_company/parent/child',
+        'edit_if': 'selected_company AND allowed_companies',
     },
     # default
     'COMPANY_MODEL': {
-        'read_and_edit_if': 'allowed_companies/parent/child AND selected_company/parent/child',
+        'read_if': 'allowed_companies/parent/child',
+        'edit_if': 'selected_company AND allowed_companies',
     },
     'COMPANY_READ_SYSTEM_MODEL': {
-        'read_if': 'system_company OR ( allowed_companies/parent/child AND selected_company/parent/child )',
-        'edit_if': 'allowed_companies/parent/child AND selected_company/parent/child',
+        'read_if': 'system_company OR allowed_companies/parent/child',
+        'edit_if': 'selected_company AND allowed_companies',
     },
     'NO_EDIT_MODEL': {
-        'edit_if': 'system_company AND ( selected_company AND allowed_companies/parent/child )',
+        'edit_if': 'system_company AND ( selected_company AND allowed_companies )',
     },
     'NO_ACCESS_MODEL': {
-        'read_and_edit_if': 'system_company AND ( selected_company AND allowed_companies/parent/child )',
+        'read_and_edit_if': 'system_company AND ( selected_company AND allowed_companies )',
     },
 }
 

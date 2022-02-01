@@ -58,6 +58,11 @@ class MulticompanyConfig(models.AbstractModel):
             if record:
                 models.Model.write(record, values)
 
+        # Hide some security rules
+        # website_sale rules include website.company_id.id which give errors.
+        _set(_ref('website_sale.product_pricelist_item_comp_rule'), {'active': False})
+        _set(_ref('website_sale.product_pricelist_comp_rule'), {'active': False})
+
         # Give access rights to company managers (including the Support User)
         company_manager = self.env.ref('multicompany_base.group_company_manager')
         erp_manager = self.env.ref('base.group_erp_manager')
@@ -242,6 +247,8 @@ class MulticompanyConfig(models.AbstractModel):
         values (dict):  values to insert into the first record
         copy (string):  optional external reference or 'model,res_id' of an existing record to 'copy' (otherwise 'create')
         '''
+        company_id = self.env.company.id
+        search = ['&'] + search + ['|',('company_id','=',company_id),'|',('company_id','parent_of',company_id),('company_id','child_of',company_id)]
         records = self._env(model).search(search)
         if not records.exists():
             if copy == False:
