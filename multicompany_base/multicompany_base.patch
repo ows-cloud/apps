@@ -33,13 +33,13 @@ index 4ecd87d3d..297113900 100644
      @http.route('/mail/read_followers', type='json', auth='user')
      def read_followers(self, res_model, res_id):
 +        record = request.env[res_model].browse(res_id)
-+        company = record.my_company()
++        company = record.record_company()
          request.env['mail.followers'].check_access_rights("read")
 -        request.env[res_model].check_access_rights("read")
 -        request.env[res_model].browse(res_id).check_access_rule("read")
 -        follower_recs = request.env['mail.followers'].search([('res_model', '=', res_model), ('res_id', '=', res_id)])
 +        record.check_access_rights("read")
-+        record.with_my_company().check_access_rule("read")
++        record.with_record_company().check_access_rule("read")
 +        follower_recs = request.env['mail.followers'].with_company(company).search([('res_model', '=', res_model), ('res_id', '=', res_id)])
  
          followers = []
@@ -49,7 +49,7 @@ index 4ecd87d3d..297113900 100644
          follower.ensure_one()
          request.env[follower.res_model].check_access_rights("read")
 -        request.env[follower.res_model].browse(follower.res_id).check_access_rule("read")
-+        request.env[follower.res_model].browse(follower.res_id).with_my_company().check_access_rule("read")
++        request.env[follower.res_model].browse(follower.res_id).with_record_company().check_access_rule("read")
  
          # find current model subtypes, add them to a dictionary
          subtypes = request.env['mail.message.subtype'].search([
@@ -58,7 +58,7 @@ index 4ecd87d3d..297113900 100644
      @http.route('/mail/get_suggested_recipients', type='json', auth='user')
      def message_get_suggested_recipients(self, model, res_ids):
 -        records = request.env[model].browse(res_ids)
-+        records = request.env[model].browse(res_ids).with_my_company()
++        records = request.env[model].browse(res_ids).with_record_company()
          try:
              records.check_access_rule('read')
              records.check_access_rights('read')
@@ -298,18 +298,18 @@ index 000000000..762a462aa
 +    controllers may not know the company of a record,
 +    and sudo() is necessary to find out.
 +    In patches to fix controllers,
-+    the methods .my_company() and .with_my_company() are often very useful.
++    the methods .record_company() and .with_record_company() are often very useful.
 +    Then sudo() is only one place here, not in every controller patch.
 +    """
 +
-+    def my_company(self):
++    def record_company(self):
 +        company = self.sudo().mapped('company_id')
 +        if len(company) == 1:
 +            if company in self.env.user.company_ids:
 +                return company
 +
-+    def with_my_company(self):
-+        return self.with_company(self.my_company())
++    def with_record_company(self):
++        return self.with_company(self.record_company())
 \ No newline at end of file
 diff --git a/odoo/addons/base/models/res_company.py b/odoo/addons/base/models/res_company.py
 index 3b20cb9d7..854d752fe 100644

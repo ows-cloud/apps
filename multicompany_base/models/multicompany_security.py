@@ -110,12 +110,11 @@ SECURITY_DOMAIN_WORD = {
     'AND': "'&'",
     'OR': "'|'",
     'false': "('{company_id}','=',False)",
-    'allowed_companies': "('{company_id}','in',company_ids)",
-    'allowed_companies/parent/child': "'|',('{company_id}','in',company_ids),'|',('{company_id}','parent_of',company_ids),('{company_id}','child_of',company_ids)",
-    'selected_company': "('{company_id}','=',company_id)",
-    'selected_company/parent/child': "'|',('{company_id}','=',company_id),'|',('{company_id}','parent_of',company_id),('{company_id}','child_of',company_id)",
+    'in_companies': "('{company_id}','in',company_ids)",
+    'in_companies/parent/child': "'|',('{company_id}','in',company_ids),'|',('{company_id}','parent_of',company_ids),('{company_id}','child_of',company_ids)",
+    'in_company': "('{company_id}','=',company_id)",
+    'in_company/parent/child': "'|',('{company_id}','=',company_id),'|',('{company_id}','parent_of',company_id),('{company_id}','child_of',company_id)",
     'system_company': "('{company_id}','=',1)",
-    'company_ids_is_company_id': "('company_ids','=',company_id)",
     'company_ids_in_company_ids': "('company_ids','in',company_ids)",
     'user_id': "('user_id','=', user.id)",
 }
@@ -129,45 +128,41 @@ COMPANY_FIELD = {
 }
 
 SECURITY_RULE = {
-    """
-    'allowed_companies' should not be necessary to combine with 'selected_company',
-    since a user's company should always be one of the user's companies.
-    But it feels safer to have both.
-    Only res.partner allows to read user partners not in the user's companies.
-    A test will be written to check that these are users who can access the user's company.
-    """
+    # It should be ok to have 'in_company' without 'in_companies'
+    # since a user's company should always be one of the user's companies.
+    # But it feels safer to include 'in_companies'.
 
     'BUS_PRESENCE_MODEL': {
         'edit_if': 'user_id',
     },
     # read partners of users with access to the company, otherwise cannot read the users
     'RES_PARTNER_MODEL': {
-        'read_if': 'company_ids_is_company_id OR allowed_companies/parent/child',
-        'edit_if': 'selected_company AND allowed_companies',
+        'read_if': 'company_ids_in_company_ids OR in_companies/parent/child',
+        'edit_if': 'in_company AND in_companies',
     },
     # read users with access to the company
     'RES_USERS_MODEL': {
         'read_if': 'company_ids_in_company_ids',
-        'edit_if': 'selected_company AND allowed_companies',
+        'edit_if': 'in_company AND in_companies',
     },
     'COMPANIES_MODEL': {
-        'read_if': 'allowed_companies/parent/child',
-        'edit_if': 'selected_company AND allowed_companies',
+        'read_if': 'in_companies/parent/child',
+        'edit_if': 'in_company AND in_companies',
     },
     # default
     'COMPANY_MODEL': {
-        'read_if': 'allowed_companies/parent/child',
-        'edit_if': 'selected_company AND allowed_companies',
+        'read_if': 'in_companies/parent/child',
+        'edit_if': 'in_company AND in_companies',
     },
     'COMPANY_READ_SYSTEM_MODEL': {
-        'read_if': 'system_company OR allowed_companies/parent/child',
-        'edit_if': 'selected_company AND allowed_companies',
+        'read_if': 'system_company OR in_companies/parent/child',
+        'edit_if': 'in_company AND in_companies',
     },
     'NO_EDIT_MODEL': {
-        'edit_if': 'system_company AND ( selected_company AND allowed_companies )',
+        'edit_if': 'system_company AND ( in_company AND in_companies )',
     },
     'NO_ACCESS_MODEL': {
-        'read_and_edit_if': 'system_company AND ( selected_company AND allowed_companies )',
+        'read_and_edit_if': 'system_company AND ( in_company AND in_companies )',
     },
 }
 
@@ -320,7 +315,8 @@ class MulticompanySecurity(models.AbstractModel):
         self._set_company_id_where_null()
         self._update_rule_domains_to_1_where_false_except_partner()
         self._set_global_security_rules_on_all_models_except_ir_rule()
-        self._set_read_and_edit_access_to_company_manager_on_models_with_company_data()
+        # So time consuming. Takes 23 seconds, while global rules take 5 seconds to update.
+        # self._set_read_and_edit_access_to_company_manager_on_models_with_company_data()
         self._update_code_to_comply_with_safe_eval()
         self._update_system_records()
         return True
