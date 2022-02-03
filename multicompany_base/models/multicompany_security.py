@@ -5,7 +5,7 @@ from openupgradelib import openupgrade
 import os
 
 from odoo import models, fields, api, exceptions, SUPERUSER_ID
-from odoo.addons.base.models.base import FIELD_NAME_TO_GET_COMPANY
+import odoo.addons.base.models.base as base
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -14,11 +14,6 @@ _logger = logging.getLogger(__name__)
 # (Not in XML, so cannot be a module name.)
 # Used for company_id fields, also in hooks.py.
 EXTID_MODULE_NAME = '__multicompany_security__'
-
-COMPANIES_MODEL = [
-    'res.company',
-    'website',
-]
 
 COMPANY_READ_SYSTEM_MODEL = [
     'account.account.type',
@@ -127,6 +122,12 @@ COMPANY_FIELD = {
     'default': 'company_id',
 }
 
+"""
+All records which a user can browse, are available on relational fields when the user is creating or editing a record.
+A user may lose access to a record by setting another user as the owner.
+If a manager can read another company than his own companies, the manager can switch to this company.
+This is a security risk (specially for parent/child).
+"""
 SECURITY_RULE = {
     # It should be ok to have 'in_company' without 'in_companies'
     # since a user's company should always be one of the user's companies.
@@ -134,6 +135,11 @@ SECURITY_RULE = {
 
     'BUS_PRESENCE_MODEL': {
         'edit_if': 'user_id',
+    },
+    # A company manager can change to any company which he/she can browse. Don't allow changing to parent/child company.
+    'RES_COMPANY_MODEL': {
+        'read_if': 'in_companies',
+        'edit_if': 'in_company AND in_companies',
     },
     # read partners of users with access to the company, otherwise cannot read the users
     'RES_PARTNER_MODEL': {
@@ -143,10 +149,6 @@ SECURITY_RULE = {
     # read users with access to the company
     'RES_USERS_MODEL': {
         'read_if': 'company_ids_in_company_ids',
-        'edit_if': 'in_company AND in_companies',
-    },
-    'COMPANIES_MODEL': {
-        'read_if': 'in_companies/parent/child',
         'edit_if': 'in_company AND in_companies',
     },
     # default
@@ -208,6 +210,8 @@ SECURITY_DO_IF = {
 def _get_security_type(model_name):
     if model_name == 'bus.presence':
         return 'BUS_PRESENCE_MODEL'
+    elif model_name == 'res.company':
+        return 'RES_COMPANY_MODEL'
     elif model_name == 'res.partner':
         return 'RES_PARTNER_MODEL'
     elif model_name == 'res.users':
@@ -218,8 +222,6 @@ def _get_security_type(model_name):
         return 'NO_EDIT_MODEL'
     elif model_name in COMPANY_READ_SYSTEM_MODEL:
         return 'COMPANY_READ_SYSTEM_MODEL'
-    elif model_name in COMPANIES_MODEL:
-        return 'COMPANIES_MODEL'
     else:
         return 'COMPANY_MODEL'
 
@@ -510,7 +512,7 @@ class MulticompanySecurity(models.AbstractModel):
 
             # C) Another way to loop
 
-            related_field_name = FIELD_NAME_TO_GET_COMPANY.get(model.model)
+            related_field_name = base.FIELD_NAME_TO_GET_COMPANY.get(model.model)
             if not related_field_name:
                 records_with_no_company.sudo().write({'company_id': self.env.company.id})
                 continue
@@ -518,18 +520,9 @@ class MulticompanySecurity(models.AbstractModel):
             related_field = self.env[model.model]._fields[related_field_name]
             related_models_and_record_ids = defaultdict(lambda: []) # {'res.partner': [(1001, 1), (1002, 2), (1003, 3)]}
             for record in records_with_no_company:
-                if related_field.type == 'many2one':
-                    related_model_name = related_field.comodel_name
-                    related_record_id = getattr(record, related_field_name)
-                elif related_field.type == 'reference':
-                    related_model_name, related_record_id = getattr(record, related_field_name).split(',')
-                    related_record_id = int(related_record_id)
-                elif related_field.type == 'many2one_reference':
-                    related_model_name = getattr(record, related_field.model_field)
-                    related_record_id = getattr(record, related_field_name)
-                else:
-                    raise UserError('_set_company_id_where_null error')
-                related_models_and_record_ids[related_model_name].append((record.id, related_record_id))
+                [(related_model_name, related_record_id)] = base._get_model_name_and_res_id(related_field, record)
+                if related_model_name and related_record_id:
+                    related_models_and_record_ids[related_model_name].append((record.id, related_record_id))
 
             for related_model_name, ids in related_models_and_record_ids.items():
 

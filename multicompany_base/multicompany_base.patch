@@ -1,5 +1,5 @@
 diff --git a/addons/auth_signup/models/res_users.py b/addons/auth_signup/models/res_users.py
-index d93e7c706..458aef840 100644
+index d93e7c70..458aef84 100644
 --- a/addons/auth_signup/models/res_users.py
 +++ b/addons/auth_signup/models/res_users.py
 @@ -194,7 +194,8 @@ class ResUsers(models.Model):
@@ -13,7 +13,7 @@ index d93e7c706..458aef840 100644
          for user in self:
              if not user.email:
 diff --git a/addons/base_setup/models/res_config_settings.py b/addons/base_setup/models/res_config_settings.py
-index 9ea1339f6..1932b047b 100644
+index 9ea1339f..1932b047 100644
 --- a/addons/base_setup/models/res_config_settings.py
 +++ b/addons/base_setup/models/res_config_settings.py
 @@ -61,6 +61,7 @@ class ResConfigSettings(models.TransientModel):
@@ -25,7 +25,7 @@ index 9ea1339f6..1932b047b 100644
          action = self.env["ir.actions.actions"]._for_xml_id("base.action_res_users")
          if self.env.ref('base.default_user', raise_if_not_found=False):
 diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
-index 4ecd87d3d..297113900 100644
+index 4ecd87d3..abf774ff 100644
 --- a/addons/mail/controllers/main.py
 +++ b/addons/mail/controllers/main.py
 @@ -128,10 +128,12 @@ class MailController(http.Controller):
@@ -63,7 +63,7 @@ index 4ecd87d3d..297113900 100644
              records.check_access_rule('read')
              records.check_access_rights('read')
 diff --git a/addons/mail/models/update.py b/addons/mail/models/update.py
-index edf5b4f2c..9be029ec9 100644
+index edf5b4f2..9be029ec 100644
 --- a/addons/mail/models/update.py
 +++ b/addons/mail/models/update.py
 @@ -98,6 +98,10 @@ class PublisherWarrantyContract(AbstractModel):
@@ -78,7 +78,7 @@ index edf5b4f2c..9be029ec9 100644
                  if not user.exists():
                      return True
 diff --git a/addons/payment/__manifest__.py b/addons/payment/__manifest__.py
-index 6626200bc..783b2e9c0 100644
+index 6626200b..783b2e9c 100644
 --- a/addons/payment/__manifest__.py
 +++ b/addons/payment/__manifest__.py
 @@ -11,7 +11,7 @@
@@ -92,7 +92,7 @@ index 6626200bc..783b2e9c0 100644
          'views/account_payment_views.xml',
 diff --git a/addons/payment/data/payment_acquirer_data_ag.xml b/addons/payment/data/payment_acquirer_data_ag.xml
 new file mode 100644
-index 000000000..117ef56af
+index 00000000..117ef56a
 --- /dev/null
 +++ b/addons/payment/data/payment_acquirer_data_ag.xml
 @@ -0,0 +1,85 @@
@@ -182,7 +182,7 @@ index 000000000..117ef56af
 +
 +</odoo>
 diff --git a/addons/website/models/ir_rule.py b/addons/website/models/ir_rule.py
-index a11ddef1e..f0b883e03 100644
+index a11ddef1..f0b883e0 100644
 --- a/addons/website/models/ir_rule.py
 +++ b/addons/website/models/ir_rule.py
 @@ -16,6 +16,13 @@ class IrRule(models.Model):
@@ -200,7 +200,7 @@ index a11ddef1e..f0b883e03 100644
          return res
  
 diff --git a/addons/website_sale/models/website.py b/addons/website_sale/models/website.py
-index 007325f9c..27c1af3b3 100644
+index 007325f9..27c1af3b 100644
 --- a/addons/website_sale/models/website.py
 +++ b/addons/website_sale/models/website.py
 @@ -22,6 +22,8 @@ class Website(models.Model):
@@ -213,7 +213,7 @@ index 007325f9c..27c1af3b3 100644
              team = self.env.ref('sales_team.salesteam_website_sales')
              return team if team.active else None
 diff --git a/odoo/addons/base/models/__init__.py b/odoo/addons/base/models/__init__.py
-index bdc3d0b1a..36463b9e8 100644
+index bdc3d0b1..36463b9e 100644
 --- a/odoo/addons/base/models/__init__.py
 +++ b/odoo/addons/base/models/__init__.py
 @@ -2,6 +2,7 @@
@@ -226,10 +226,10 @@ index bdc3d0b1a..36463b9e8 100644
  from . import ir_model
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 000000000..762a462aa
+index 00000000..eab87658
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
-@@ -0,0 +1,80 @@
+@@ -0,0 +1,131 @@
 +from odoo import api, fields, models
 +from odoo.exceptions import UserError
 +from . import ir_model
@@ -246,51 +246,102 @@ index 000000000..762a462aa
 +    'website.menu': 'website_id',
 +}
 +
++def _get_model_name_and_res_id(field, data):
++    if not _get_value(field.name, data):
++        comodel_name = res_id = None
++    elif field.type == 'many2one':
++        comodel_name = field.comodel_name
++        res_id = _get_value(field.name, data)
++    elif field.type == 'many2one_reference':
++        comodel_name = _get_value(field.model_field, data)
++        res_id = _get_value(field.name, data)
++    elif field.type == 'reference':
++        comodel_name, res_id = _get_value(field.name, data).split(',')
++        res_id = int(res_id)
++    elif field.type == 'char':
++      if (field.model_name == 'ir.property' and field.name in ('res_id', 'value_reference')):
++        comodel_name, res_id = _get_value(field.name, data).split(',')
++        res_id = int(res_id)
++      else:
++        comodel_name = res_id = None
++    elif field.type in ('one2many', 'many2many'):
++        comodel_name = field.comodel_name
++        commands = _get_value(field.name, data)
++        # for command in commands:
++        #     This is complex. Need recursive function to check nested values for command 0-1
++        #     Command 6 has ids, while the others have id.
++        #     TODO later
++        return []
++    else:
++        comodel_name = res_id = None
++    return [(comodel_name, res_id)]
++
++def _get_value(key, record_or_values):
++    if type(record_or_values) is dict:
++        values = record_or_values
++        return values[key]
++    else:
++        record = record_or_values
++        return getattr(record, key)
++
++
 +class Base(models.AbstractModel):
 +    _inherit = 'base'
 +
-+    def create(self, vals_list):
-+        """
-+        This code cannot be inside multicompany_base; then it is not active on installing/updating modules.
++    """
++    This code cannot be inside multicompany_base; then it is not active on installing/updating modules.
 +
-+        If multicompany_base is installed:
-+            Don't accept {'company_id': False}
-+            (e.g. stock.location from XML)
-+        """
++    If multicompany_base is installed:
++        Don't accept {'company_id': False}
++        (e.g. stock.location from XML)
++
++        Don't accept FK relations to records which the user cannot browse.
++    """
++
++    def create(self, vals_list):
 +        for vals_dict in vals_list:
-+            if 'company_id' in vals_dict and not vals_dict['company_id']:
-+                if self.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
-+                    vals_dict['company_id'] = self.related_company(vals_dict).id
++            vals_dict = self._set_company_if_false_and_multicompany_base_is_installed(vals_dict)
++            self._security_check_that_user_can_browse_all_relations(vals_dict)
 +        return super(Base, self).create(vals_list)
 +
-+    def related_company(self, record_or_values):
++    def write(self, vals_dict):
++        vals_dict = self._set_company_if_false_and_multicompany_base_is_installed(vals_dict)
++        self._security_check_that_user_can_browse_all_relations(vals_dict)
++        return super(Base, self).write(vals_dict)
++
++    def _set_company_if_false_and_multicompany_base_is_installed(self, vals_dict):
++        if 'company_id' in vals_dict and not vals_dict['company_id']:
++            if self.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
++                vals_dict['company_id'] = self._related_company(vals_dict).id
++        return vals_dict
++
++    # Also used in multicompany_security
++    def _related_company(self, record_or_values):
 +        field_name = FIELD_NAME_TO_GET_COMPANY.get(self._name)
 +        if not field_name:
 +            return self.env.company
 +
-+        # implicit parameter: record_or_value
-+        def _get_value(key):
-+            if type(record_or_values) is dict:
-+                values = record_or_values
-+                return values[key]
-+            else:
-+                record = record_or_values
-+                return getattr(record, key)
-+
 +        field = self._fields[field_name]
-+        if field.type == 'many2one':
-+            comodel_name = field.comodel_name
-+            res_id = _get_value(field_name)
-+        elif field.type == 'reference':
-+            comodel_name, res_id = _get_value(field_name).split(',')
-+            res_id = int(res_id)
-+        elif field.type == 'many2one_reference':
-+            comodel_name = _get_value(field.model_field)
-+            res_id = _get_value(field_name)
-+        else:
-+            raise UserError('_get_company error')
++        [(comodel_name, res_id)] = _get_model_name_and_res_id(field, record_or_values)
 +        related_record = self.env[comodel_name].browse(res_id)
 +        return related_record.company_id
++
++    def _security_check_that_user_can_browse_all_relations(self, vals_dict):
++        if not self.env.su:
++            for (key, value) in vals_dict.items():
++                field = self._fields[key]
++                if field.type in ('many2one', 'many2one_reference', 'reference', 'char', 'one2many', 'many2many'):
++                    model_name_res_id = _get_model_name_and_res_id(field, vals_dict)
++                    for model_name, res_id in model_name_res_id:
++                        if model_name and res_id:
++                            try:
++                                # browse().field will give AccessError if the user cannot read the record.
++                                # This is super important for security!
++                                # Without this line, a company manager can get access to e.g. SYSTEM company
++                                # with user.write({'company_id': 1, 'company_ids': [[4, 1, 0]})
++                                self.env[model_name].browse(res_id).display_name
++                            except:
++                                raise UserError("Failed browsing this record: {},{}".format(model_name, res_id))
 +
 +    """
 +    MULTICOMPANY CONTROLLER PATCHES
@@ -310,9 +361,8 @@ index 000000000..762a462aa
 +
 +    def with_record_company(self):
 +        return self.with_company(self.record_company())
-\ No newline at end of file
 diff --git a/odoo/addons/base/models/res_company.py b/odoo/addons/base/models/res_company.py
-index 3b20cb9d7..854d752fe 100644
+index 3b20cb9d..854d752f 100644
 --- a/odoo/addons/base/models/res_company.py
 +++ b/odoo/addons/base/models/res_company.py
 @@ -213,7 +213,7 @@ class Company(models.Model):
@@ -325,7 +375,7 @@ index 3b20cb9d7..854d752fe 100644
          # Make sure that the selected currency is enabled
          if vals.get('currency_id'):
 diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
-index 8b50afad4..2fd5cbe00 100644
+index 8b50afad..2fd5cbe0 100644
 --- a/odoo/addons/base/models/res_partner.py
 +++ b/odoo/addons/base/models/res_partner.py
 @@ -524,6 +524,7 @@ class Partner(models.Model):
@@ -337,7 +387,7 @@ index 8b50afad4..2fd5cbe00 100644
          # res.partner must only allow to set the company_id of a partner if it
          # is the same as the company of all users that inherit from this partner
 diff --git a/odoo/addons/base/models/res_users.py b/odoo/addons/base/models/res_users.py
-index 34f35ac82..61cefe775 100644
+index 34f35ac8..61cefe77 100644
 --- a/odoo/addons/base/models/res_users.py
 +++ b/odoo/addons/base/models/res_users.py
 @@ -659,6 +659,7 @@ class Users(models.Model):
@@ -349,7 +399,7 @@ index 34f35ac82..61cefe775 100644
      def _update_last_login(self):
          # only create new records to avoid any side-effect on concurrent transactions
 diff --git a/odoo/models.py b/odoo/models.py
-index 34882ef5c..25d4ef274 100644
+index 8158ab99..5b52f304 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -459,7 +509,7 @@ index 34882ef5c..25d4ef274 100644
  
          if inconsistencies:
 diff --git a/odoo/modules/loading.py b/odoo/modules/loading.py
-index 8093f14b1..a064632db 100644
+index 8093f14b..a064632d 100644
 --- a/odoo/modules/loading.py
 +++ b/odoo/modules/loading.py
 @@ -568,7 +568,10 @@ def load_modules(db, force_demo=False, status=None, update_module=False):
@@ -475,7 +525,7 @@ index 8093f14b1..a064632db 100644
  
          # STEP 9: save installed/updated modules for post-install tests
 diff --git a/odoo/modules/registry.py b/odoo/modules/registry.py
-index d17caac09..3ab7c967e 100644
+index d17caac0..3ab7c967 100644
 --- a/odoo/modules/registry.py
 +++ b/odoo/modules/registry.py
 @@ -282,7 +282,10 @@ class Registry(Mapping):
@@ -491,7 +541,7 @@ index d17caac09..3ab7c967e 100644
  
      @lazy_property
 diff --git a/odoo/tools/safe_eval.py b/odoo/tools/safe_eval.py
-index f60bb5e91..ae6bbc93c 100644
+index f60bb5e9..ae6bbc93 100644
 --- a/odoo/tools/safe_eval.py
 +++ b/odoo/tools/safe_eval.py
 @@ -326,6 +326,38 @@ def safe_eval(expr, globals_dict=None, locals_dict=None, mode="eval", nocopy=Fal

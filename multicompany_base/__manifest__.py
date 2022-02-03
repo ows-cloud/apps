@@ -8,8 +8,8 @@
     'author': 'AppsToGROW',
     'category': 'Uncategorized',
     'data': [
-        'security/ir.model.access.csv',
         'security/security.xml',
+        'security/ir.model.access.csv',
         'views/ir.actions.server.xml',
         'views/ir.model.data.xml',
         'views/res.company.xml',
