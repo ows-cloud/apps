@@ -20,8 +20,7 @@ class Company(models.Model):
     alias_company_name = fields.Char("Alias Company Name",
         help="Email Alias will get a dot plus the Alias Company Name, like alias_name.alias_company_name@alias_domain"
     )
-    alias_domain_id = fields.Many2one('mail.alias.domain', string="Alias Domain")
 
     _sql_constraints = [
-        ('alias_company_unique', 'UNIQUE(alias_company_name, alias_domain_id)', 'Unfortunately this company alias is already used, please choose a unique one')
+        ('alias_company_name_unique', 'UNIQUE(alias_company_name)', 'Unfortunately this company alias is already used, please choose a unique one')
     ]
