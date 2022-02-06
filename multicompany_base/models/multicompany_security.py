@@ -65,6 +65,7 @@ NO_EDIT_MODEL = [
     'ir.module.module.exclusion',
     'ir.rule',
     'ir.server.object.lines',
+    'mail.message.subtype',
     'res.bank',
     'res.country',
     'res.country.state',
