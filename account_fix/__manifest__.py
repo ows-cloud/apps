@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': 'Account Fix',
+    'name': 'Account Regex Fix',
     'summary': 'Journal Sequence',
 
     'author': 'AppsToGROW',
