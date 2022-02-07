@@ -6,16 +6,22 @@
     'summary': '',
 
     'author': 'AppsToGROW',
-    'auto_install': False,
     'category': 'Uncategorized',
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
+        'views/ir.actions.server.xml',
+        'views/ir.model.data.xml',
         'views/res.company.xml',
     ],
     'depends': [
         'base',
+        'base_setup',
+        # 'mail',
     ],
+    'post_init_hook': 'post_init_hook',
     'license': 'AGPL-3',
+    'uninstall_hook': 'WARNING_DELETE_RULES_uninstall_hook',
     'version': '14.0.1.0.0',
     'website': 'http://www.appstogrow.co',
 }

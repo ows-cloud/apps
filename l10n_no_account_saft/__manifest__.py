@@ -4,7 +4,7 @@
 {
     'name': 'Norway - SAF-T',
     'summary': '',
-    'version': '0.1',
+    'version': '14.0.1.0.0',
 
 
     'author': 'AppsToGROW',

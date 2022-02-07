@@ -1,6 +1,0 @@
-id,name,model_id:id,groups:id,domain_force,perm_read,perm_write,perm_create,perm_unlink
-res_field_value_company_id_rule,res_field_value multi-company,model_res_field_value,,"[('company_id','child_of',[user.company_id.id])]",1,1,1,1
-res_field_company_id_rule,res_field multi-company,model_res_field,,"[('company_id','child_of',[user.company_id.id])]",0,1,1,1
-res_field_1_or_company_id_rule,res_field multi-company,model_res_field,,"['|', ('company_id','=',1), ('company_id','child_of',[user.company_id.id])]",1,0,0,0
-res_field_selection_value_company_id_rule,res_field_selection_value multi-company,model_res_field_selection_value,,"[('company_id','child_of',[user.company_id.id])]",0,1,1,1
-res_field_selection_value_1_or_company_id_rule,res_field_selection_value multi-company,model_res_field_selection_value,,"['|', ('company_id','=',1), ('company_id','child_of',[user.company_id.id])]",1,0,0,0

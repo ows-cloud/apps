@@ -1,25 +1,140 @@
+
 from odoo import models
 import logging
 
 _logger = logging.getLogger(__name__)
-SYSTEM_COMPANY = 1
-ADMIN_USER = 2
+SYSTEM_COMPANY_ID = 1
 
 class MulticompanyConfig(models.AbstractModel):
     _name = 'multicompany.config'
-    _description = 'Configuration of companies'
+    _description = 'Configuration of companies with forced security'
+
+    """
+    Sometimes Odoo assumes that a user has access to a specific record.
+    With forced security, the user might not have access.
+    The configuration will search for specific records, as admin user logged into one specific company.
+    The search will include all records permitted by the security rules, including inactive records and parent/child companies.
+    - Exception: Search for company website
+    If not found, create (or copy) a new record for the company.
+    """
 
     def _register_hook(self, update_module=False):
-        if update_module:
-            param = self.env['ir.config_parameter'].get_param('multicompany_base.force_config')
-            if param in ('1', 't', 'true', 'True'):
-                companies = self.env['res.company'].sudo().search([])
-                self._configure(companies)
-                _logger.info('multicompany.force.config done')
+        pass # using multicompany.security
+
+    def configure_system_and_all_companies(self):
+        # Returning an error value to _register_hook will be ignored (see loading.py).
+        if not self.env.user.has_group('base.group_system'):
+            return False
+
+        _logger.info('Starting multicompany.config configure_system_and_all_companies')
+
+        self._configure_system()
+
+        all_companies = self.env['res.company'].sudo().search([])
+        self._configure_companies(all_companies)
+        return 
+
+    def _configure_system(self):
+
+        # The system pricelist should be archived, so that websites will get the company's pricelist.
+        # product_list = self.env.ref('product.list0', raise_if_not_found=False)
+        # if product_list:
+        #     product_list.active = False
+
+        # If active, new websites will get default crm.team which is not accessable.
+        # EDIT: Patch will check if multicompany_base is installed.
+        # website_salesteam = self.env.ref('sales_team.salesteam_website_sales', raise_if_not_found=False)
+        # if website_salesteam:
+        #     website_salesteam.active = False
+
+        def _ref(xmlid):
+            return self.env.ref(xmlid, raise_if_not_found=False)
+
+        def _id(record):
+            if record:
+                return record.id
+
+        def _set(record, values):
+            if record:
+                models.Model.write(record, values)
+
+        # Hide some security rules
+        # website_sale rules include website.company_id.id which give errors.
+        _set(_ref('website_sale.product_pricelist_item_comp_rule'), {'active': False})
+        _set(_ref('website_sale.product_pricelist_comp_rule'), {'active': False})
+
+        # Give access rights to company managers (including the Support User)
+        company_manager = self.env.ref('multicompany_base.group_company_manager')
+        erp_manager = self.env.ref('base.group_erp_manager')
+
+        # Field access to create users
+        _set(_ref('auth_signup.field_res_partner__signup_expiration'), {'groups': [(4, company_manager.id, 0), (4, erp_manager.id, 0)]})
+        _set(_ref('auth_signup.field_res_partner__signup_token'), {'groups': [(4, company_manager.id, 0), (4, erp_manager.id, 0)]})
+        _set(_ref('auth_signup.field_res_partner__signup_type'), {'groups': [(4, company_manager.id, 0), (4, erp_manager.id, 0)]})
+
+        # Access to change password
+        _set(_ref('base.change_password_wizard_action'), {'groups_id': [(4, company_manager.id, 0)]})
+
+        #
+        # Menu (move to multicompany_ag?)
+        #
+        # Website
+        _set(_ref('website.menu_website_configuration'), {'groups_id': [
+            (3, _id(_ref('base.group_user')), 0),
+            (4, _id(_ref('website.group_website_publisher')), 0),
+        ]})
+        # Employees
+        _set(_ref('hr.menu_hr_root'), {'groups_id': [
+            (3, _id(_ref('base.group_user')), 0),
+            #(4, _id(_ref('hr.group_hr_user')), 0),
+        ]})
+        # Settings
+        _set(_ref('base.menu_administration'), {'groups_id': [
+            (4, company_manager.id, 0),
+        ]})
+
+        # Internal User
+        _set(_ref('base.group_user'), {'implied_ids': [
+            (3, _id(_ref('sale.group_delivery_invoice_address')), 0),
+            (3, _id(_ref('analytic.group_analytic_accounting')), 0),
+            (3, _id(_ref('website.group_multi_website')), 0),
+        ]})
+
+        # Support User
+        support_user = self.env.ref('__multicompany_base__.support_user', raise_if_not_found=False)
+        if not support_user:
+            companies = self.env['res.company'].sudo().search([])
+            company_ids = companies.ids
+            support_user = self.env['res.users'].sudo().create({
+                'login': 'support',
+                'lang': 'en_US',
+                'name': 'Support User',
+                'company_ids': [(6, 0, companies.ids)],
+            })
+            xmlid = self.env['ir.model.data'].create({
+                'module': '__multicompany_base__',
+                'name': 'support_user',
+                'model': 'res.users',
+                'res_id': support_user.id,
+            })
+        support_user.write({'groups_id': [(4, company_manager.id, 0)]})
+
+    def _configure_companies(self, companies):
+        for company in companies:
+            self = self._prepare(company)
+            # --------------------------------------------------
+            # General company mail.channel may be confusing in a parent/child environment. Skipping this for now.
+            # self._create_a_company_mail_channel_for_all_employees()
+            # Bad idea to copy all system sequences with code
+            # self._copy_system_sequences_with_code(company.id)
+            self._create_default_user(company.id)
+            public_user = self._create_public_user(company.id)
+            self._create_website(company, public_user)
+            # --------------------------------------------------
 
     def _prepare(self, company):
         self = self.with_user(
-            self.env.user.browse(ADMIN_USER) # Cannot be SUPERUSER
+            self.env.ref('__multicompany_base__.support_user')
         ).with_context(
             active_test=False,
             allowed_company_ids=[company.id],
@@ -28,38 +143,32 @@ class MulticompanyConfig(models.AbstractModel):
         self.env.companies = company
         return self
 
-    def _configure(self, companies):
-        for company in companies:
-            self = self._prepare(company)
-            # --------------------------------------------------
-            self._create_a_general_mail_channel_for_all_employees()
-            self._copy_system_sequences_with_code(company.id)
-            self._create_default_user(company.id)
-            public_user = self._create_public_user(company.id)
-            self._create_website(company, public_user)
-            # --------------------------------------------------
-
-    def _create_a_general_mail_channel_for_all_employees(self):
+    def _create_a_company_mail_channel_for_all_employees(self):
         imd_record = self._env('ir.model.data').search([('module', '=', 'mail'), ('name', '=', 'channel_all_employees')])
         if imd_record:
             assert imd_record.model == 'mail.channel'
             group_user_id = self.env.ref('base.group_user').id
+            all_employees = self.env['res.users'].search([('groups_id', '=', group_user_id), ('default_user', '=', False)])
+            partner_ids = all_employees.mapped('partner_id').ids
+            add_mail_channel_partners = [(0, 0, id) for id in partner_ids]
             return self._insert_first_record(
                 model='mail.channel',
-                search=['|', ('id', '=', imd_record.res_id), ('replace_record_id', '=', imd_record.res_id)],
+                search=[('all_employees', '=', True)],
                 values={
                     'name': 'general',
                     'description': 'General announcements for all employees.',
                     'group_ids': [(4, group_user_id), 0],
-                    'replace_record_id': imd_record.res_id,
+                    'all_employees': True,
+                    'channel_last_seen_partner_ids': add_mail_channel_partners,
                 },
             )
 
     def _copy_system_sequences_with_code(self, company_id):
-        system_sequences_with_code = self._env('ir.sequence').sudo().search([('code', 'like', '_'), ('company_id', '=', SYSTEM_COMPANY)])
+        system_sequences_with_code = self._env('ir.sequence').sudo().search([('code', 'like', '_'), ('company_id', '=', SYSTEM_COMPANY_ID)])
         sequences_with_code = []
         for sequence in system_sequences_with_code:
             sequences_with_code.append(
+                # self.sudo() ?
                 self._insert_first_record(
                     model='ir.sequence',
                     search=[('code', '=', sequence.code)],
@@ -73,12 +182,10 @@ class MulticompanyConfig(models.AbstractModel):
         return sequences_with_code
 
     def _create_default_user(self, company_id):
-        return self._insert_first_record(
+        default_user = self._insert_first_record(
             model='res.users',
             search=[
-                ('active', '=', False),
-                ('company_ids', 'in', [company_id]),
-                ('login', '=', 'default_user_for_company_' + str(company_id)),
+                ('default_user', '=', True),
             ],
             values={
                 'company_id': company_id,
@@ -86,15 +193,16 @@ class MulticompanyConfig(models.AbstractModel):
                 'login': 'default_user_for_company_' + str(company_id),
                 'name': 'Default user for company ' + str(company_id),
                 'active': False,
+                'default_user': True,
             },
         )
+        return default_user
 
     def _create_public_user(self, company_id):
-        return self._insert_first_record(
+        public_user = self._insert_first_record(
             model='res.users',
             search=[
                 ('groups_id', '=', self._ref('base.group_public').id),
-                ('company_ids', 'in', [company_id]),
             ],
             values={
                 'company_id': company_id,
@@ -108,6 +216,7 @@ class MulticompanyConfig(models.AbstractModel):
                 # <field name="partner_id" ref="public_partner"/>
             },
         )
+        return public_user
 
     def _create_website(self, company, public_user):
         website_user_field = self._ref('website.field_website__user_id')
@@ -115,7 +224,7 @@ class MulticompanyConfig(models.AbstractModel):
             return self
         self._insert_first_record(
             model='ir.default',
-            search=[('company_id', '=', company.id), ('field_id', '=', website_user_field.id)],
+            search=[('field_id', '=', website_user_field.id)],
             values={'company_id': company.id, 'field_id': website_user_field.id, 'json_value': public_user.id},
         )
         default_languages = [self.env.ref('base.lang_en').id]
@@ -123,23 +232,25 @@ class MulticompanyConfig(models.AbstractModel):
             model='website',
             search=[('company_id', '=', company.id)],
             values={'company_id': company.id, 'name': company.name, 'language_ids': [(6, None, default_languages)]},
-            return_existing_record_if_one=False,
         )
         if website:
-            company.write({'website_id': website.id})
+            if not company.website_id.id:
+                company.write({'website_id': website.id})
         return website
 
     #
     # _insert_first_record and "blank" methods to use after failing to return a record(set).
     #
 
-    def _insert_first_record(self, model, search, values, copy=False, return_existing_record_if_one=True):
+    def _insert_first_record(self, model, search, values, copy=False):
         '''
         model (string): the model to insert the first record
         search (list):  the search domain to see if a record already exists
         values (dict):  values to insert into the first record
         copy (string):  optional external reference or 'model,res_id' of an existing record to 'copy' (otherwise 'create')
         '''
+        company_id = self.env.company.id
+        search = ['&'] + search + ['|',('company_id','=',company_id),'|',('company_id','parent_of',company_id),('company_id','child_of',company_id)]
         records = self._env(model).search(search)
         if not records.exists():
             if copy == False:
@@ -152,7 +263,7 @@ class MulticompanyConfig(models.AbstractModel):
             else:
                 record = self._ref(copy).sudo().copy(values)
                 return record
-        elif return_existing_record_if_one:
+        else:
             record_count = self._env(model).with_context(active_test=False).search_count(search)
             if record_count == 1:
                 return records # Other variables might be dependent on the record

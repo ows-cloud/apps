@@ -5,6 +5,8 @@ class IrConfigParameter(models.Model):
     _inherit = 'ir.config_parameter'
 
     def force_set_param(self):
+        if not self.env.user.has_group('base.group_system'):
+            return False
         set_param = self.sudo().set_param
         set_param('auth_signup.reset_password', repr(True))
         set_param('auth_signup.invitation_scope', 'b2c')
@@ -16,7 +18,5 @@ class IrConfigParameter(models.Model):
         set_param('auth_signup_with_captcha', repr(True))
         set_param('auth_login_with_captcha', repr(False))
 
-        # OTHER
-
-        # The system pricelist should be archived, so that websites will get the company's pricelist.
-        self.env.ref('product.list0').active = False
+        set_param('multicompany_base.force_security', '1')
+        set_param('multicompany_base.force_config', '1')

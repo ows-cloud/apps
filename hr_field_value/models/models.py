@@ -8,7 +8,7 @@ class HrContract(models.Model):
     def _compute_default_field_value_ids(self):
         result = []
         records = self.env['res.field'].search([('model', '=', 'hr.contract'), ('auto_create', '=', True),
-                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.country_id.id)])
+                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.partner_id.country_id.id)])
         for record in records:
             result.append((0, 0, {'model': 'hr.contract', 'company_id': self.env.company.id,
                                   'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
@@ -25,7 +25,7 @@ class HrEmployee(models.Model):
     def _compute_default_field_value_ids(self):
         result = []
         records = self.env['res.field'].search([('model', '=', 'hr.employee'), ('auto_create', '=', True),
-                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.country_id.id)])
+                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.partner_id.country_id.id)])
         for record in records:
             result.append((0, 0, {'model': 'hr.employee', 'company_id': self.env.company.id,
                                   'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
@@ -42,7 +42,7 @@ class HrJob(models.Model):
     def _compute_default_field_value_ids(self):
         result = []
         records = self.env['res.field'].search([('model', '=', 'hr.job'), ('auto_create', '=', True),
-                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.country_id.id)])
+                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.partner_id.country_id.id)])
         for record in records:
             result.append((0, 0, {'model': 'hr.job', 'company_id': self.env.company.id,
                                   'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
@@ -59,7 +59,7 @@ class HrLeaveType(models.Model):
     def _compute_default_field_value_ids(self):
         result = []
         records = self.env['res.field'].search([('model', '=', 'hr.leave.type'), ('auto_create', '=', True),
-                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.country_id.id)])
+                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.partner_id.country_id.id)])
         for record in records:
             result.append((0, 0, {'model': 'hr.leave.type', 'company_id': self.env.company.id,
                                   'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
@@ -76,7 +76,7 @@ class HrPayslip(models.Model):
     def _compute_default_field_value_ids(self):
         result = []
         records = self.env['res.field'].search([('model', '=', 'hr.payslip'), ('auto_create', '=', True),
-                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.country_id.id)])
+                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.partner_id.country_id.id)])
         for record in records:
             result.append((0, 0, {'model': 'hr.payslip', 'company_id': self.env.company.id,
                                   'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
@@ -93,7 +93,7 @@ class HrSalaryRule(models.Model):
     def _compute_default_field_value_ids(self):
         result = []
         records = self.env['res.field'].search([('model', '=', 'hr.salary.rule'), ('auto_create', '=', True),
-                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.country_id.id)])
+                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.partner_id.country_id.id)])
         for record in records:
             result.append((0, 0, {'model': 'hr.salary.rule', 'company_id': self.env.company.id,
                                   'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
@@ -110,7 +110,7 @@ class ResCompany(models.Model):
     def _compute_default_field_value_ids(self):
         result = []
         records = self.env['res.field'].search([('model', '=', 'res.company'), ('auto_create', '=', True),
-                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.country_id.id)])
+                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.partner_id.country_id.id)])
         for record in records:
             result.append((0, 0, {'model': 'res.company', 'company_id': self.env.company.id,
                                   'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
