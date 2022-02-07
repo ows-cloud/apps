@@ -9,7 +9,6 @@
     'category': 'Administration',
     'data': [
         'security/ir.model.access.csv',
-        'security/ir.rule.csv',
         'views/views.xml',
     ],
     'depends': ['base'],
