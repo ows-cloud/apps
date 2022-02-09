@@ -15,6 +15,10 @@ _logger = logging.getLogger(__name__)
 # Used for company_id fields, also in hooks.py.
 EXTID_MODULE_NAME = '__multicompany_security__'
 
+COMPANIES_MODEL = [
+    'base_import.import', # Import write() compares company_id with stored user.company_id instead of context company_id.
+]
+
 COMPANY_READ_SYSTEM_MODEL = [
     'account.account.type',
     'ir.actions.act_url',
@@ -51,7 +55,6 @@ NO_EDIT_MODEL = [
     'base.module.update',
     'base.module.upgrade',
     'base.update.translations',
-    'base_import.import',
     'ir.cron',
     'ir.logging',
     'ir.model',
@@ -152,6 +155,10 @@ SECURITY_RULE = {
         'read_if': 'company_ids_in_company_ids',
         'edit_if': 'in_company AND in_companies',
     },
+    'COMPANIES_MODEL': {
+        'read_if': 'in_companies/parent/child',
+        'edit_if': 'in_companies',
+    },
     # default
     'COMPANY_MODEL': {
         'read_if': 'in_companies/parent/child',
@@ -223,6 +230,8 @@ def _get_security_type(model_name):
         return 'NO_EDIT_MODEL'
     elif model_name in COMPANY_READ_SYSTEM_MODEL:
         return 'COMPANY_READ_SYSTEM_MODEL'
+    elif model_name in COMPANIES_MODEL:
+        return 'COMPANIES_MODEL'
     else:
         return 'COMPANY_MODEL'
 

@@ -29,11 +29,13 @@ class Alias(models.Model):
     def _set_alias_name_with_alias_company_name_if_required(self, vals_dict, alias_name=None, company_id=None):
         alias_name = vals_dict.get('alias_name') or alias_name
         company_id = vals_dict.get('company_id') or company_id
+        # TODO: Raise UserError
         assert alias_name and company_id, "ERROR in _set_alias_name_with_alias_company_name_if_required. alias_name = {}, company_id = {}".format(alias_name, company_id)
 
         require_alias_company_name = self.env['ir.config_parameter'].sudo().get_param('mail_alias_multicompany.require_alias_company_name')
         if require_alias_company_name in ('1', 't', 'true', 'True'):
             company = self.env['res.company'].browse(company_id)
+            # TODO: Raise UserError
             assert company.alias_company_name, "ERROR in _set_alias_name_with_alias_company_name_if_required. Please set a company alias name."
             length = len(company.alias_company_name) + 1
             if not alias_name[-length:] == '.' + company.alias_company_name:
