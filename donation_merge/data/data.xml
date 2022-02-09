@@ -50,51 +50,66 @@
             <field name="dpi">90</field>
         </record>
 
+        <!-- A4 res.partner -->
+        <template id="report_address_sheet_a4">
+            <t t-set="envelope" t-value="0"/>
+            <t t-call="donation_merge.report_address_main">
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+            </t>
+        </template>
+
         <!-- ENVELOPE res.partner -->
-        <template id="report_envelope_dle">
-            <t t-call="donation_merge.report_envelope_main">
+        <template id="report_address_envelope_dle">
+            <t t-set="envelope" t-value="1"/>
+            <t t-call="donation_merge.report_address_main">
                 <br/>
             </t>
         </template>
-        <template id="report_envelope_c5">
-            <t t-call="donation_merge.report_envelope_main">
+        <template id="report_address_envelope_c5">
+            <t t-set="envelope" t-value="1"/>
+            <t t-call="donation_merge.report_address_main">
                 <br/>
                 <br/>
                 <br/>
                 <br/>
             </t>
         </template>
-        <template id="report_envelope_main">
+        <template id="report_address_main">
             <t t-call="web.html_container">
                 <t t-foreach="docs.sorted(key=lambda x: x.name)" t-as="o">
                     <t t-call="web.basic_layout">
                         <div class="page">
                             <table style="width:100%;">
+                                <t t-if="envelope">
+                                    <tr>
+                                        <td style="width: 55%" valign="top">
+                                            <p style="font-size: 6px;"><br/></p>
+                                            <p style="font-size: 18px;">
+                                                Granheimstiftelsen<br/>
+                                                Postboks 243<br/>
+                                                1851 Mysen <br/>
+                                                <t t-if="o.country_id.code == 'NO'"></t>
+                                                <t t-elif="o.country_id.code in ['SE', 'DK']">NORGE</t>
+                                                <t t-else="">NORWAY</t>
+                                            </p>
+                                        </td>
+                                        <td style="width: 45%" align="right">
+                                            <p style="font-size: 6px;"><br/></p>
+                                            <img src="https://granheims.no/wp-content/uploads/2021/07/Posten.png" alt="Demo Icon" width="100" height="100"/>
+                                            <p>
+                                                <br/>
+                                                <br/>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </t>
                                 <tr>
-                                    <td style="width: 45%" valign="top">
-                                        <p style="font-size: 6px;"><br/></p>
+                                    <td style="width: 55%;"></td>
+                                    <td style="width: 45%;">
                                         <p style="font-size: 18px;">
-                                            Granheimstiftelsen<br/>
-                                            Postboks 243<br/>
-                                            1851 Mysen <br/>
-                                            <t t-if="o.country_id.code == 'NO'"></t>
-                                            <t t-elif="o.country_id.code in ['SE', 'DK']">NORGE</t>
-                                            <t t-else="">NORWAY</t>
-                                        </p>
-                                    </td>
-                                    <td style="width: 55%" align="right">
-                                        <p style="font-size: 6px;"><br/></p>
-                                        <img src="https://granheims.no/wp-content/uploads/2021/07/Posten.png" alt="Demo Icon" width="100" height="100"/>
-                                        <p>
-                                            <br/>
-                                            <br/>
-                                        </p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 45%;"></td>
-                                    <td style="width: 55%;">
-                                        <p style="font-size: 24px;">
                                             <t t-raw="0"/>
                                             <span t-field="o.name"/><br/>
                                             <span t-field="o.street"/><br t-if="o.street"/>
@@ -198,26 +213,34 @@
             </t>
         </template>
 
-        <record id="action_report_envelope_dle" model="ir.actions.report">
+        <record id="action_report_address_sheet_a4" model="ir.actions.report">
+            <field name="name">Address on A4 sheet</field>
+            <field name="model">res.partner</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">donation_merge.report_address_sheet_a4</field>
+            <field name="report_file">donation_merge.report_address_sheet_a4</field>
+            <field name="paperformat_id" ref="base.paperformat_euro"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <record id="action_report_address_envelope_dle" model="ir.actions.report">
             <field name="name">Envelope DLE (110x220 mm)</field>
             <field name="model">res.partner</field>
             <field name="report_type">qweb-pdf</field>
-            <field name="report_name">donation_merge.report_envelope_dle</field>
-            <field name="report_file">donation_merge.report_envelope_dle</field>
+            <field name="report_name">donation_merge.report_address_envelope_dle</field>
+            <field name="report_file">donation_merge.report_address_envelope_dle</field>
             <field name="paperformat_id" ref="donation_merge.paperformat_dle"/>
             <field name="binding_type">report</field>
-            <field name="attachment">Envelope DL.pdf</field>
         </record>
 
-        <record id="action_report_envelope_c5" model="ir.actions.report">
+        <record id="action_report_address_envelope_c5" model="ir.actions.report">
             <field name="name">Envelope C5</field>
             <field name="model">res.partner</field>
             <field name="report_type">qweb-pdf</field>
-            <field name="report_name">donation_merge.report_envelope_c5</field>
-            <field name="report_file">donation_merge.report_envelope_c5</field>
+            <field name="report_name">donation_merge.report_address_envelope_c5</field>
+            <field name="report_file">donation_merge.report_address_envelope_c5</field>
             <field name="paperformat_id" ref="donation_merge.paperformat_c5"/>
             <field name="binding_type">report</field>
-            <field name="attachment">Envelope C5.pdf</field>
         </record>
 
         <record id="action_report_donation_tax_receipt" model="ir.actions.report">
@@ -228,8 +251,6 @@
             <field name="report_file">donation_merge.report_donation_tax_receipt</field>
             <field name="paperformat_id" ref="donation_merge.paperformat_a5"/>
             <field name="binding_type">report</field>
-            <field name="attachment">Receipt to '+(object.partner_id.name)+'.pdf</field>
-            <!-- English only attachment name? -->
         </record>
 
         <record id="mail_template_donation_tax_receipt_english" model="mail.template">
@@ -284,24 +305,21 @@
             <field name="name">Send English Donation Receipts on Email</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">mail.compose.message</field>
-            <field name="src_model">donation.tax.receipt</field>
             <field name="target">new</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="mail.email_compose_message_wizard_form"/>
-            <field name="context">{'default_composition_mode': 'mass_mail', 'default_template_id': %('donation_merge.mail_template_donation_tax_receipt_english')s, 'default_use_template': True}</field>
-            <!-- ref('') ? -->
+            <field name="binding_model_id" ref="donation_base.model_donation_tax_receipt"/>
+            <field name="context" eval="{'default_composition_mode': 'mass_mail', 'default_template_id': ref('donation_merge.mail_template_donation_tax_receipt_english'), 'default_use_template': True}"/>
         </record>
         <record id="action_donation_tax_receipt_norwegian" model="ir.actions.act_window">
             <field name="name">Send Norwegian Donation Receipts on Email</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">mail.compose.message</field>
-            <field name="src_model">donation.tax.receipt</field>
             <field name="target">new</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="mail.email_compose_message_wizard_form"/>
-            <field name="context">{'default_composition_mode': 'mass_mail', 'default_template_id': %('donation_merge.mail_template_donation_tax_receipt_norwegian')s, 'default_use_template': True}</field>
-            <!-- ref('') ? -->
+            <field name="binding_model_id" ref="donation_base.model_donation_tax_receipt"/>
+            <field name="context" eval="{'default_composition_mode': 'mass_mail', 'default_template_id': ref('donation_merge.mail_template_donation_tax_receipt_norwegian'), 'default_use_template': True}"/>
         </record>
-        <!-- Context: Cannot get %('donation_merge.mail_template_donation_tax_receipt_english')s to database-id. -->
     </data>
 </odoo>
