@@ -132,15 +132,6 @@
             <field name="code">env['hr.payslip.line'].l10n_no_feriepenger()</field>
         </record>
 
-        <!-- man_months (hr.payslip.line) -->
-
-        <record id="action_l10n_no_man_months" model="ir.actions.server">
-            <field name="name">Beregn månedsverk</field>
-            <field name="model_id" ref="payroll.model_hr_payslip_line"/>
-            <field name="state">code</field>
-            <field name="code">env['hr.payslip.line'].recompute_man_months()</field>
-        </record>
-
         <!-- l10n_no_payroll.tabelltrekk -->
 
         <record model="ir.actions.server" id="action_l10n_no_import_tax_deduction">
@@ -169,11 +160,6 @@
                   sequence="22"
                   parent="menu_payroll_norway"
                   action="action_l10n_no_feriepenger"/>
-        <menuitem id="menu_payroll_norway_man_months"
-                  name="Beregn månedsverk"
-                  sequence="23"
-                  parent="menu_payroll_norway"
-                  action="action_l10n_no_man_months"/>
         <menuitem id="menu_l10n_no_import_tax_deduction"
                   name="Importer trekktabeler"
                   sequence="100"

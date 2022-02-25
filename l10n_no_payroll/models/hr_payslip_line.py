@@ -24,7 +24,3 @@ class HrPayslipLine(models.Model):
                     months_per_year = 12.0
                     hours_per_month = float(hours_per_week) * weeks_per_year / months_per_year
                     line.l10n_no_man_months = line.quantity * line.rate / 100.0 / hours_per_month
-
-    def recompute_man_months(self):
-        ids = [x.get('id') for x in self.search_read([], ['id'])]
-        self.env.all.tocompute[self._fields['l10n_no_man_months']].update(ids)
