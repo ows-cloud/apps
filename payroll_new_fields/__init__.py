@@ -1,1 +1,1 @@
-from . import models
+from . import hr_payslip_line
