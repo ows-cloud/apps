@@ -3,7 +3,7 @@
 
       <!-- hr.contract -->
 
-        <record model="ir.ui.view" id="view_hr_contract_form">
+        <record model="ir.ui.view" id="hr_contract_view_form">
             <field name="name">hr.contract.form.hr_professional</field>
             <field name="model">hr.contract</field>
             <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
@@ -108,7 +108,7 @@ domain="[('model','=','hr.job'),'|',('country_id','=',False),('country_id','=',c
 
         <!-- hr.leave.type -->
 
-        <record model="ir.ui.view" id="view_hr_leave_type_form">
+        <record model="ir.ui.view" id="hr_leave_type_view_form">
             <field name="name">hr.leave.type.form</field>
             <field name="model">hr.leave.type</field>
             <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/> 
@@ -143,10 +143,10 @@ domain="[('model','=','hr.leave.type'),'|',('country_id','=',False),('country_id
 
         <!-- hr.payslip -->
 
-        <record model="ir.ui.view" id="view_hr_payslip_form">
+        <record model="ir.ui.view" id="hr_payslip_view_form">
             <field name="name">hr.payslip.form field_value_ids</field>
             <field name="model">hr.payslip</field>
-            <field name="inherit_id" ref="payroll.view_hr_payslip_form"/>
+            <field name="inherit_id" ref="payroll.hr_payslip_view_form"/>
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='input_line_ids']" position="after">

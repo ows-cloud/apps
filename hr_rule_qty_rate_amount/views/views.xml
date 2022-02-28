@@ -33,7 +33,7 @@
         <record model="ir.ui.view" id="view_hr_payslip_form">
             <field name="name">hr.payslip.form qty_rate_amount_ids</field>
             <field name="model">hr.payslip</field>
-            <field name="inherit_id" ref="payroll.view_hr_payslip_form"/>
+            <field name="inherit_id" ref="payroll.hr_payslip_view_form"/>
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='input_line_ids']" position="after">

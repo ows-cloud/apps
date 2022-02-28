@@ -12,10 +12,12 @@
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',
-        'data/data.xml',
         'data/res.field.csv',
         'data/res.field.selection_value.csv',
         'execute_functions.xml',
+    ],
+    "demo": [
+        "demo/hr.salary.rule.xml",
     ],
     'depends': [
         'hr_field_value',

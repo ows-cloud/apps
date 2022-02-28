@@ -17,7 +17,7 @@
                     <field name="quantity" />
                     <field name="rate" />
                     <field name="amount" />
-                    <field name="total" />
+                    <field name="total" sum="Total" />
                     <field name="amount_select" invisible="1" />
                     <field name="register_id" invisible="1" />
                     <field name="date_from"/>
