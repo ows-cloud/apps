@@ -324,14 +324,17 @@ class MulticompanySecurity(models.AbstractModel):
         # Returning an error value to _register_hook will be ignored (see loading.py).
         if not self.env.user.has_group('base.group_system'):
             return False
+        # Takes a long time if there are many records without company_id
         self._set_company_id_where_null()
         self._update_rule_domains_to_1_where_false_except_partner()
         self._set_global_security_rules_on_all_models_except_ir_rule()
-        # So time consuming. Takes 23 seconds, while global rules take 5 seconds to update.
-        # self._set_read_and_edit_access_to_company_manager_on_models_with_company_data()
         self._update_code_to_comply_with_safe_eval()
         self._update_system_records()
         return True
+
+    def set_company_manager_security(self):
+        # So time consuming. Takes 23 seconds, while global rules take 5 seconds to update.
+        self._set_read_and_edit_access_to_company_manager()
 
     def _set_global_security_rules_on_all_models_except_ir_rule(self):
         _logger.info('Starting _set_global_security_rules_on_all_models_except_ir_rule')
@@ -353,29 +356,38 @@ class MulticompanySecurity(models.AbstractModel):
                 )
                 self._set_record_values('ir.rule', domain, values, xmlid_name)
 
-    def _set_read_and_edit_access_to_company_manager_on_models_with_company_data(self):
-        _logger.info('Starting _set_read_and_edit_access_to_company_manager_on_models_with_company_data')
+    def _set_read_and_edit_access_to_company_manager(self):
+        # Read and edit access on models with company data.
+        # Read access on NO_EDIT_MODELs.
+        _logger.info('Starting _set_read_and_edit_access_to_company_manager')
         group_company_manager_id = self.env.ref('multicompany_base.group_company_manager').id
-        models_to_exclude = NO_EDIT_MODEL + NO_ACCESS_MODEL + ['ir.rule']
+        models_to_exclude = NO_ACCESS_MODEL + ['ir.rule']
         models = self.env['ir.model'].search([('model', 'not in', models_to_exclude)])
         for model in models:
+            if model.model in NO_EDIT_MODEL:
+                security_do_if = 'read_if'
+            else:
+                security_do_if = 'read_and_edit_if'
             # ir.model.access
-            values = copy.deepcopy(SECURITY_DO_IF['read_and_edit_if'])
+            values = copy.deepcopy(SECURITY_DO_IF[security_do_if])
             values['group_id'] = group_company_manager_id
             values['model_id'] = model.id
-            values['name'] = '{model} - company manager'.format(model=model.model)
-            domain = domain = [('name', '=', values['name']), ('model_id', '=', values['model_id']), ('group_id', '=', values['group_id'])]
+            values['name'] = '{model} - company manager, {security_do_if}'.format(model=model.model, security_do_if=security_do_if)
+            domain = [('name', '=', values['name']), ('model_id', '=', values['model_id']), ('group_id', '=', values['group_id'])]
             xmlid_name = '{model}_company_manager_access'.format(
                 model=model.model.replace('.','_'),
             )
             self._set_record_values('ir.model.access', domain, values, xmlid_name)
             # ir.rule
+            if model.model in NO_EDIT_MODEL:
+                # only system records, no need for company rule
+                continue
             values = copy.deepcopy(SECURITY_DO_IF['read_and_edit_if'])
             values['groups'] = [(4, group_company_manager_id), 0]
             values['model_id'] = model.id
             values['domain_force'] = "[(1, '=', 1)]"
             values['name'] = '{model} - company manager'.format(model=model.model)
-            domain = domain = [('name', '=', values['name']), ('model_id', '=', values['model_id']), ('groups', 'in', [group_company_manager_id])]
+            domain = [('name', '=', values['name']), ('model_id', '=', values['model_id']), ('groups', 'in', [group_company_manager_id])]
             xmlid_name = '{model}_company_manager_rule'.format(
                 model=model.model.replace('.','_'),
             )
@@ -475,7 +487,6 @@ class MulticompanySecurity(models.AbstractModel):
 
         all_models = self.env['ir.model'].search([])
         for model in all_models:
-            _logger.debug(model.model)
             if not self.env[model.model]._auto:
                 continue
             if model.model == 'ir.model.fields':
@@ -537,7 +548,7 @@ class MulticompanySecurity(models.AbstractModel):
             for related_model_name, ids in related_models_and_record_ids.items():
 
                 related_record_ids =  [tup[1] for tup in ids if tup[1]]
-                related_records = self.env[related_model_name].browse(related_record_ids)
+                related_records = self.env[related_model_name].sudo().browse(related_record_ids)
                 related_companies = related_records.mapped('company_id')
                 for related_company in related_companies:
                     related_records_with_this_company = related_records.filtered(lambda r: r.company_id == related_company)
