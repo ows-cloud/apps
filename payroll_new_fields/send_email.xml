@@ -6,8 +6,9 @@
         <record id="mail_template_hr_payslip" model="mail.template">
             <field name="name">Send payslip by email</field>
             <field name="model_id" ref="payroll.model_hr_payslip"/>
-            <field name="email_from">${user.email_formatted | safe}</field>
-            <field name="partner_to">${object.employee_id.address_home_id.email}</field>
+            <field name="email_from">${user.employee_id.work_email}</field>
+            <field name="email_to">${object.employee_id.address_home_id.email}</field>
+            <field name="reply_to">${user.employee_id.work_email}</field>
             <field name="subject">Salary for ${object.payslip_run_id.name} from ${object.company_id.name}</field>
             <field name="body_html" type="html">
     <div style="margin: 0px; padding: 0px;">
