@@ -199,6 +199,19 @@ index a11ddef1..f0b883e0 100644
          res['website'] = is_frontend and Website.get_current_website() or Website
          return res
  
+diff --git a/addons/website_livechat/__manifest__.py b/addons/website_livechat/__manifest__.py
+index 0eb1eb3d..fff647d2 100644
+--- a/addons/website_livechat/__manifest__.py
++++ b/addons/website_livechat/__manifest__.py
+@@ -10,7 +10,7 @@ Allow website visitors to chat with the collaborators. This module also brings a
+     'depends': ['website', 'im_livechat'],
+     'installable': True,
+     'application': False,
+-    'auto_install': True,
++    'auto_install': False,
+     'data': [
+         'views/assets.xml',
+         'views/website_livechat.xml',
 diff --git a/addons/website_sale/models/website.py b/addons/website_sale/models/website.py
 index 007325f9..27c1af3b 100644
 --- a/addons/website_sale/models/website.py
@@ -226,10 +239,10 @@ index bdc3d0b1..36463b9e 100644
  from . import ir_model
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 00000000..94b5b828
+index 00000000..0dbf1581
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
-@@ -0,0 +1,132 @@
+@@ -0,0 +1,136 @@
 +from odoo import api, fields, models
 +from odoo.exceptions import UserError
 +from . import ir_model
@@ -355,13 +368,17 @@ index 00000000..94b5b828
 +    """
 +
 +    def record_company(self):
-+        company = self.sudo().mapped('company_id')
++        try:
++            company = self.sudo().mapped('company_id')
++        except:
++            return
 +        if len(company) == 1:
 +            if company in self.env.user.company_ids:
 +                return company
 +
 +    def with_record_company(self):
-+        return self.with_company(self.record_company())
++        company = self.record_company()
++        return self.with_company(company) if company else self
 diff --git a/odoo/addons/base/models/res_company.py b/odoo/addons/base/models/res_company.py
 index 3b20cb9d..854d752f 100644
 --- a/odoo/addons/base/models/res_company.py
