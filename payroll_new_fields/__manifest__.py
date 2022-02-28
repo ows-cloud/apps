@@ -9,7 +9,8 @@
     'auto_install': True,
     'category': 'Uncategorized',
     'data': [
-        'views.xml',
+        'hr.payslip.line.xml',
+        'send_email.xml',
     ],
     'depends': ['payroll'],
     'license': 'AGPL-3',
