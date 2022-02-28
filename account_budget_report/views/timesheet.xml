@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_search" model="ir.ui.view">
+            <field name="name">BETA TIMESHEET SEARCH</field>
+            <field name="model">account.budget.line</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <search>
+                    <filter string="Date" name="filter_date" date="date" default_period="last_30_days"/>
+                    <separator/>
+                    <filter string="My Hours" name="filter_uid" domain="[('create_uid','=',uid)]"/>
+                    
+                    <group expand="0" string="Group By">
+                      <filter string="Date" name="date" domain="[]" context="{'group_by':'date'}" help="Date"/>
+                      <filter string="User" name="create_uid" domain="[]" context="{'group_by':'create_uid'}"/>
+                      <filter string="Analytic Account" name="analytic_account_id" domain="[]" context="{'group_by':'analytic_account_id'}"/>
+                    </group>
+                  </search>
+            </field>
+        </record>
+        <record id="view_pivot" model="ir.ui.view">
+            <field name="name">BETA TIMESHEET PIVOT</field>
+            <field name="model">account.budget.line</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <pivot>
+                    <field name="balance" string="Hours" type="measure"/>
+                    <field name="date" type="row" interval="week"/>
+                    <field name="analytic_account_id" type="row"/>
+                  </pivot>
+            </field>
+        </record>
+        <record id="view_tree" model="ir.ui.view">
+            <field name="name">BETA TIMESHEET TREE</field>
+            <field name="model">account.budget.line</field>
+            <field name="priority" eval="20"/>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="crossovered_budget_id" invisible="1"/>
+                    <field name="write_uid" invisible="1"/>
+                    <field name="date"/>
+                    <field name="analytic_account_id" options="{'no_create': True, 'no_create_edit': True}" domain="[('name', 'not like', '~%')]"/>
+                    <field name="crossovered_budget_id"/>
+                    <field name="create_uid"/>
+                    <field name="balance" string="Hours"/>
+                  </tree>
+            </field>
+        </record>
+        <!--
+            window action
+            <field name="name">TIMESHEET HOURS"</field>
+            <field name="res_model">account.budget.line</field>
+            <field name="view_mode">tree,pivot</field>
+            <field name="domain">[('account_id', '=', False), ('crossovered_budget_id', '=', 18)]</field>
+            <field name="context">{'default_crossovered_budget_id': 18, 'search_default_filter_date': 1, 'search_default_filter_uid': 1}</field>
+            <field name="view_ids">CONNECT WITH TREE AND PIVOT</field>
+
+            menuitem
+            Employees/BETA TIMESHEET
+        -->
+    </data>
+</odoo>
