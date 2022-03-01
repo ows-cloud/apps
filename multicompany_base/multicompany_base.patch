@@ -62,6 +62,20 @@ index 4ecd87d3..abf774ff 100644
          try:
              records.check_access_rule('read')
              records.check_access_rights('read')
+diff --git a/addons/mail/models/mail_thread.py b/addons/mail/models/mail_thread.py
+index cf65e469..0f59894b 100644
+--- a/addons/mail/models/mail_thread.py
++++ b/addons/mail/models/mail_thread.py
+@@ -1052,6 +1052,9 @@ class MailThread(models.AbstractModel):
+             # disabled subscriptions during message_new/update to avoid having the system user running the
+             # email gateway become a follower of all inbound messages
+             ModelCtx = Model.with_user(related_user).sudo()
++            if alias: 
++                # TODO: check if alias has company_id field
++                ModelCtx = ModelCtx.with_company(alias.company_id)
+             if thread_id and hasattr(ModelCtx, 'message_update'):
+                 thread = ModelCtx.browse(thread_id)
+                 thread.message_update(message_dict)
 diff --git a/addons/mail/models/update.py b/addons/mail/models/update.py
 index edf5b4f2..9be029ec 100644
 --- a/addons/mail/models/update.py
