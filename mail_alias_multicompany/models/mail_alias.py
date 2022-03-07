@@ -38,8 +38,8 @@ class Alias(models.Model):
         require_alias_company_name = self.env['ir.config_parameter'].sudo().get_param('mail_alias_multicompany.require_alias_company_name')
         if require_alias_company_name in ('1', 't', 'true', 'True'):
             company = self.env['res.company'].browse(company_id)
-            # TODO: Raise UserError
-            assert company.alias_company_name, "ERROR in _set_alias_name_with_alias_company_name_if_required. Please set a company alias name."
+            if not company.alias_company_name:
+                raise UserError("ERROR in _set_alias_name_with_alias_company_name_if_required. Please edit the company: set a company alias name.")
             length = len(company.alias_company_name) + 1
             if not alias_name[-length:] == '.' + company.alias_company_name:
                 vals_dict['alias_name'] = alias_name + '.' + company.alias_company_name
