@@ -5,6 +5,7 @@ from datetime import datetime
 import logging
 _logger = logging.getLogger(__name__)
 
+
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
 
@@ -78,6 +79,14 @@ class HrPayslip(models.Model):
                     'date_to': date,
                 })
 
+        # TODO: Move to l10n_no_payroll
+        loennsart_fp_i_aar = self.env['res.field.value'].search(
+            [('model','=','res.company'),('field_id','=',self.env.ref('l10n_no_payroll.res_field_l10n_no_loennsart_fp_i_aar').id)]
+        ).ensure_one().reference_value
+        loennsart_fp_i_fjor = self.env['res.field.value'].search(
+            [('model','=','res.company'),('field_id','=',self.env.ref('l10n_no_payroll.res_field_l10n_no_loennsart_fp_i_fjor').id)]
+        ).ensure_one().reference_value
+
         # create one account.move per journal/month
         # update payslip.move_id & payslip.date
         precision = self.env['decimal.precision'].precision_get('Payroll')
@@ -110,6 +119,14 @@ class HrPayslip(models.Model):
                         continue
 
                     def _add(new_amount, new_account, new_partner_id=False):
+                        # Also using these variables:
+                        # precision
+                        # line
+                        # contract_analytic_account_id
+                        # name
+                        # slip
+                        # group
+                        # account_move_lines
                         new_amount = float_round(new_amount, precision_digits=precision)
                         if new_account.user_type_id.include_initial_balance:
                             new_analytic_account_id = None
@@ -164,6 +181,7 @@ class HrPayslip(models.Model):
 
                         aga = float(c_field['l10n_no_Grunnlagsprosent']) / 100.0
                         fp = float(c_field['l10n_no_fp_prosent']) / 100.0
+                        fp_senior = float(c_field['l10n_no_fp_prosent_senior']) / 100.0
 
                         beregn_aga = line.salary_rule_id.field_value_ids.filtered(lambda x: x.field_code == 'l10n_no_BeregnAga')
                         if beregn_aga:
@@ -177,10 +195,18 @@ class HrPayslip(models.Model):
                             _add(amount * aga, c_field['l10n_no_aga_konto'])
                             _add(-amount * aga, c_field['l10n_no_aga_motkonto'])
                         if beregn_fp:
+                            year = line.slip_id.date_to.year
+                            birthyear = line.employee_id.birthday.year
+                            if year - birthyear >= 59:
+                                fp = fp_senior
                             _add(amount * fp, c_field['l10n_no_fp_konto'])
                             _add(-amount * fp, c_field['l10n_no_fp_motkonto'])
                             _add(amount * aga * fp, c_field['l10n_no_aga_fp_konto'])
                             _add(-amount * aga * fp, c_field['l10n_no_aga_fp_motkonto'])
+
+                        if line.salary_rule_id in (loennsart_fp_i_aar, loennsart_fp_i_fjor):
+                            _add(-amount * aga, c_field['l10n_no_aga_fp_konto'])
+                            _add(amount * aga, c_field['l10n_no_aga_fp_motkonto'])
 
             if not float_is_zero(total, precision_digits=precision):
                 acc_journal = self.env['account.journal'].browse(group['journal_id'])
