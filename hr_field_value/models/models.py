@@ -86,6 +86,23 @@ class HrPayslip(models.Model):
                                       domain=[('model', '=', 'hr.payslip')], context={'default_model': 'hr.payslip'}, copy=True)
 
 
+class HrPayslipRun(models.Model):
+    _inherit = 'hr.payslip.run'
+
+    @api.model
+    def _compute_default_field_value_ids(self):
+        result = []
+        records = self.env['res.field'].search([('model', '=', 'hr.payslip.run'), ('auto_create', '=', True),
+                                                '|', ('country_id', '=', False), ('country_id', '=', self.env.company.partner_id.country_id.id)])
+        for record in records:
+            result.append((0, 0, {'model': 'hr.payslip.run', 'company_id': self.env.company.id,
+                                  'field_id': record.id, 'value': record.default_value, 'field_data_type': record.data_type}))
+        return result
+
+    field_value_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
+                                      domain=[('model', '=', 'hr.payslip.run')], context={'default_model': 'hr.payslip.run'}, copy=True)
+
+
 class HrSalaryRule(models.Model):
     _inherit = 'hr.salary.rule'
 
