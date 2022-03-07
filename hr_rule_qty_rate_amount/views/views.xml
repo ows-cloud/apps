@@ -72,6 +72,9 @@
                     <field name="condition_select" position="after">
                         <field name="qty_rate_amount_from" attrs="{'invisible':[('condition_select', '!=', 'python')]}"/>
                     </field>
+                    <field name="company_id" position="after">
+                        <button name="convert_rule" type="object" string="Convert Rule" groups="base.group_no_one"/>
+                    </field>
                 </data>
             </field>
         </record>

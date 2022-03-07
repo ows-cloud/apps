@@ -8,6 +8,23 @@ class HrPayslip(models.Model):
                                           context={'default_model': 'hr.payslip'},
                                           copy=True)
 
+    # TODO: make payroll PR (set employee contract)
+    def get_payslip_vals(
+        self, date_from, date_to, employee_id=False, contract_id=False
+    ):
+        res = super(HrPayslip, self).get_payslip_vals(date_from, date_to, employee_id, contract_id)
+        if employee_id and not res['value'].get('contract_id'):
+            employee = employee = self.env["hr.employee"].browse(employee_id)
+            contract_ids = employee._get_contracts(
+                date_from=date_from, date_to=date_to
+            ).ids
+            if len(contract_ids) == 1:
+                contract = self.env["hr.contract"].browse(contract_ids[0])
+                res["value"].update({"contract_id": contract.id})
+                if contract.struct_id:
+                    res["value"].update({"struct_id": contract.struct_id.id})
+        return res
+
     # Changes are done only in the contracts loop
     @api.model
     def _get_payslip_lines(self, contract_ids, payslip_id):
@@ -118,13 +135,19 @@ class HrPayslip(models.Model):
                 localdict['result_qty'] = 1.0
                 localdict['result_rate'] = 100
                 localdict['result_analytic'] = None
+                localdict['result_name'] = None
                 localdict['result_list'] = None
                 #check if the rule can be applied
                 if rule._satisfy_condition(localdict) and rule.id not in blacklist:
                   #compute values for the payslip_line(s) of the rule
                   payslip_lines = rule._compute_rule(localdict)
                   for payslip_line in payslip_lines:
-                    amount, qty, rate, analytic_account_id = payslip_line
+                    amount = payslip_line['result']
+                    qty = payslip_line.get('result_qty') or 1.0
+                    rate = payslip_line.get('result_rate') or 100.0
+                    analytic_account_id = payslip_line.get('result_analytic') or False
+                    name = payslip_line.get('result_name') or rule.name
+
                     key = rule.code + '-' + str(contract.id) + '-' + str(analytic_account_id)
                     code_analytic = rule.code + '-' + str(analytic_account_id)
                     #check if there is already a rule computed with that code
@@ -140,7 +163,7 @@ class HrPayslip(models.Model):
                         'salary_rule_id': rule.id,
                         'contract_id': contract.id,
                         'analytic_account_id': analytic_account_id,
-                        'name': rule.name,
+                        'name': name,
                         'code': rule.code,
                         'category_id': rule.category_id.id,
                         'sequence': rule.sequence,

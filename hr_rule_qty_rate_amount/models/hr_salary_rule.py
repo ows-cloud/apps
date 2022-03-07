@@ -78,13 +78,25 @@ for record in records:
                 if localdict['result_list']:
                     return localdict['result_list']
                 else:
-                    return [(float(localdict['result']), \
-                        'result_qty' in localdict and localdict['result_qty'] or 1.0, \
-                        'result_rate' in localdict and localdict['result_rate'] or 100.0, \
-                        'result_analytic' in localdict and localdict['result_analytic'] or False
-                    )]
-            except:
-                raise UserError(_('Wrong python code defined for salary rule %s (%s).') % (self.name, self.code))
+                    return [{
+                        'result': float(localdict['result']),
+                        'result_qty': localdict.get('result_qty') or 1.0,
+                        'result_rate': localdict.get('result_rate') or 100.0,
+                        'result_analytic': localdict.get('result_analytic') or False,
+                        'result_name': localdict.get('result_name') or False,
+                    }]
+            except Exception as ex:
+                raise UserError(
+                    _(
+                        """
+Wrong python code defined for salary rule %s (%s).
+Here is the error received:
+
+%s
+"""
+                    )
+                    % (self.name, self.code, repr(ex))
+                )
 
     def _satisfy_condition(self, localdict):
         """
@@ -106,5 +118,32 @@ for record in records:
                 localdict['rule'] = self
                 safe_eval(self.condition_python, localdict, mode='exec', nocopy=True)
                 return 'result' in localdict and localdict['result'] or False
-            except:
-                raise UserError(_('Wrong python condition defined for salary rule %s (%s).') % (self.name, self.code))
+            except Exception as ex:
+                raise UserError(
+                    _(
+                        """
+Wrong python condition defined for salary rule %s (%s).
+Here is the error received:
+
+%s
+"""
+                    )
+                    % (self.name, self.code, repr(ex))
+                )
+
+    def convert_rule(self):
+        for rule in self:
+            # result_list.append((amount, record.quantity, record.rate, record.analytic_account_id.id))
+            text = rule.amount_python_compute
+            last_line = text.split('\n')[-1]
+            if '  result_list.append((' in last_line:
+                new = last_line
+                new = new.replace('  result_list.append((', '').replace('))', '')
+                words = new.split(', ')
+                assert len(words) == 4
+                new_last_line = "  result_list.append({{'result': {}, 'result_qty': {}, 'result_rate': {}, 'result_analytic': {}}})".format(
+                    words[0], words[1], words[2], words[3],
+                )
+                last_line = last_line.replace('result_list', '# result_list')
+                text_without_last_line = text[:text.rfind('\n')]
+                rule.amount_python_compute = text_without_last_line + '\n' + last_line + '\n' + new_last_line
