@@ -253,10 +253,10 @@ index bdc3d0b1..36463b9e 100644
  from . import ir_model
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 00000000..0dbf1581
+index 00000000..8c601bc4
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
-@@ -0,0 +1,136 @@
+@@ -0,0 +1,139 @@
 +from odoo import api, fields, models
 +from odoo.exceptions import UserError
 +from . import ir_model
@@ -355,13 +355,16 @@ index 00000000..0dbf1581
 +            return self.env.company
 +
 +    def _security_check_that_user_can_browse_all_relations(self, vals_dict):
++        model_exceptions = [
++            'ir.mail_server', # Send mail from a mail server which the user cannot access.
++        ]
 +        if not self.env.su:
 +            for (key, value) in vals_dict.items():
 +                field = self._fields[key]
 +                if field.type in ('many2one', 'many2one_reference', 'reference', 'char', 'one2many', 'many2many'):
 +                    model_name_res_id = _get_model_name_and_res_id(field, vals_dict)
 +                    for model_name, res_id in model_name_res_id:
-+                        if model_name and res_id:
++                        if model_name and res_id and model_name not in model_exceptions:
 +                            try:
 +                                # browse().field will give AccessError if the user cannot read the record.
 +                                # This is super important for security!
