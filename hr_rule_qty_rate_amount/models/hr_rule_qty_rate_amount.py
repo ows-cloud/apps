@@ -74,8 +74,8 @@ class HrRuleQtyRateAmount(models.Model):
         if months and round(months, 2) != 1.00:
             if uom:
                 uom = ' á {:.2f} {}'.format(result_dict[multiply_with], uom)
-                result_dict['result_name'] += " ({:.2f} months{})".format(months, uom)
-                result_dict[multiply_with] *= months
+            result_dict['result_name'] += " ({:.2f} months{})".format(months, uom)
+            result_dict[multiply_with] *= months
         if result_dict['result_qty'] == 0.0 or result_dict['result_rate'] == 0.0:
             result_dict['result'] = 0
         elif not result_dict['result']:
