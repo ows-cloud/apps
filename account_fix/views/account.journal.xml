@@ -7,11 +7,19 @@
     <field name="model">account.journal</field>
     <field name="inherit_id" ref="account.view_account_journal_form" />
     <field name="arch" type="xml">
-        <xpath expr="//page[@name='advanced_settings']/group" position="inside">
-            <group string="Sequence Numbers">
-                <field name="sequence_override_regex" groups="account.group_account_manager"/>
-            </group>
-        </xpath>
+        <data>
+            <xpath expr="//field[@name='default_account_id'][3]" position="attributes">
+                <attribute name="attrs">{'required': 0, 'invisible': [('type', '!=', 'sale')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='default_account_id'][4]" position="attributes">
+                <attribute name="attrs">{'required': 0, 'invisible': [('type', '!=', 'purchase')]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='advanced_settings']/group" position="inside">
+                <group string="Sequence Numbers">
+                    <field name="sequence_override_regex" groups="account.group_account_manager"/>
+                </group>
+            </xpath>
+        </data>
     </field>
 </record>
 
