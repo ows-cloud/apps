@@ -44,3 +44,45 @@ class HrRuleQtyRateAmount(models.Model):
         if 'res_id' in values and values['res_id'] == False:
             values.pop('res_id')
         return super(HrRuleQtyRateAmount, self).write(values)
+
+    def get_months(self, payslip, month_correction_field_name):
+        """ Method to use in hr.salary.rule python code """
+        months = 1
+        m = payslip.field_value_ids
+        if m:
+            m = m.filtered(lambda x: x.field_code == month_correction_field_name)
+        if m:
+            months += float(m.value)
+        return months
+
+    def get_result_dict(self, months, multiply_with, uom=None, default_amount=0):
+        """ Method to use in hr.salary.rule python code """
+        record = self.ensure_one()
+        result_dict = {
+            'result': record.amount,
+            'result_qty': record.quantity,
+            'result_rate': record.rate,
+            'result_analytic': record.analytic_account_id.id,
+            'result_name': record.salary_rule_id.name,
+        }
+        if round(months, 2) != 1.00:
+            if uom:
+                uom = ' á {:.2f} {}'.format(result_dict[multiply_with], uom)
+                result_dict['result_name'] += " ({:.2f} months{})".format(months, uom)
+                result_dict[multiply_with] *= months
+        if result_dict['result_qty'] == 0.0 or result_dict['result_rate'] == 0.0:
+            result_dict['result'] = 0
+        elif not result_dict['result']:
+            result_dict['result'] = default_amount
+        return result_dict
+
+    """
+    EXAMPLE CODE
+    default_amount = 3.50
+
+    result_list = []
+    records = contract.qty_rate_amount_ids.filtered(lambda x: x.salary_rule_id.id == rule.id)
+    for record in records:
+        months = record.get_months(payslip=payslip, month_correction_field_name='x_month_salary')
+        result_list.append(record.get_result_dict(months=months, multiply_with='result_qty', uom='km', default_amount=default_amount))
+    """
