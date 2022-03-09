@@ -55,8 +55,14 @@ class HrRuleQtyRateAmount(models.Model):
             months += float(m.value)
         return months
 
-    def get_result_dict(self, months, multiply_with, uom=None, default_amount=0):
-        """ Method to use in hr.salary.rule python code """
+    def get_result_dict(self, months=None, multiply_with=None, uom=None, default_amount=0):
+        """ Method to use in hr.salary.rule python code.
+
+        If # of months is not 1:
+            Set the 'months' and what to 'multiply_with' ('result_qty' or 'result_rate').
+            If 'uom' is set, the payslip line will include this text.
+        If record.amount is 0, use 'default_amount'.
+        """
         record = self.ensure_one()
         result_dict = {
             'result': record.amount,
@@ -65,7 +71,7 @@ class HrRuleQtyRateAmount(models.Model):
             'result_analytic': record.analytic_account_id.id,
             'result_name': record.salary_rule_id.name,
         }
-        if round(months, 2) != 1.00:
+        if months and round(months, 2) != 1.00:
             if uom:
                 uom = ' á {:.2f} {}'.format(result_dict[multiply_with], uom)
                 result_dict['result_name'] += " ({:.2f} months{})".format(months, uom)
