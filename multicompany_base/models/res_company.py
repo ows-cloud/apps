@@ -34,11 +34,11 @@ class Company(models.Model):
             model_name = model_record.model
             model = self.env[model_name]
             company_id_field_record = self.env['ir.model.fields'].search([('model', '=', model_name), ('name', '=', 'company_id')])
-            if not company_id_field_record or not company_id_field_record.store or not model._auto or model._inherits:
+            create_date_field_record = self.env['ir.model.fields'].search([('model', '=', model_name), ('name', '=', 'create_date')])
+            if not create_date_field_record or not company_id_field_record or not company_id_field_record.store or not model._auto or model._inherits:
                 continue
             table_name = model._table
-            sql = "SELECT company_id, '{}' as table_name, date_trunc('year', write_date) AS year, count(id) as no_of_records FROM {} GROUP BY company_id, year;".format(table_name, table_name)
-            _logger.info(sql)
+            sql = "SELECT company_id, '{}' as table_name, date_trunc('year', create_date) AS sql_year, count(id) as no_of_records FROM {} GROUP BY company_id, sql_year;".format(table_name, table_name)
             self.env.cr.execute(sql)
             sql_result = self.env.cr.fetchall()
             for row in sql_result:
