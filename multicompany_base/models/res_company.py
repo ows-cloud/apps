@@ -27,3 +27,20 @@ class Company(models.Model):
     def configure(self):
         companies = self
         self.env['multicompany.config']._configure_companies(companies)
+
+    def count_records(self):
+        csv = 'company_id,table_name,year,no_of_records\n'
+        for model_record in self.env['ir.model'].search([]):
+            model_name = model_record.model
+            model = self.env[model_name]
+            company_id_field_record = self.env['ir.model.fields'].search([('model', '=', model_name), ('name', '=', 'company_id')])
+            if not company_id_field_record or not company_id_field_record.store or not model._auto or model._inherits:
+                continue
+            table_name = model._table
+            sql = "SELECT company_id, '{}' as table_name, date_trunc('year', write_date) AS year, count(id) as no_of_records FROM {} GROUP BY company_id, year;".format(table_name, table_name)
+            _logger.info(sql)
+            self.env.cr.execute(sql)
+            sql_result = self.env.cr.fetchall()
+            for row in sql_result:
+                csv += "{},{},{},{}\n".format(row[0], row[1], str(row[2])[:4], row[3])
+        raise UserError(csv)
