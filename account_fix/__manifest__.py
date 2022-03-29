@@ -8,11 +8,15 @@
     'author': 'AppsToGROW',
     'category': 'Administration',
     'data': [
-        'views/account.group.xml',
+        'views/account.group.xml', # depends on account_financial_report
         'views/account.journal.xml',
         'views/account.move.xml',
+        'views/account.move.line.xml',
     ],
-    'depends': ['account'],
+    'depends': [
+        'account',
+        'account_financial_report',
+    ],
     'license': 'AGPL-3',
     'version': '14.0.1.0.0',
     'website': 'http://www.appstogrow.co',
