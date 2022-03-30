@@ -213,6 +213,18 @@ index a11ddef1..f0b883e0 100644
          res['website'] = is_frontend and Website.get_current_website() or Website
          return res
  
+diff --git a/addons/website/models/website.py b/addons/website/models/website.py
+index e4f485f4..67def917 100644
+--- a/addons/website/models/website.py
++++ b/addons/website/models/website.py
+@@ -299,6 +299,7 @@ class Website(models.Model):
+             new_menu = menu.copy({
+                 'parent_id': t_menu.id,
+                 'website_id': self.id,
++                'page_id': None,
+             })
+             for submenu in menu.child_id:
+                 copy_menu(submenu, new_menu)
 diff --git a/addons/website_livechat/__manifest__.py b/addons/website_livechat/__manifest__.py
 index 0eb1eb3d..fff647d2 100644
 --- a/addons/website_livechat/__manifest__.py
