@@ -39,6 +39,10 @@ COMPANY_READ_SYSTEM_MODEL = [
     'ir.ui.menu',
     'ir.ui.view',
     'mail.template',
+    'mis.report',
+    'mis.report.kpi',
+    'mis.report.style',
+    'mis.report.subreport',
     'res.field',                    # https://github.com/apps2grow/apps/tree/14.0/base_field_value
     'res.field.selection_value',    # https://github.com/apps2grow/apps/tree/14.0/base_field_value
     'stock.location',
