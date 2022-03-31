@@ -129,7 +129,7 @@ class MulticompanyConfig(models.AbstractModel):
             # self._copy_system_sequences_with_code(company.id)
             self._create_default_user(company.id)
             public_user = self._create_public_user(company.id)
-            self._create_website(company, public_user)
+            self._create_website_and_crm_team(company, public_user)
             # --------------------------------------------------
 
     def _prepare(self, company):
@@ -218,7 +218,7 @@ class MulticompanyConfig(models.AbstractModel):
         )
         return public_user
 
-    def _create_website(self, company, public_user):
+    def _create_website_and_crm_team(self, company, public_user):
         website_user_field = self._ref('website.field_website__user_id')
         if not website_user_field:
             return self
@@ -236,6 +236,17 @@ class MulticompanyConfig(models.AbstractModel):
         if website:
             if not company.website_id.id:
                 company.write({'website_id': website.id})
+            # crm.team
+            crm_team_field = self._ref('website_crm.field_website__crm_default_team_id')
+            if crm_team_field:
+                crm_team = self._insert_first_record(
+                    model='crm.team',
+                    search=[(1, '=', 1)],
+                    values={'company_id': company.id},
+                    copy='sales_team.salesteam_website_sales',
+                )
+                if not website.crm_default_team_id:
+                    website.crm_default_team_id = crm_team
         return website
 
     #
