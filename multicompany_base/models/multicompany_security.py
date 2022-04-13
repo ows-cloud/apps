@@ -20,7 +20,11 @@ COMPANIES_MODEL = [
 ]
 
 COMPANY_READ_SYSTEM_MODEL = [
+    'account.account.template',
     'account.account.type',
+    'account.chart.template',
+    'account.fiscal.position.template',
+    'account.tax.template',
     'ir.actions.act_url',
     'ir.actions.act_window',
     'ir.actions.act_window_close',

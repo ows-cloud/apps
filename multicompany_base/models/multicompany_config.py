@@ -127,9 +127,10 @@ class MulticompanyConfig(models.AbstractModel):
             # self._create_a_company_mail_channel_for_all_employees()
             # Bad idea to copy all system sequences with code
             # self._copy_system_sequences_with_code(company.id)
-            self._create_default_user(company.id)
-            public_user = self._create_public_user(company.id)
-            self._create_website_and_crm_team(company, public_user)
+            self._create_default_user()
+            public_user = self._create_public_user()
+            self._create_website_and_crm_team(public_user)
+            self._create_product_category()
             # --------------------------------------------------
 
     def _prepare(self, company):
@@ -163,7 +164,8 @@ class MulticompanyConfig(models.AbstractModel):
                 },
             )
 
-    def _copy_system_sequences_with_code(self, company_id):
+    def _copy_system_sequences_with_code(self):
+        company_id = self.env.company.id
         system_sequences_with_code = self._env('ir.sequence').sudo().search([('code', 'like', '_'), ('company_id', '=', SYSTEM_COMPANY_ID)])
         sequences_with_code = []
         for sequence in system_sequences_with_code:
@@ -174,14 +176,14 @@ class MulticompanyConfig(models.AbstractModel):
                     search=[('code', '=', sequence.code)],
                     values={
                         'number_next': 1,
-                        'company_id': company_id,
                     },
                     copy='ir.sequence,' + str(sequence.id),
                 )
             )
         return sequences_with_code
 
-    def _create_default_user(self, company_id):
+    def _create_default_user(self):
+        company_id = self.env.company.id
         default_user = self._insert_first_record(
             model='res.users',
             search=[
@@ -198,7 +200,8 @@ class MulticompanyConfig(models.AbstractModel):
         )
         return default_user
 
-    def _create_public_user(self, company_id):
+    def _create_public_user(self):
+        company_id = self.env.company.id
         public_user = self._insert_first_record(
             model='res.users',
             search=[
@@ -218,7 +221,8 @@ class MulticompanyConfig(models.AbstractModel):
         )
         return public_user
 
-    def _create_website_and_crm_team(self, company, public_user):
+    def _create_website_and_crm_team(self, public_user):
+        company = self.env.company
         website_user_field = self._ref('website.field_website__user_id')
         if not website_user_field:
             return self
@@ -241,19 +245,24 @@ class MulticompanyConfig(models.AbstractModel):
             if crm_team_field:
                 crm_team = self._insert_first_record(
                     model='crm.team',
-                    search=[(1, '=', 1)],
-                    values={'company_id': company.id},
                     copy='sales_team.salesteam_website_sales',
                 )
                 if not website.crm_default_team_id:
                     website.crm_default_team_id = crm_team
         return website
 
+    def _create_product_category(self):
+        product_category = self._insert_first_record(
+            model='product.category',
+            copy='product.product_category_all',
+        )
+        return product_category
+
     #
     # _insert_first_record and "blank" methods to use after failing to return a record(set).
     #
 
-    def _insert_first_record(self, model, search, values, copy=False):
+    def _insert_first_record(self, model, search=[(1, '=', 1)], values={}, copy=False):
         '''
         model (string): the model to insert the first record
         search (list):  the search domain to see if a record already exists
@@ -261,6 +270,7 @@ class MulticompanyConfig(models.AbstractModel):
         copy (string):  optional external reference or 'model,res_id' of an existing record to 'copy' (otherwise 'create')
         '''
         company_id = self.env.company.id
+        values['company_id'] = company_id
         search = ['&'] + search + ['|',('company_id','=',company_id),'|',('company_id','parent_of',company_id),('company_id','child_of',company_id)]
         records = self._env(model).search(search)
         if not records.exists():
