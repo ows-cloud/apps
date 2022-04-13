@@ -272,7 +272,7 @@ class MulticompanyConfig(models.AbstractModel):
                 record = self._env(model).sudo().browse(int(res_id)).copy(values)
                 return record
             else:
-                record = self._ref(copy).sudo().copy(values)
+                record = self.sudo()._ref(copy).copy(values)
                 return record
         else:
             record_count = self._env(model).with_context(active_test=False).search_count(search)
