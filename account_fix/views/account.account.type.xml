@@ -10,6 +10,7 @@
         <data>
             <field name="type" position="after">
                 <field name="internal_group"/>
+                <field name="company_id" groups="base.group_multi_company"/>
             </field>
         </data>
     </field>
