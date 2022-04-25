@@ -602,7 +602,7 @@ index f60bb5e9..ae6bbc93 100644
 +        # value = list of safe exceptions
 +        unsafe_except = {
 +            'cache': [],
-+            '.cr': ['.create'],
++            '.cr': ['.create', '.credit'],
 +            '._cr': ['._cron'],
 +            '.execute': [],
 +            '._execute': [],
