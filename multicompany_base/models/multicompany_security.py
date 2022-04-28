@@ -45,6 +45,7 @@ COMPANY_READ_SYSTEM_MODEL = [
     'mail.template',
     'mis.report',
     'mis.report.kpi',
+    'mis.report.kpi.expression',
     'mis.report.style',
     'mis.report.subreport',
     'res.field',                    # https://github.com/apps2grow/apps/tree/14.0/base_field_value
