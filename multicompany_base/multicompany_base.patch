@@ -509,15 +509,18 @@ index 34f35ac8..61cefe77 100644
      def _update_last_login(self):
          # only create new records to avoid any side-effect on concurrent transactions
 diff --git a/odoo/api.py b/odoo/api.py
-index 606a06e7..562ec6a8 100644
+index 606a06e7..3404ce1a 100644
 --- a/odoo/api.py
 +++ b/odoo/api.py
-@@ -511,7 +511,7 @@ class Environment(Mapping):
+@@ -511,7 +511,10 @@ class Environment(Mapping):
  
      def ref(self, xml_id, raise_if_not_found=True):
          """Return the record corresponding to the given ``xml_id``."""
 -        return self['ir.model.data'].xmlid_to_object(xml_id, raise_if_not_found=raise_if_not_found)
-+        return self['ir.model.data'].xmlid_to_object(xml_id, raise_if_not_found=raise_if_not_found).access_control(raise_if_access_error=raise_if_not_found)
++        result = self['ir.model.data'].xmlid_to_object(xml_id, raise_if_not_found=raise_if_not_found)
++        if result:
++            return result.access_control(raise_if_access_error=raise_if_not_found)
++        return result
  
      def is_superuser(self):
          """ Return whether the environment is in superuser mode. """
