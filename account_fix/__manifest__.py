@@ -13,6 +13,7 @@
         'views/account.journal.xml',
         'views/account.move.xml',
         'views/account.move.line.xml',
+        'views/res.company.xml',
     ],
     'depends': [
         'account',
