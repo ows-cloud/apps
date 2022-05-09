@@ -25,6 +25,7 @@ COMPANY_READ_SYSTEM_MODEL = [
     'account.chart.template',
     'account.fiscal.position.template',
     'account.tax.template',
+    'crm.team', # to avoid error: access_control() failed
     'ir.actions.act_url',
     'ir.actions.act_window',
     'ir.actions.act_window_close',
@@ -50,6 +51,7 @@ COMPANY_READ_SYSTEM_MODEL = [
     'mis.report.subreport',
     'res.field',                    # https://github.com/apps2grow/apps/tree/14.0/base_field_value
     'res.field.selection_value',    # https://github.com/apps2grow/apps/tree/14.0/base_field_value
+    'res.partner', # to avoid error: access_control() failed
     'stock.location',
     'uom.uom',
     'website.menu',
