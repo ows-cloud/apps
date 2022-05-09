@@ -51,7 +51,7 @@ COMPANY_READ_SYSTEM_MODEL = [
     'mis.report.subreport',
     'res.field',                    # https://github.com/apps2grow/apps/tree/14.0/base_field_value
     'res.field.selection_value',    # https://github.com/apps2grow/apps/tree/14.0/base_field_value
-    'res.partner', # to avoid error: access_control() failed
+    # 'res.partner', # to avoid error: access_control() failed - res.partner has a separate configuration below
     'stock.location',
     'uom.uom',
     'website.menu',
@@ -158,7 +158,7 @@ SECURITY_RULE = {
     },
     # read partners of users with access to the company, otherwise cannot read the users
     'RES_PARTNER_MODEL': {
-        'read_if': 'company_ids_in_company_ids OR in_companies/parent/child',
+        'read_if': 'system_company OR company_ids_in_company_ids OR in_companies/parent/child',
         'edit_if': 'in_company AND in_companies',
     },
     # read users with access to the company
