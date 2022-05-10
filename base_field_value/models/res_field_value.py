@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 from datetime import datetime
 import logging
 _logger = logging.getLogger(__name__)
@@ -164,6 +165,13 @@ class ResFieldValue(models.Model):
     _name = 'res.field.value'
     _description = 'Field Value'
 
+    @api.model
+    def _compute_default_model(self):
+        try:
+            return self.env.context['params']['model']
+        except:
+            raise UserError('Please save changes, then refresh the page (F5).')
+
     field_id = fields.Many2one('res.field', string="Field", required=True, index=True, ondelete='restrict')
     field_code = fields.Char(string='Code', related='field_id.code', store=False, readonly=True)
     field_app = fields.Selection(string='Application', related='field_id.app', store=False, readonly=True)
@@ -172,7 +180,7 @@ class ResFieldValue(models.Model):
     selection_value_id = fields.Many2one('res.field.selection_value', string='Selection')
     reference_value = fields.Reference('_get_reference_model', string="Reference")
     value = fields.Char()
-    model = fields.Char(required=True, readonly=True, index=True)
+    model = fields.Char(required=True, readonly=True, index=True, default=_compute_default_model)
     res_id = fields.Integer(required=True, readonly=True, index=True, ondelete='restrict') # '''ondelete SHOULD NOT be 'cascade', see the write method''')
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, store=True, index=True, default=lambda self: self.env.company)
     company_country_id = fields.Many2one('res.country', string='Company Country', related='company_id.country_id', store=False, readonly=True)
@@ -239,7 +247,7 @@ class ResCompany(models.Model):
         return result
         
     field_value_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
-        domain=[('model','=','res.company')], context={'default_model': 'res.company'}, copy=True)
+        domain=[('model','=','res.company')], copy=True)
 
 class ResUsers(models.Model):
     _inherit = 'res.users'
@@ -255,5 +263,5 @@ class ResUsers(models.Model):
         return result
         
     field_value_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
-        domain=[('model','=','res.users')], context={'default_model': 'res.users'}, copy=True)
+        domain=[('model','=','res.users')], copy=True)
 '''

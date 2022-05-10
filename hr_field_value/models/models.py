@@ -15,7 +15,7 @@ class HrContract(models.Model):
         return result
 
     field_value_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
-                                      domain=[('model', '=', 'hr.contract')], context={'default_model': 'hr.contract'}, copy=True)
+                                      domain=[('model', '=', 'hr.contract')], copy=True)
 
 
 class HrEmployee(models.Model):
@@ -32,7 +32,7 @@ class HrEmployee(models.Model):
         return result
 
     field_value_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
-                                      domain=[('model', '=', 'hr.employee')], context={'default_model': 'hr.employee'}, copy=True)
+                                      domain=[('model', '=', 'hr.employee')], copy=True)
 
 
 class HrJob(models.Model):
@@ -49,7 +49,7 @@ class HrJob(models.Model):
         return result
 
     field_value_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
-                                      domain=[('model', '=', 'hr.job')], context={'default_model': 'hr.job'}, copy=True)
+                                      domain=[('model', '=', 'hr.job')], copy=True)
 
 
 class HrLeaveType(models.Model):
@@ -66,7 +66,7 @@ class HrLeaveType(models.Model):
         return result
 
     field_value_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
-                                      domain=[('model', '=', 'hr.leave.type')], context={'default_model': 'hr.leave.type'}, copy=True)
+                                      domain=[('model', '=', 'hr.leave.type')], copy=True)
 
 
 class HrPayslip(models.Model):
@@ -83,7 +83,7 @@ class HrPayslip(models.Model):
         return result
 
     field_value_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
-                                      domain=[('model', '=', 'hr.payslip')], context={'default_model': 'hr.payslip'}, copy=True)
+                                      domain=[('model', '=', 'hr.payslip')], copy=True)
 
 
 class HrPayslipRun(models.Model):
@@ -100,7 +100,7 @@ class HrPayslipRun(models.Model):
         return result
 
     field_value_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
-                                      domain=[('model', '=', 'hr.payslip.run')], context={'default_model': 'hr.payslip.run'}, copy=True)
+                                      domain=[('model', '=', 'hr.payslip.run')], copy=True)
 
 
 class HrSalaryRule(models.Model):
@@ -117,7 +117,7 @@ class HrSalaryRule(models.Model):
         return result
 
     field_value_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
-                                      domain=[('model', '=', 'hr.salary.rule')], context={'default_model': 'hr.salary.rule'}, copy=True)
+                                      domain=[('model', '=', 'hr.salary.rule')], copy=True)
 
 
 class ResCompany(models.Model):
@@ -134,4 +134,4 @@ class ResCompany(models.Model):
         return result
 
     field_value_hr_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
-                                         domain=[('model', '=', 'res.company'), ('field_app', '=like', 'hr%')], context={'default_model': 'res.company', 'default_field_app': 'hr'}, copy=True)
+                                         domain=[('model', '=', 'res.company'), ('field_app', '=like', 'hr%')], copy=True)
