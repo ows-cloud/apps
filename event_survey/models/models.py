@@ -22,15 +22,15 @@ class EventEvent(models.Model):
     registration_validation_action_id = fields.Many2one('ir.actions.server', "Validation Action")
 
     # copied from website_event/models/event.py 12.0
-    is_participating = fields.Boolean("Is Participating", compute="_compute_is_participating")
-    def _compute_is_participating(self):
-        # we don't allow public user to see participating label
-        if self.env.user != self.env['website'].get_current_website().user_id:
-            email = self.env.user.partner_id.email
-            for event in self:
-                domain = ['&','&', '|', ('email', '=', email), ('partner_id', '=', self.env.user.partner_id.id),
-                          ('event_id', '=', event.id), ('state', '!=', 'cancel')]
-                event.is_participating = self.env['event.registration'].sudo().search_count(domain)
+    # is_participating = fields.Boolean("Is Participating", compute="_compute_is_participating")
+    # def _compute_is_participating(self):
+    #     # we don't allow public user to see participating label
+    #     if self.env.user != self.env['website'].get_current_website().user_id:
+    #         email = self.env.user.partner_id.email
+    #         for event in self:
+    #             domain = ['&','&', '|', ('email', '=', email), ('partner_id', '=', self.env.user.partner_id.id),
+    #                       ('event_id', '=', event.id), ('state', '!=', 'cancel')]
+    #             event.is_participating = self.env['event.registration'].sudo().search_count(domain)
 
     _sql_constraints = [
         ('registration_survey_uniq', 'unique (registration_survey_id)', 'Each registration survey must be unique.'),
