@@ -222,6 +222,19 @@ index 00000000..117ef56a
 +    </record>
 +
 +</odoo>
+diff --git a/addons/point_of_sale/models/pos_config.py b/addons/point_of_sale/models/pos_config.py
+index 15c629e8..a3829669 100644
+--- a/addons/point_of_sale/models/pos_config.py
++++ b/addons/point_of_sale/models/pos_config.py
+@@ -654,6 +654,8 @@ class PosConfig(models.Model):
+     # a localisation installed
+     @api.model
+     def post_install_pos_localisation(self, companies=False):
++        if self.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
++            return
+         self = self.sudo()
+         if not companies:
+             companies = self.env['res.company'].search([])
 diff --git a/addons/product/models/product_template.py b/addons/product/models/product_template.py
 index 5bb5f477..754c8d6d 100644
 --- a/addons/product/models/product_template.py

@@ -12,6 +12,7 @@
                     <field name="currency_exchange_journal_id" groups="base.group_no_one"/>
                     <field name="income_currency_exchange_account_id" groups="base.group_no_one"/>
                     <field name="expense_currency_exchange_account_id" groups="base.group_no_one"/>
+                    <field name="account_default_pos_receivable_account_id" groups="base.group_no_one"/>
                 </field>
             </data>
         </field>
