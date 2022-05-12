@@ -581,7 +581,7 @@ class MulticompanySecurity(models.AbstractModel):
         ir_model_contact = self.env.ref('base.model_res_partner')
         rules = self.env['ir.rule'].search([('domain_force', 'like', 'company%False'), ('model_id', '!=', ir_model_contact.id)])
         for rule in rules:
-            domain = rule.domain_force.strip('] [')
+            domain = rule.domain_force.strip('[] \n')
             domain_list = domain.split(',')
             false_in_domain_list = [count for count, str in enumerate(domain_list) if 'False' in str]
             for false_position in false_in_domain_list:
