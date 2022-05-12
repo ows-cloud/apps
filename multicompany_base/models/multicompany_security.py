@@ -59,6 +59,7 @@ COMPANY_READ_SYSTEM_MODEL = [
 
 NO_EDIT_MODEL = [
     # BASE, IR, RES
+    'base.automation',
     'base.language.export',
     'base.language.import',
     'base.language.install',
