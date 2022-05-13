@@ -24,6 +24,7 @@ COMPANY_READ_SYSTEM_MODEL = [
     'account.account.type',
     'account.chart.template',
     'account.fiscal.position.template',
+    'account.payment.term', # to avoid error with ref('account.account_payment_term_immediate').sudo() in website_sale
     'account.tax.template',
     'crm.team', # to avoid error: access_control() failed
     'ir.actions.act_url',
