@@ -180,7 +180,8 @@ class ResFieldValue(models.Model):
     selection_value_id = fields.Many2one('res.field.selection_value', string='Selection')
     reference_value = fields.Reference('_get_reference_model', string="Reference")
     value = fields.Char()
-    model = fields.Char(required=True, readonly=True, index=True, default=_compute_default_model)
+    # readonly temporarily False, because _compute_default_model doesn't happen on hr.contract and hr.payslip
+    model = fields.Char(required=True, readonly=False, index=True, default=_compute_default_model)
     res_id = fields.Integer(required=True, readonly=True, index=True, ondelete='restrict') # '''ondelete SHOULD NOT be 'cascade', see the write method''')
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, store=True, index=True, default=lambda self: self.env.company)
     company_country_id = fields.Many2one('res.country', string='Company Country', related='company_id.country_id', store=False, readonly=True)
