@@ -1,9 +1,17 @@
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 
 class HrRuleQtyRateAmount(models.Model):
     _name = 'hr.rule.qty_rate_amount'
     _description = 'hr.rule.qty_rate_amount'
+
+    @api.model
+    def _compute_default_model(self):
+        try:
+            return self.env.context['params']['model']
+        except:
+            raise UserError('Please save changes, then refresh the page (F5).')
 
     salary_rule_id = fields.Many2one('hr.salary.rule', string="Salary Rule", ondelete='restrict')
     analytic_account_id = fields.Many2one('account.analytic.account', string="Analytic Account", ondelete='restrict')
@@ -11,7 +19,7 @@ class HrRuleQtyRateAmount(models.Model):
     rate = fields.Float("Rate (%)", default=100.0)
     amount = fields.Float()
     total = fields.Float(compute='_compute_total')
-    model = fields.Char(required=True, readonly=True, index=True)
+    model = fields.Char(required=True, readonly=True, index=True, default=_compute_default_model)
     res_id = fields.Integer(required=True, readonly=True, index=True,
                             ondelete='''Should NOT be 'cascade', see the write method''')
     company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True,
