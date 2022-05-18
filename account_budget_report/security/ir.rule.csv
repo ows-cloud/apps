@@ -1,7 +1,7 @@
 id,name,model_id:id,groups:id,domain_force,perm_read,perm_write,perm_create,perm_unlink
 account_budget_line_adviser_rule,account_budget_line adviser,model_account_budget_line,account.group_account_manager,"[(1,'=',1)]",1,1,1,1
 account_budget_line_analytic_rule,account_budget_line analytic manager,model_account_budget_line,base.group_user,"[('analytic_account_id.user_id.id','=',[user.id])]",1,1,1,1
-account_budget_line_company_rule,account_budget_line multi-company,model_account_budget_line,,"[('company_id','child_of',[user.company_id.id])]",1,1,1,1
+account_budget_line_company_rule,account_budget_line multi-company,model_account_budget_line,,"[('company_id', 'in', company_ids)]",1,1,1,1
 account_budget_report_adviser_rule,account_budget_report adviser,model_account_budget_report,account.group_account_manager,"[(1,'=',1)]",1,1,1,1
 account_budget_report_analytic_rule,account_budget_report analytic manager,model_account_budget_report,base.group_user,"[('analytic_account_id.user_id.id','=',[user.id])]",1,1,1,1
-account_budget_report_company_rule,account_budget_report multi-company,model_account_budget_report,,"[('company_id','child_of',[user.company_id.id])]",1,1,1,1
+account_budget_report_company_rule,account_budget_report multi-company,model_account_budget_report,,"[('company_id', 'in', company_ids)]",1,1,1,1
