@@ -60,7 +60,7 @@ class AmeldingLogikk:
         self.date_to = date_to.date()
         self.company = self._get(self.amelding_record, 'company_id')
         company_id = self._get(self.company,'id')
-        self.employees = self._get_records('hr.employee', [('company_id','=',company_id)], self.company)
+        self.employees = self._get_records('hr.employee', [('company_id','=',company_id), ('active', '=', True)], self.company)
         self.contracts = self._get_records('hr.contract', [('company_id','=',company_id)], self.company)
         self.payslips = self._get_records('hr.payslip', [('company_id','=',company_id),('date_to','>=',date_from), ('date_to','<=',date_to)], self.company)
         self.payslip_lines = self._get_records('hr.payslip.line', [('slip_id','in',self._mapped(self.payslips, 'id'))], self.company)
