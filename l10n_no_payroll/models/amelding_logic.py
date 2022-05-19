@@ -64,7 +64,7 @@ class AmeldingLogikk:
         self.contracts = self._get_records('hr.contract', [('company_id','=',company_id)], self.company)
         self.payslips = self._get_records('hr.payslip', [('company_id','=',company_id),('date_to','>=',date_from), ('date_to','<=',date_to)], self.company)
         self.payslip_lines = self._get_records('hr.payslip.line', [('slip_id','in',self._mapped(self.payslips, 'id'))], self.company)
-        self.payslip_runs = self._get_records('hr.payslip.run', [('company_id','=',company_id),('date_end','>=',date_from), ('date_end','<=',date_to)], self.company)
+        self.payslip_runs = self.payslips.mapped('payslip_run_id')
         #self.salary_rules = self._get_records('hr.salary.rule', [], self.company) # hr.payslip.line.salary_rule_id
         self.countries = self._get_records('res.country', [], self.company)
         self.jobs = self._get_records('hr.job', [('company_id','=',company_id)], self.company)
@@ -76,6 +76,7 @@ class AmeldingLogikk:
             'hr.leave.type',
             'hr.payslip',
             'hr.payslip.line',
+            'hr.payslip.run',
             'hr.salary.rule',
             'res.company',
         ]
@@ -149,7 +150,9 @@ class AmeldingLogikk:
         #    bif = self.BetalingsinformasjonForForenkletOrdning()
         #    je.betalingsinformasjonForForenkletOrdning.append(bif) #optional
         #je.annenBagatellmessigStoette = 1000.5 #replace #optional
-        je.pensjonsinnretning.append(self._get(self.company, 'l10n_no_pensjonsinnretning'))
+        pensjonsinnretning = self._get(self.company, 'l10n_no_pensjonsinnretning')
+        if pensjonsinnretning:
+            je.pensjonsinnretning.append(pensjonsinnretning)
         return je
         
     # def Betalingsinformasjon(self, bi, sumForskuddstrekk=None, sumArbeidsgiveravgift=None, sumFinansskattLoenn=None, **kwargs):
@@ -192,7 +195,7 @@ class AmeldingLogikk:
         for payslip_run in self.payslip_runs:
             agaplikt_uten_loennsopplysningsplikt = self._get(payslip_run, 'l10n_no_AgapliktUtenLoennsopplysningsplikt')
             if agaplikt_uten_loennsopplysningsplikt:
-                self.aga['avgiftsgrunnlagBeloep'] += agaplikt_uten_loennsopplysningsplikt
+                self.aga['avgiftsgrunnlagBeloep'] += int(agaplikt_uten_loennsopplysningsplikt)
 
         aga = self.Arbeidsgiveravgift()
         if aga:
