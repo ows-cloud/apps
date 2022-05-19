@@ -18,7 +18,7 @@ class SurveySurvey(models.Model):
 
         question_list = []
         for q in questions:
-            question_list.append(('%s_%s_%s' % (q.survey_id.id, q.page_id.id, q.id), q.question, q.type, q.page_id.sequence, q.page_id.id, q.sequence, q.id))
+            question_list.append(('%s_%s_%s' % (q.survey_id.id, q.page_id.id, q.id), q.title, q.question_type, q.page_id.sequence, q.page_id.id, q.sequence, q.id))
         question_list.sort(key=lambda t: (t[3], t[4], t[5], t[6]))
         
         csv = '"id",' + ','.join(['"%s"' % tup[1] for tup in question_list]) + '\n'
@@ -57,14 +57,14 @@ class SurveySurvey(models.Model):
             if not answer.skipped:
                 answer_tag = '%s_%s_%s' % (answer.survey_id.id, answer.page_id.id, answer.question_id.id)
                 answer_value = None
-                if answer.answer_type == 'free_text':
-                    answer_value = answer.value_free_text
-                elif answer.answer_type == 'text' and answer.question_id.type == 'textbox':
-                    answer_value = answer.value_text
-                elif answer.answer_type == 'text' and answer.question_id.type != 'textbox':
+                if answer.answer_type == 'text_box':
+                    answer_value = answer.value_text_box
+                elif answer.answer_type == 'char_box' and answer.question_id.question_type == 'char_box':
+                    answer_value = answer.value_char_box
+                elif answer.answer_type == 'suggestion':
                     # here come comment answers for matrices, simple choice and multiple choice
                     answer_tag = "%s_%s" % (answer_tag, 'comment')
-                    answer_value = answer.value_text
+                    answer_value = answer.value_char_box
                 elif answer.answer_type == 'number':
                     answer_value = answer.value_number.__str__()
                 elif answer.answer_type == 'date':
