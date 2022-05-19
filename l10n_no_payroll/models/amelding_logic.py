@@ -64,6 +64,7 @@ class AmeldingLogikk:
         self.contracts = self._get_records('hr.contract', [('company_id','=',company_id)], self.company)
         self.payslips = self._get_records('hr.payslip', [('company_id','=',company_id),('date_to','>=',date_from), ('date_to','<=',date_to)], self.company)
         self.payslip_lines = self._get_records('hr.payslip.line', [('slip_id','in',self._mapped(self.payslips, 'id'))], self.company)
+        self.payslip_runs = self._get_records('hr.payslip.run', [('company_id','=',company_id),('date_end','>=',date_from), ('date_end','<=',date_to)], self.company)
         #self.salary_rules = self._get_records('hr.salary.rule', [], self.company) # hr.payslip.line.salary_rule_id
         self.countries = self._get_records('res.country', [], self.company)
         self.jobs = self._get_records('hr.job', [('company_id','=',company_id)], self.company)
@@ -183,21 +184,20 @@ class AmeldingLogikk:
         v = a.Virksomhet()
         v.norskIdentifikator = self._get(self.company, 'l10n_no_virksomhet') #string #required
 
-        #totals = {'loennOgGodtgjoerelse': 0, 'tilskuddOgPremieTilPensjon': 0, 'fradragIGrunnlagetForSone': 0, 'forskuddstrekk': 0, }
-        
-        company_id = self._get(self.company,'id')
         for employee in self.employees:
             im = self.Inntektsmottaker(employee)
-            #im, info = self.Inntektsmottaker(employee)
             if im:
                 v.inntektsmottaker.append(im) #optional
-            #totals = { k: totals.get(k, 0) + info.get(k, 0) for k in set(totals) }
-        #v.arbeidsgiveravgift, sumArbeidsgiveravgift = self.Arbeidsgiveravgift(
-        #    totals['loennOgGodtgjoerelse'], totals['tilskuddOgPremieTilPensjon'], totals['fradragIGrunnlagetForSone'])
+
+        for payslip_run in self.payslip_runs:
+            agaplikt_uten_loennsopplysningsplikt = self._get(payslip_run, 'l10n_no_AgapliktUtenLoennsopplysningsplikt')
+            if agaplikt_uten_loennsopplysningsplikt:
+                self.aga['avgiftsgrunnlagBeloep'] += agaplikt_uten_loennsopplysningsplikt
+
         aga = self.Arbeidsgiveravgift()
         if aga:
             v.arbeidsgiveravgift = aga #optional
-        #return v, {'sumForskuddstrekk': totals['forskuddstrekk'], 'sumArbeidsgiveravgift': sumArbeidsgiveravgift, 'sumFinansskattLoenn': 0}
+
         return v
     
     def Inntektsmottaker(self, employee):
