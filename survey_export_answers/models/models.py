@@ -14,7 +14,7 @@ class SurveySurvey(models.Model):
         self.ensure_one()
         survey = self
         questions = self.env['survey.question'].search([('survey_id','=',survey.id)])
-        all_answers = [[input.id, json.loads(self.prefill(survey, input.token))] for input in survey.user_input_ids]
+        all_answers = [[input.id, json.loads(self.prefill(survey, input.access_token))] for input in survey.user_input_ids]
 
         question_list = []
         for q in questions:
@@ -48,9 +48,9 @@ class SurveySurvey(models.Model):
 
         # Fetch previous answers
         if page:
-            previous_answers = UserInputLine.sudo().search([('user_input_id.token', '=', token), ('page_id', '=', page.id)])
+            previous_answers = UserInputLine.sudo().search([('user_input_id.access_token', '=', token), ('page_id', '=', page.id)])
         else:
-            previous_answers = UserInputLine.sudo().search([('user_input_id.token', '=', token)])
+            previous_answers = UserInputLine.sudo().search([('user_input_id.access_token', '=', token)])
 
         # Return non empty answers in a JSON compatible format
         for answer in previous_answers:
@@ -69,11 +69,11 @@ class SurveySurvey(models.Model):
                     answer_value = answer.value_number.__str__()
                 elif answer.answer_type == 'date':
                     answer_value = answer.value_date
-                elif answer.answer_type == 'suggestion' and not answer.value_suggested_row:
-                    answer_value = answer.value_suggested.id
-                elif answer.answer_type == 'suggestion' and answer.value_suggested_row:
-                    answer_tag = "%s_%s" % (answer_tag, answer.value_suggested_row.id)
-                    answer_value = answer.value_suggested.id
+                elif answer.answer_type == 'suggestion' and not answer.matrix_row_id:
+                    answer_value = answer.suggested_answer_id.id
+                elif answer.answer_type == 'suggestion' and answer.matrix_row_id:
+                    answer_tag = "%s_%s" % (answer_tag, answer.matrix_row_id.id)
+                    answer_value = answer.suggested_answer_id.id
                 if answer_value:
                     ret.setdefault(answer_tag, []).append(answer_value)
                 else:
