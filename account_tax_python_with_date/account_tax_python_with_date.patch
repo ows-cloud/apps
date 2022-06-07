@@ -1,0 +1,46 @@
+diff --git a/addons/account/models/account_move.py b/addons/account/models/account_move.py
+index 07c91be9..c214cf8d 100644
+--- a/addons/account/models/account_move.py
++++ b/addons/account/models/account_move.py
+@@ -681,6 +681,7 @@ class AccountMove(models.Model):
+                     line.tax_tag_ids = [(5, 0, 0)]
+                 continue
+ 
++            line = line.with_context(tax_date=line.date)
+             compute_all_vals = _compute_base_line_taxes(line)
+ 
+             # Assign tags on base line
+@@ -3468,6 +3469,7 @@ class AccountMoveLine(models.Model):
+ 
+     def _get_price_total_and_subtotal(self, price_unit=None, quantity=None, discount=None, currency=None, product=None, partner=None, taxes=None, move_type=None):
+         self.ensure_one()
++        self = self.with_context(tax_date=self.date)
+         return self._get_price_total_and_subtotal_model(
+             price_unit=price_unit or self.price_unit,
+             quantity=quantity or self.quantity,
+diff --git a/addons/account_tax_python/models/account_tax.py b/addons/account_tax_python/models/account_tax.py
+index 435be47f..9d722d94 100644
+--- a/addons/account_tax_python/models/account_tax.py
++++ b/addons/account_tax_python/models/account_tax.py
+@@ -34,7 +34,8 @@ class AccountTaxPython(models.Model):
+             product = product.product_variant_id
+         if self.amount_type == 'code':
+             company = self.env.company
+-            localdict = {'base_amount': base_amount, 'price_unit':price_unit, 'quantity': quantity, 'product':product, 'partner':partner, 'company': company}
++            tax_date = self.env.context.get('tax_date')
++            localdict = {'base_amount': base_amount, 'price_unit':price_unit, 'quantity': quantity, 'product':product, 'partner':partner, 'company': company, 'tax_date': tax_date}
+             safe_eval(self.python_compute, localdict, mode="exec", nocopy=True)
+             return localdict['result']
+         return super(AccountTaxPython, self)._compute_amount(base_amount, price_unit, quantity, product, partner)
+diff --git a/addons/sale/models/sale.py b/addons/sale/models/sale.py
+index 8907171e..e69a8bcf 100644
+--- a/addons/sale/models/sale.py
++++ b/addons/sale/models/sale.py
+@@ -1205,6 +1205,7 @@ class SaleOrderLine(models.Model):
+         """
+         for line in self:
+             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
++            line = line.with_context(tax_date=line.order_id.date_order)
+             taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.order_id.partner_shipping_id)
+             line.update({
+                 'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
