@@ -1,8 +1,8 @@
 diff --git a/addons/account/models/account_move.py b/addons/account/models/account_move.py
-index 5f7e30b5..d1dc801a 100644
+index 8a270111..1baf18d2 100644
 --- a/addons/account/models/account_move.py
 +++ b/addons/account/models/account_move.py
-@@ -2539,11 +2539,11 @@ class AccountMove(models.Model):
+@@ -2545,11 +2545,11 @@ class AccountMove(models.Model):
  
          # Search for partners in copy.
          cc_mail_addresses = email_split(msg_dict.get('cc', ''))
