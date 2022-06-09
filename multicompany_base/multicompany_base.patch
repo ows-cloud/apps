@@ -1,8 +1,8 @@
 diff --git a/addons/account/models/account_move.py b/addons/account/models/account_move.py
-index 07c91be9..144eb5f7 100644
+index 5f7e30b5..d1dc801a 100644
 --- a/addons/account/models/account_move.py
 +++ b/addons/account/models/account_move.py
-@@ -2526,11 +2526,11 @@ class AccountMove(models.Model):
+@@ -2539,11 +2539,11 @@ class AccountMove(models.Model):
  
          # Search for partners in copy.
          cc_mail_addresses = email_split(msg_dict.get('cc', ''))
@@ -239,8 +239,22 @@ index 5bb5f477..754c8d6d 100644
  
      @tools.ormcache()
      def _get_default_uom_id(self):
+diff --git a/addons/purchase_stock/models/product.py b/addons/purchase_stock/models/product.py
+index a52be154..66bfb199 100644
+--- a/addons/purchase_stock/models/product.py
++++ b/addons/purchase_stock/models/product.py
+@@ -11,8 +11,7 @@ class ProductTemplate(models.Model):
+ 
+     @api.model
+     def _get_buy_route(self):
+-        buy_route_id = self.env.ref('purchase_stock.route_warehouse0_buy', raise_if_not_found=False).id
+-        buy_route = self.env['stock.location.route'].search([('id', '=', buy_route_id)])
++        buy_route = self.env.ref('purchase_stock.route_warehouse0_buy', raise_if_not_found=False)
+         if buy_route:
+             return buy_route.ids
+         return []
 diff --git a/addons/web/controllers/main.py b/addons/web/controllers/main.py
-index a7cb825a..e6c749bc 100644
+index bcac8f45..adad03ec 100644
 --- a/addons/web/controllers/main.py
 +++ b/addons/web/controllers/main.py
 @@ -1591,6 +1591,10 @@ class Binary(http.Controller):
@@ -298,7 +312,7 @@ index 0eb1eb3d..fff647d2 100644
          'views/assets.xml',
          'views/website_livechat.xml',
 diff --git a/addons/website_sale/models/website.py b/addons/website_sale/models/website.py
-index 55582697..58a5e701 100644
+index 2e530271..6c9626b5 100644
 --- a/addons/website_sale/models/website.py
 +++ b/addons/website_sale/models/website.py
 @@ -22,6 +22,8 @@ class Website(models.Model):
@@ -544,7 +558,7 @@ index 606a06e7..3404ce1a 100644
      def is_superuser(self):
          """ Return whether the environment is in superuser mode. """
 diff --git a/odoo/models.py b/odoo/models.py
-index 8b429c03..6ac2d3f1 100644
+index fc18b27a..374dc36e 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
