@@ -30,13 +30,21 @@ class CalendarEventDate(models.Model):
         of calendar.event.type and start_date involved"""
 
         # required: name, privacy, show_as, start, stop
-        
-        calendar_events = self.env['calendar.event'].search([('categ_ids', 'in', self.type_ids.ids)])
-        calendar_event_dates = calendar_events.mapped('start_date')
+
+        if not show_from_date:
+            show_from_date = datetime(2000, 1, 1).date()        
+        calendar_events = self.env['calendar.event'].search(
+            [
+                ('categ_ids', 'in', self.type_ids.ids),
+                ('start', '>', show_from_date),
+            ]
+        )
+        calendar_event_dates_str = calendar_events.mapped('start_date_str')
+        calendar_event_dates = [datetime.strptime(s, '%Y-%m-%d').date() for s in calendar_event_dates_str]
+
         if add_date:
             calendar_event_dates.append(add_date)
-        if not show_from_date:
-            show_from_date = datetime(2000, 1, 1).date()
+
         result = [(5, 0, 0)] + [
             (0, 0, {
                 'name': "{} on {}".format(calendar_event_type.name, str(calendar_event_date)),

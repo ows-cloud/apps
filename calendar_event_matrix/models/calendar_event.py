@@ -17,4 +17,4 @@ class CalendarEvent(models.Model):
 
     def _get_start_date_str(self):
         for record in self:
-            record.start_date_str = str(record.start_date)
+            record.start_date_str = str(record.start.date())

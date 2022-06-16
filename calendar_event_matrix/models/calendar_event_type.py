@@ -6,3 +6,4 @@ class CalendarEventType(models.Model):
 
     group_id = fields.Many2one('calendar.event.type.group', string="Group")
     allowed_partner_ids = fields.Many2many('res.partner', string="Allowed contacts")
+    sequence = fields.Integer()

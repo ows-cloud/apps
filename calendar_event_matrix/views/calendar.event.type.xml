@@ -12,6 +12,9 @@
                 <!-- <tree position="attributes">
                     <attribute name="editable"/>
                 </tree> -->
+                <field name="name" position="before">
+                    <field name="sequence" widget="handle"/>
+                </field>
                 <tree position="inside">
                     <field name="group_id"/>
                     <field name="allowed_partner_ids" widget="many2many_tags"/>
