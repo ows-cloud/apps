@@ -1,7 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
     'name': 'Calendar Event Matrix',
-    'summary': "Schedule people for tasks",
+    'summary': "Schedule attendees",
     "version": "14.0.1.0.0",
     "author": "Henrik Norlin, "
               "Odoo Community Association (OCA)",
@@ -14,8 +14,7 @@
     ],
     "data": [
         'security/ir.model.access.csv',
-        'views/calendar.event.type.xml',
-        'views/calendar.event.type.group.xml',
+        'views/calendar.event.matrix.xml',
     ],
     "installable": True,
 }

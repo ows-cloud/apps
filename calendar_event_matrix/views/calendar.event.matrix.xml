@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_calendar_event_matrix_tree" model="ir.ui.view">
+        <field name="name">calendar.event.matrix tree</field>
+        <field name="model">calendar.event.matrix</field>
+        <field name="type">tree</field>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_calendar_event_matrix_form" model="ir.ui.view">
+        <field name="name">calendar.event.matrix form wizard</field>
+        <field name="model">calendar.event.matrix</field>
+        <field name="type">form</field>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <form>
+                <div class="oe_edit_only">
+                    <label for="name"/>
+                </div>
+                <h1>
+                    <field name="name"/>
+                </h1>
+                <button name="reload" type="object" string="Reload" class="oe_highlight"/>
+                <p/>
+                <field name="date_from"/>
+                <button name="show_from_date" type="object" string="Show from date" class="oe_highlight"/>
+                <button name="show_attendees_from_date" type="object" string="Show attendees from date" class="oe_highlight"/>
+                <button name="count_attendees_from_date" type="object" string="Count attendees from date" class="oe_highlight"/>
+                <p/>
+                <field name="date_action"/>
+                <button name="add_date" type="object" string="Add date" class="oe_highlight"/>
+                <button name="remove_date" type="object" string="Remove date" class="oe_highlight"/>
+                <notebook>
+                    <page name="rows" string="Rows">
+                        <field name="row_ids">
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle"/>
+                                <field name="name"/>
+                                <field name="matrix_id"/>
+                                <field name="allowed_partner_ids" widget="many2many_tags"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </form>
+        </field>
+    </record>
+    <record id="view_calendar_event_matrix_count_form" model="ir.ui.view">
+        <field name="name">calendar.event.matrix count form</field>
+        <field name="model">calendar.event.matrix</field>
+        <field name="inherit_id" ref="view_calendar_event_matrix_form"/>
+        <field name="type">form</field>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page name="partner_count" string="# of Attendees">
+                    <field name="event_ids" widget="x2many_2d_matrix"
+                        field_x_axis="start_date_str" field_y_axis="matrix_row_id" field_value="partner_count">
+                        <tree default_order="start_date_str">
+                            <field name="start_date_str"/>
+                            <field name="matrix_row_id" widget="many2many_tags"/>
+                            <field name="partner_count"/>
+                        </tree>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
+    <record id="view_calendar_event_matrix_show_form" model="ir.ui.view">
+        <field name="name">calendar.event.matrix show form</field>
+        <field name="model">calendar.event.matrix</field>
+        <field name="inherit_id" ref="view_calendar_event_matrix_form"/>
+        <field name="type">form</field>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page name="partner_ids" string="Attendees">
+                    <field name="event_ids" widget="x2many_2d_matrix"
+                        field_x_axis="start_date_str" field_y_axis="matrix_row_id" field_value="partner_ids">
+                        <tree default_order="start_date_str">
+                            <field name="start_date_str"/>
+                            <field name="matrix_row_id" widget="many2many_tags"/>
+                            <field name="partner_ids" widget="many2many_tags"/>
+                        </tree>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
+    <record id="view_calendar_event_matrix_old_form" model="ir.ui.view">
+        <field name="name">calendar.event.matrix form</field>
+        <field name="model">calendar.event.matrix</field>
+        <field name="inherit_id" ref="view_calendar_event_matrix_form"/>
+        <field name="type">form</field>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page name="old" string="Old">
+                    <field name="event_ids" widget="x2many_2d_matrix"
+                        field_x_axis="start_date_str" field_y_axis="matrix_row_id" field_value="partner_ids">
+                        <tree default_order="start_date_str">
+                            <field name="start_date_str"/>
+                            <field name="matrix_row_id" widget="many2many_tags"/>
+                            <field name="partner_ids" widget="many2many_tags"/>
+                        </tree>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <record id="action_calendar_event_matrix" model="ir.actions.act_window">
+        <field name="name">Calendar Event Matrix</field>
+        <field name="res_model">calendar.event.matrix</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Schedule attendees
+          </p><p>
+            ...
+          </p>
+        </field>
+    </record>
+
+    <menuitem
+    id="menu_calendar_event_matrix"
+    name="Calendar Event Matrix"
+    parent="calendar.mail_menu_calendar"
+    action="action_calendar_event_matrix"/>
+
+</odoo>
