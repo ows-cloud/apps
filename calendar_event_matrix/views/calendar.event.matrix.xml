@@ -41,8 +41,9 @@
                             <tree editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="name"/>
-                                <field name="default_start"/>
-                                <field name="default_stop"/>
+                                <field name="allday"/>
+                                <field name="default_start" attrs="{'required': [('allday', '=', False)]}"/>
+                                <field name="default_stop" attrs="{'required': [('allday', '=', False)]}"/>
                                 <field name="allowed_partner_ids" widget="many2many_tags"/>
                             </tree>
                         </field>
@@ -61,12 +62,15 @@
         <field name="arch" type="xml">
             <page name="matrix_rows" position="before">
                 <page name="partner_count" string="# of Attendees">
-                    <field name="event_ids" widget="x2many_2d_matrix"
+                    <field name="event_ids"
+                        readonly="1"
+                        widget="x2many_2d_matrix"
                         show_row_totals="0" show_column_totals="0"
                         field_x_axis="start_date_str" field_y_axis="matrix_row_id" field_value="partner_count">
-                        <tree default_order="start_date_str">
+                        <tree default_order="start_date_str,matrix_row_sequence">
                             <field name="start_date_str"/>
-                            <field name="matrix_row_id" widget="many2many_tags"/>
+                            <field name="matrix_row_id"/>
+                            <field name="matrix_row_sequence" invisible="1"/>
                             <field name="partner_count"/>
                         </tree>
                     </field>
@@ -84,11 +88,13 @@
         <field name="arch" type="xml">
             <page name="matrix_rows" position="before">
                 <page name="partner_show" string="Attendees">
-                    <field name="event_ids" widget="x2many_2d_matrix"
+                    <field name="event_ids"
+                        widget="x2many_2d_matrix"
                         field_x_axis="start_date_str" field_y_axis="matrix_row_id" field_value="partner_ids">
-                        <tree default_order="start_date_str">
+                        <tree default_order="start_date_str,matrix_row_sequence">
                             <field name="start_date_str"/>
-                            <field name="matrix_row_id" widget="many2many_tags"/>
+                            <field name="matrix_row_id"/>
+                            <field name="matrix_row_sequence" invisible="1"/>
                             <field name="partner_ids" widget="many2many_tags"/>
                         </tree>
                     </field>
@@ -106,34 +112,14 @@
         <field name="arch" type="xml">
             <page name="matrix_rows" position="before">
                 <page name="partner_boolean" string="Boolean">
-                    <field name="event_ids" widget="x2many_2d_matrix"
+                    <field name="event_ids"
+                        widget="x2many_2d_matrix"
                         field_x_axis="start_date_str" field_y_axis="matrix_row_id" field_value="matrix_partner_attending">
-                        <tree default_order="start_date_str">
+                        <tree default_order="start_date_str,matrix_row_sequence">
                             <field name="start_date_str"/>
-                            <field name="matrix_row_id" widget="many2many_tags"/>
+                            <field name="matrix_row_id"/>
+                            <field name="matrix_row_sequence" invisible="1"/>
                             <field name="matrix_partner_attending"/>
-                        </tree>
-                    </field>
-                </page>
-            </page>
-        </field>
-    </record>
-    <record id="view_calendar_event_matrix_old_form" model="ir.ui.view">
-        <field name="name">calendar.event.matrix old form</field>
-        <field name="model">calendar.event.matrix</field>
-        <field name="inherit_id" ref="view_calendar_event_matrix_form"/>
-        <field name="mode">primary</field>
-        <field name="type">form</field>
-        <field name="priority" eval="20"/>
-        <field name="arch" type="xml">
-            <page name="matrix_rows" position="before">
-                <page name="old" string="Old">
-                    <field name="event_ids" widget="x2many_2d_matrix"
-                        field_x_axis="start_date_str" field_y_axis="matrix_row_id" field_value="partner_ids">
-                        <tree default_order="start_date_str">
-                            <field name="start_date_str"/>
-                            <field name="matrix_row_id" widget="many2many_tags"/>
-                            <field name="partner_ids" widget="many2many_tags"/>
                         </tree>
                     </field>
                 </page>
@@ -145,6 +131,7 @@
         <field name="name">Calendar Event Matrix</field>
         <field name="res_model">calendar.event.matrix</field>
         <field name="view_mode">tree,form</field>
+        <field name="context">{"form_view_initial_mode": "edit"}</field> <!-- not working with view_mode="tree,form" -->
         <field name="help" type="html">
           <p class="o_view_nocontent_smiling_face">
             Schedule attendees

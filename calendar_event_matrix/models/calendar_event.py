@@ -5,6 +5,7 @@ class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
 
     matrix_row_id = fields.Many2one('calendar.event.matrix.row', string="Matrix Row")
+    matrix_row_sequence = fields.Integer("Matrix Row Sequence", related="matrix_row_id.sequence")
     matrix_partner_attending = fields.Boolean(
         "Matrix Partner Attending",
         compute="_get_matrix_partner_attending",

@@ -13,6 +13,7 @@
         'web_widget_x2many_2d_matrix',
     ],
     "data": [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'views/calendar.event.matrix.xml',
     ],
