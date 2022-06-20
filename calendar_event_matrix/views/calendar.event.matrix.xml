@@ -104,7 +104,8 @@
                             <field name="start_date_str"/>
                             <field name="matrix_row_id"/>
                             <field name="matrix_row_sequence" invisible="1"/>
-                            <field name="partner_ids" widget="many2many_tags"/>
+                            <field name="matrix_available_partner_ids" invisible="1"/>
+                            <field name="partner_ids" widget="many2many_tags" domain="[('id', 'in', matrix_available_partner_ids)]"/>
                         </tree>
                     </field>
                 </page>
