@@ -3,18 +3,32 @@
     <template id="report_calendar_event_matrix">
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Calendar Event Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <t t-foreach="docs" t-as="o">
-                            <tr><td><p t-field="o.name"/></td></tr>
-                        </t>
-                    </tbody>
-                </table>
+                <t t-foreach="docs" t-as="o">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th t-field="o.name"/>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="columns" t-value="int(len(o.event_ids) / len(o.row_ids))"/>
+                            <t t-set="col" t-value="1"/>
+                            <t t-foreach="o.event_ids.sorted(key=lambda r: [r.matrix_row_id.sequence, r.start_date_str])" t-as="ce">
+                                <t t-if="col == 1">
+                                    &lt;tr&gt;
+                                </t>
+                                <td>
+                                <p t-field="ce.start_date_str"/>
+                                <p t-field="ce.name"/>
+                                </td>
+                                <t t-if="col == columns">
+                                    &lt;&#47;tr&gt;
+                                </t>                                
+                                <t t-set="col" t-value="col+1"/>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
             </t>
         </t>
     </template>
