@@ -9,6 +9,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
+                <field name="partner_ids" string="Contacts"/>
             </tree>
         </field>
     </record>
@@ -44,7 +45,15 @@
                                 <field name="allday"/>
                                 <field name="default_start" attrs="{'required': [('allday', '=', False)]}"/>
                                 <field name="default_stop" attrs="{'required': [('allday', '=', False)]}"/>
-                                <field name="allowed_partner_ids" widget="many2many_tags"/>
+                                <!-- <field name="default_all_matrix_partners"/>
+                                <field name="allowed_partner_ids" widget="many2many_tags"/> -->
+                            </tree>
+                        </field>
+                    </page>
+                    <page name="matrix_partner_ids" string="Contacts">
+                        <field name="partner_ids">
+                            <tree editable="bottom">
+                                <field name="name"/> <!-- widget="many2many_tags" cannot open popup to select multiple contacts -->
                             </tree>
                         </field>
                     </page>

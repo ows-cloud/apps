@@ -23,6 +23,7 @@ class CalendarEventMatrix(models.Model):
     date_action = fields.Date("Add Date", default=datetime.now().date())
     row_ids = fields.One2many('calendar.event.matrix.row', 'matrix_id', string="Types")
     event_ids = fields.Many2many('calendar.event')
+    partner_ids = fields.Many2many('res.partner')
     matrix_partner_id = fields.Many2one(
         "res.partner",
         "Matrix Partner",
@@ -118,3 +119,23 @@ class CalendarEventMatrix(models.Model):
                     result.append((0, 0, dict))
 
         return [(5, 0, 0)] + result
+
+    # def create(self, values):
+    #     super(CalendarEventMatrix, self).create(values)
+    #     if "partner_ids" in values:
+    #         self._update_partner_ids(values["partner_ids"][0][2])
+
+    # def write(self, values):
+    #     super(CalendarEventMatrix, self).write(values)
+    #     if "partner_ids" in values:
+    #         self._update_partner_ids(values["partner_ids"][0][2])
+
+    # def _update_partner_ids(self, partner_ids):
+    #     """ remove partner not implemented """
+    #     self.ensure_one()
+    #     for row in self.row_ids:
+    #         if row.default_all_matrix_partners:
+    #             # search for calendar.event with this row without the partners
+    #             calendar_events = self.env["calendar.event"].search([("matrix_row_id", "=", row.id)])
+    #             for ce in calendar_events:
+    #                 todo = "add partners"

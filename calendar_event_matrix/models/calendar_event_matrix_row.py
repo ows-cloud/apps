@@ -12,4 +12,24 @@ class CalendarEventMatrixRow(models.Model):
     allday = fields.Boolean(help="If True, don't use default_start & default_stop")
     default_start = fields.Datetime("Default Start Time", help="Any date; only the time is relevant.")
     default_stop = fields.Datetime("Default Stop Time", help="Any date; only the time is relevant.")
+    # default_all_matrix_partners = fields.Boolean("Add all participants")
+    # Not implemented
     allowed_partner_ids = fields.Many2many('res.partner', string="Allowed contacts")
+
+    # def create(self, values):
+    #     if "default_all_matrix_partners" in values:
+    #         self._update_default_all_matrix_partners(self, values["default_all_matrix_partners"])
+    #     super().create(values)
+
+    # # def write(self, values):
+    # #     if "default_all_matrix_partners" in values:
+    # #         self._update_default_all_matrix_partner(self, values["default_all_matrix_partners"])
+    # #     super().write(values)
+
+    # def _update_default_all_matrix_partners(self):
+    #     self.ensure_one()
+    #     if self.default_all_matrix_partners:
+    #         # search for calendar.event with this row
+    #         # for each calendar.event:
+    #         #   add missing partners
+    #         pass
