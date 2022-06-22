@@ -116,6 +116,8 @@ class CalendarEventMatrix(models.Model):
                             minutes=matrix_row.default_stop.minute,
                             seconds=matrix_row.default_stop.second,
                         )
+                        if dict["stop"] < dict["start"]:
+                            dict["stop"] = dict["stop"] + timedelta(days=1)
                     result.append((0, 0, dict))
 
         return [(5, 0, 0)] + result

@@ -11,6 +11,7 @@ class CalendarEventMatrixRow(models.Model):
     matrix_id = fields.Many2one('calendar.event.matrix', string="Group")
     allday = fields.Boolean(help="If True, don't use default_start & default_stop")
     default_start = fields.Datetime("Default Start Time", help="Any date; only the time is relevant.")
+    # default_duration = fields.Float("Default Duration")
     default_stop = fields.Datetime("Default Stop Time", help="Any date; only the time is relevant.")
     # Not implemented
     # default_all_matrix_partners = fields.Boolean("Add all participants")

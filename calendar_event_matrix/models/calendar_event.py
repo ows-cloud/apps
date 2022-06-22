@@ -25,7 +25,19 @@ class CalendarEvent(models.Model):
 
     def _get_matrix_available_partner_ids(self):
         for record in self:
-            record.matrix_available_partner_ids = record.matrix_row_id.matrix_id.partner_ids
+            partner_ids = self.env["res.partner"]
+            for partner in record.matrix_row_id.matrix_id.partner_ids:
+                domain = [
+                    ("partner_ids", "in", [partner.id]),
+                    ("id", "!=", record.id),
+                    '|',
+                    '&', ('start', '>', record.start), ('start', '<', record.stop),
+                    '&', ('stop', '>', record.start), ('stop', '<', record.stop),
+                ]
+                overlapping_events = self.env["calendar.event"].search(domain)
+                if not overlapping_events:
+                    partner_ids += partner
+            record.matrix_available_partner_ids = partner_ids
 
     matrix_partner_attending = fields.Boolean(
         "Matrix Partner Attending",
