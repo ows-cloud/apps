@@ -20,6 +20,7 @@ class CalendarEventMatrix(models.Model):
 
     name = fields.Char()
     date_from = fields.Date("Show From Date", default=datetime.now().date())
+    date_to = fields.Date("Show To Date")
     date_action = fields.Date("Add Date", default=datetime.now().date())
     row_ids = fields.One2many('calendar.event.matrix.row', 'matrix_id', string="Types")
     event_ids = fields.Many2many('calendar.event')
@@ -44,7 +45,7 @@ class CalendarEventMatrix(models.Model):
         self.event_ids = self._default_event_ids()
 
     def show_matrix(self):
-        self.event_ids = self._default_event_ids(show_from_date=self.date_from)
+        self.event_ids = self._default_event_ids(date_from=self.date_from, date_to=self.date_to)
         view_ref = self.env.context.get("view_ref")
         view = self.env.ref(view_ref)
         return {
@@ -55,28 +56,35 @@ class CalendarEventMatrix(models.Model):
             "context": {"form_view_initial_mode": "edit"},
         }
 
-    def _default_event_ids(self, add_date=None, show_from_date=None):
+    def _default_event_ids(self, add_date=None, date_from=None, date_to=None):
         """take care that the widget gets records passed for every combination
         of calendar.event.matrix.row and start/start_date involved"""
 
         # required: name, privacy, show_as, start, stop
 
-        if not show_from_date:
-            show_from_date = datetime(2000, 1, 1).date()
+        if not date_from:
+            date_from = datetime(2000, 1, 1).date()
+        if not date_to:
+            date_to = datetime(2099, 1, 1).date()
         calendar_events = self.env['calendar.event'].search(
             [
                 ('matrix_row_id', 'in', self.row_ids.ids),
                 '|', 
-                ('start', '>=', show_from_date),
-                ('start_date', '>=', str(show_from_date)),
+                ('start', '>=', date_from),
+                ('start_date', '>=', str(date_from)),
+                '|', 
+                ('stop', '<=', date_to),
+                ('stop_date', '<=', str(date_to)),
             ]
         )
         calendar_event_dates_str = calendar_events.mapped('start_date_str')
         calendar_event_dates = {datetime.strptime(s, '%Y-%m-%d').date() for s in calendar_event_dates_str}
 
         if add_date:
-            if add_date < show_from_date:
+            if add_date < date_from:
                 raise UserError("Date cannot be smaller than date_from")
+            if add_date > date_to:
+                raise UserError("Date cannot be greater than date_to")
             if add_date in calendar_event_dates:
                 raise UserError("Date already exists")
 

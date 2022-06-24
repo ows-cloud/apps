@@ -19,7 +19,7 @@ class CalendarEvent(models.Model):
             else:
                 record.start_date_str = str(record.start_date)
 
-    matrix_row_id = fields.Many2one('calendar.event.matrix.row', string="Matrix Row")
+    matrix_row_id = fields.Many2one('calendar.event.matrix.row', string="Matrix Row", ondelete="cascade")
     matrix_row_sequence = fields.Integer("Matrix Row Sequence", related="matrix_row_id.sequence")
     matrix_available_partner_ids = fields.Many2many("res.partner", compute="_get_matrix_available_partner_ids")
 

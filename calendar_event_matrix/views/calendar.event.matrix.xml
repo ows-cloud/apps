@@ -28,6 +28,7 @@
                     <field name="name"/>
                 </h1>
                 <field name="date_from"/>
+                <field name="date_to"/>
                 <button name="show_matrix" type="object" string="Show attendees from date" class="oe_highlight" context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_show_form'}"/>
                 <button name="show_matrix" type="object" string="Count attendees from date" class="oe_highlight" context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_count_form'}"/>
                 <field name="matrix_partner_id"/>
