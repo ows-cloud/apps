@@ -97,7 +97,8 @@ class CalendarEventMatrix(models.Model):
                 if allday:
                     ce = calendar_events.filtered(lambda x: x.matrix_row_id == matrix_row and x.start_date == matrix_date)
                 else:
-                    ce = calendar_events.filtered(lambda x: x.matrix_row_id == matrix_row and x.start.date() == matrix_date)
+                    # TODO: get hours from timezone
+                    ce = calendar_events.filtered(lambda x: x.matrix_row_id == matrix_row and (x.start + timedelta(hours=2)).date() == matrix_date)
                 if ce:
                     result.append((4, ce.ensure_one().id))
                 else:
@@ -114,12 +115,17 @@ class CalendarEventMatrix(models.Model):
                         dict["stop_date"] = matrix_date
                     else:
                         dict["allday"] = False
+                        # TODO: get hours from timezone
+                        start_day = -1 if matrix_row.default_start.hour >=22 else 0
                         dict["start"] = get_datetime(matrix_date) + timedelta(
+                            days=start_day,
                             hours=matrix_row.default_start.hour,
                             minutes=matrix_row.default_start.minute,
                             seconds=matrix_row.default_start.second,
                         )
+                        stop_day = -1 if matrix_row.default_stop.hour >= 22 else 0
                         dict["stop"] = get_datetime(matrix_date) + timedelta(
+                            days=stop_day,
                             hours=matrix_row.default_stop.hour,
                             minutes=matrix_row.default_stop.minute,
                             seconds=matrix_row.default_stop.second,

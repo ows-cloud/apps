@@ -1,4 +1,5 @@
 from odoo import _, api, fields, models
+from datetime import timedelta
 
 
 class CalendarEvent(models.Model):
@@ -15,7 +16,8 @@ class CalendarEvent(models.Model):
     def _get_start_date_str(self):
         for record in self:
             if record.start:
-                record.start_date_str = str(record.start.date())
+                # TODO: get hours from timezone
+                record.start_date_str = str((record.start + timedelta(hours=+2)).date())
             else:
                 record.start_date_str = str(record.start_date)
 
