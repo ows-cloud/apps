@@ -1,8 +1,31 @@
 diff --git a/addons/account/models/account_move.py b/addons/account/models/account_move.py
-index 8a270111..1baf18d2 100644
+index 8a270111..b9db3fb7 100644
 --- a/addons/account/models/account_move.py
 +++ b/addons/account/models/account_move.py
-@@ -2545,11 +2545,11 @@ class AccountMove(models.Model):
+@@ -56,9 +56,8 @@ class AccountMove(models.Model):
+     def _sequence_yearly_regex(self):
+         return self.journal_id.sequence_override_regex or super()._sequence_yearly_regex
+ 
+-    @property
+-    def _sequence_fixed_regex(self):
+-        return self.journal_id.sequence_override_regex or super()._sequence_fixed_regex
++    # REMOVED: def _sequence_fixed_regex(self):
++    # More info in https://github.com/OCA/OCB/pull/1110
+ 
+     @api.model
+     def _search_default_journal(self, journal_types):
+@@ -1180,8 +1179,8 @@ class AccountMove(models.Model):
+                 try:
+                     if not move.posted_before:
+                         move._constrains_date_sequence()
+-                    # Has already a name or is not posted, we don't add to a batch
+-                    continue
++                    # REMOVED: continue
++                    # More info in https://github.com/OCA/OCB/pull/1110
+                 except ValidationError:
+                     # Has never been posted and the name doesn't match the date: recompute it
+                     pass
+@@ -2545,11 +2544,11 @@ class AccountMove(models.Model):
  
          # Search for partners in copy.
          cc_mail_addresses = email_split(msg_dict.get('cc', ''))
