@@ -79,7 +79,7 @@ class HrRuleQtyRateAmount(models.Model):
             'result_analytic': record.analytic_account_id.id,
             'result_name': record.salary_rule_id.name,
         }
-        if months and round(months, 2) != 1.00:
+        if months != None and round(months, 2) != 1.00:
             if uom:
                 uom = ' á {:.2f} {}'.format(result_dict[multiply_with], uom)
             result_dict['result_name'] += " ({:.2f} months{})".format(months, uom)
