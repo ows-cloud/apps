@@ -66,7 +66,7 @@ index 9ea1339f..1932b047 100644
          action = self.env["ir.actions.actions"]._for_xml_id("base.action_res_users")
          if self.env.ref('base.default_user', raise_if_not_found=False):
 diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
-index 9f2d4a5e..038e7e37 100644
+index 9f2d4a5e..8b5e0940 100644
 --- a/addons/mail/controllers/main.py
 +++ b/addons/mail/controllers/main.py
 @@ -136,10 +136,12 @@ class MailController(http.Controller):
@@ -94,6 +94,15 @@ index 9f2d4a5e..038e7e37 100644
  
          # find current model subtypes, add them to a dictionary
          subtypes = request.env['mail.message.subtype'].search([
+@@ -276,7 +278,7 @@ class MailController(http.Controller):
+             'moderation_counter': request.env.user.moderation_counter,
+             'moderation_channel_ids': request.env.user.moderation_channel_ids.ids,
+             'partner_root': request.env.ref('base.partner_root').sudo().mail_partner_format(),
+-            'public_partner': request.env.ref('base.public_partner').sudo().mail_partner_format(),
++            'public_partner': request.env['res.partner'].sudo(bypass_global_rules=True).env.ref('base.public_partner').mail_partner_format(),
+             'public_partners': [partner.mail_partner_format() for partner in request.env.ref('base.group_public').sudo().with_context(active_test=False).users.partner_id],
+             'current_partner': request.env.user.partner_id.mail_partner_format(),
+             'current_user_id': request.env.user.id,
 @@ -295,7 +297,7 @@ class MailController(http.Controller):
  
      @http.route('/mail/get_suggested_recipients', type='json', auth='user')
@@ -527,8 +536,47 @@ index 00000000..0c891a55
 +    def with_record_company(self):
 +        company = self.record_company()
 +        return self.with_company(company) if company else self
+diff --git a/odoo/addons/base/models/ir_config_parameter.py b/odoo/addons/base/models/ir_config_parameter.py
+index 9063b1f2..02a8f737 100644
+--- a/odoo/addons/base/models/ir_config_parameter.py
++++ b/odoo/addons/base/models/ir_config_parameter.py
+@@ -107,3 +107,6 @@ class IrConfigParameter(models.Model):
+     def unlink(self):
+         self.clear_caches()
+         return super(IrConfigParameter, self).unlink()
++
++    def sudo(self, bypass_global_rules=True):
++        return super(IrConfigParameter, self).sudo(bypass_global_rules=bypass_global_rules)
+diff --git a/odoo/addons/base/models/ir_rule.py b/odoo/addons/base/models/ir_rule.py
+index 7bbf0305..b379fe5e 100644
+--- a/odoo/addons/base/models/ir_rule.py
++++ b/odoo/addons/base/models/ir_rule.py
+@@ -113,7 +113,7 @@ class IrRule(models.Model):
+         if mode not in self._MODES:
+             raise ValueError('Invalid mode: %r' % (mode,))
+ 
+-        if self.env.su:
++        if self.env.su and self.env.context.get("bypass_global_rules"):
+             return self.browse(())
+ 
+         query = """ SELECT r.id FROM ir_rule r JOIN ir_model m ON (r.model_id=m.id)
+@@ -124,6 +124,14 @@ class IrRule(models.Model):
+                          OR r.global)
+                     ORDER BY r.id
+                 """.format(mode=mode)
++
++        if self.env.su:
++            query = """ SELECT r.id FROM ir_rule r JOIN ir_model m ON (r.model_id=m.id)
++                        WHERE m.model=%s AND r.active AND r.perm_{mode}
++                        AND r.global
++                        ORDER BY r.id
++                        -- %s
++                    """.format(mode=mode)
+         self._cr.execute(query, (model_name, self._uid))
+         return self.browse(row[0] for row in self._cr.fetchall())
+ 
 diff --git a/odoo/addons/base/models/res_company.py b/odoo/addons/base/models/res_company.py
-index 3b20cb9d..854d752f 100644
+index 3b20cb9d..0d0dc55c 100644
 --- a/odoo/addons/base/models/res_company.py
 +++ b/odoo/addons/base/models/res_company.py
 @@ -213,7 +213,7 @@ class Company(models.Model):
@@ -540,6 +588,19 @@ index 3b20cb9d..854d752f 100644
  
          # Make sure that the selected currency is enabled
          if vals.get('currency_id'):
+@@ -300,3 +300,12 @@ class Company(models.Model):
+             main_company = self.env['res.company'].sudo().search([], limit=1, order="id")
+ 
+         return main_company
++
++    """
++    oca/server-auth/password_security needs to read the stored user.company_id.
++    When another company is selected, sudo(bypass_global_rules=False) causes error.
++    """
++    def _read(self, fields):
++        if self.env.su:
++            self = self.with_context(bypass_global_rules=True)
++        super(Company, self)._read(fields)
 diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
 index de9b3679..d5449e83 100644
 --- a/odoo/addons/base/models/res_partner.py
@@ -553,7 +614,7 @@ index de9b3679..d5449e83 100644
          # res.partner must only allow to set the company_id of a partner if it
          # is the same as the company of all users that inherit from this partner
 diff --git a/odoo/addons/base/models/res_users.py b/odoo/addons/base/models/res_users.py
-index b66b50a3..60fa9ee9 100644
+index b66b50a3..4a17a4d0 100644
 --- a/odoo/addons/base/models/res_users.py
 +++ b/odoo/addons/base/models/res_users.py
 @@ -659,6 +659,7 @@ class Users(models.Model):
@@ -564,6 +625,15 @@ index b66b50a3..60fa9ee9 100644
      @api.model
      def _update_last_login(self):
          # only create new records to avoid any side-effect on concurrent transactions
+@@ -680,7 +681,7 @@ class Users(models.Model):
+         ip = request.httprequest.environ['REMOTE_ADDR'] if request else 'n/a'
+         try:
+             with cls.pool.cursor() as cr:
+-                self = api.Environment(cr, SUPERUSER_ID, {})[cls._name]
++                self = api.Environment(cr, SUPERUSER_ID, {})[cls._name].with_context(bypass_global_rules=True)
+                 with self._assert_can_auth():
+                     user = self.search(self._get_login_domain(login), order=self._get_login_order(), limit=1)
+                     if not user:
 diff --git a/odoo/api.py b/odoo/api.py
 index 606a06e7..3404ce1a 100644
 --- a/odoo/api.py
@@ -581,7 +651,7 @@ index 606a06e7..3404ce1a 100644
      def is_superuser(self):
          """ Return whether the environment is in superuser mode. """
 diff --git a/odoo/models.py b/odoo/models.py
-index fc18b27a..374dc36e 100644
+index fc18b27a..2d769c95 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -641,7 +711,33 @@ index fc18b27a..374dc36e 100644
          finally:
              psycopg2.extensions.set_wait_callback(callback)
          self.env['ir.model.data'].invalidate_cache(fnames=fields)
-@@ -3251,10 +3269,12 @@ Fields:
+@@ -1738,6 +1756,10 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
+         :return: list of pairs ``(id, text_repr)`` for each records
+         :rtype: list(tuple)
+         """
++        if self.env.su:
++            # name_get(): Bypass global rules
++            self = self.with_context(bypass_global_rules=True)
++
+         result = []
+         name = self._rec_name
+         if name in self._fields:
+@@ -3068,7 +3090,13 @@ Fields:
+                 self = self - self.env.records_to_compute(field)
+         else:
+             fnames = [field.name]
+-        self._read(fnames)
++        # AVOID RECURSION LOOP with sudo(bypass_global_rules=False)
++        user_group_ids = self.env["res.users"]._fields["groups_id"]
++        if self.env.su and \
++            (field.name in ["company_id", "company_ids"] or field == user_group_ids):
++            self.with_context(bypass_global_rules=True)._read(fnames)
++        else:
++            self._read(fnames)
+ 
+     def _read(self, fields):
+         """ Read the given fields of the records in ``self`` from the database,
+@@ -3251,10 +3279,12 @@ Fields:
          """ Check the companies of the values of the given field names.
  
          :param list fnames: names of relational fields to check
@@ -656,7 +752,7 @@ index fc18b27a..374dc36e 100644
          For :class:`~odoo.addons.base.models.res_users` relational fields,
          verifies record company is in `company_ids` fields.
  
-@@ -3279,6 +3299,9 @@ Fields:
+@@ -3279,6 +3309,9 @@ Fields:
              return
  
          inconsistencies = []
@@ -666,7 +762,7 @@ index fc18b27a..374dc36e 100644
          for record in self:
              company = record.company_id if record._name != 'res.company' else record
              # The first part of the check verifies that all records linked via relation fields are compatible
-@@ -3287,9 +3310,9 @@ Fields:
+@@ -3287,9 +3320,9 @@ Fields:
                  corecord = record.sudo()[name]
                  # Special case with `res.users` since an user can belong to multiple companies.
                  if corecord._name == 'res.users' and corecord.company_ids:
@@ -678,7 +774,7 @@ index fc18b27a..374dc36e 100644
                      inconsistencies.append((record, name, corecord))
              # The second part of the check (for property / company-dependent fields) verifies that the records
              # linked via those relation fields are compatible with the company that owns the property value, i.e.
-@@ -3300,9 +3323,9 @@ Fields:
+@@ -3300,9 +3333,9 @@ Fields:
                  # Special case with `res.users` since an user can belong to multiple companies.
                  corecord = record.sudo()[name]
                  if corecord._name == 'res.users' and corecord.company_ids:
@@ -690,6 +786,51 @@ index fc18b27a..374dc36e 100644
                      inconsistencies.append((record, name, corecord))
  
          if inconsistencies:
+@@ -3339,7 +3372,7 @@ Fields:
+            :raise UserError: * if current ir.rules do not permit this operation.
+            :return: None if the operation is allowed
+         """
+-        if self.env.su:
++        if self.env.su and self.env.context.get("bypass_global_rules"):
+             return
+ 
+         # SQL Alternative if computing in-memory is too slow for large dataset
+@@ -3370,7 +3403,7 @@ Fields:
+ 
+     def _filter_access_rules(self, operation):
+         """ Return the subset of ``self`` for which ``operation`` is allowed. """
+-        if self.env.su:
++        if self.env.su and self.env.context.get("bypass_global_rules"):
+             return self
+ 
+         if not self._ids:
+@@ -4286,7 +4319,7 @@ Fields:
+ 
+            :param query: the current query object
+         """
+-        if self.env.su:
++        if self.env.su and self.env.context.get("bypass_global_rules"):
+             return
+ 
+         # apply main rules on the object
+@@ -5027,7 +5060,7 @@ Fields:
+         """
+         return self._browse(env, self._ids, self._prefetch_ids)
+ 
+-    def sudo(self, flag=True):
++    def sudo(self, flag=True, bypass_global_rules=False):
+         """ sudo([flag=True])
+ 
+         Returns a new version of this recordset with superuser mode enabled or
+@@ -5057,7 +5090,7 @@ Fields:
+         if not isinstance(flag, bool):
+             _logger.warning("deprecated use of sudo(user), use with_user(user) instead", stack_info=True)
+             return self.with_user(flag)
+-        return self.with_env(self.env(su=flag))
++        return self.with_env(self.env(su=flag)).with_context(bypass_global_rules=bypass_global_rules)
+ 
+     def with_user(self, user):
+         """ with_user(user)
 diff --git a/odoo/modules/loading.py b/odoo/modules/loading.py
 index 8093f14b..a064632d 100644
 --- a/odoo/modules/loading.py
