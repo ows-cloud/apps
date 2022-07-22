@@ -74,6 +74,7 @@ NO_EDIT_MODEL = [
     'ir.model.access',
     'ir.model.constraint',
     'ir.model.fields',
+    'ir.model.fields.selection',
     'ir.model.relation',
     'ir.module.category',
     'ir.module.module',
