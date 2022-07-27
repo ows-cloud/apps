@@ -7,6 +7,7 @@ class IrModuleMigrationInfo(models.Model):
     _inherit = "ir.module.migration.info"
 
     module_id = fields.Many2one("Module")
+    module_name = fields.Char("Module Name")
     mig_version = fields.Char("Version")
 
     mig_title = fields.Char("Title")
