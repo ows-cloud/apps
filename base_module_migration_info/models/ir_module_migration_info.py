@@ -3,11 +3,16 @@ from odoo.release import major_version # 14.0
 from odoo.exceptions import UserError
 
 
-class IrModuleModule(models.Model):
-    _inherit = "ir.module.module"
+class IrModuleMigrationInfo(models.Model):
+    _inherit = "ir.module.migration.info"
 
+    module_id = fields.Many2one("Module")
+    mig_version = fields.Char("Version")
+
+    mig_title = fields.Char("Title")
     mig_url = fields.Char("URL")
     mig_state = fields.Selection([("open", "Open"), ("merged", "Merged")], string="State")
     mig_opened = fields.Date("Opened")
     mig_merged = fields.Date("Merged")
-    mig_last_commented = fields.Date("Last Commented")
+    mig_no_of_reviewers = fields.Integer("No of reviewers")
+    mig_no_of_comments = fields.Integer("No of comments")
