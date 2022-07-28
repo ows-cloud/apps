@@ -379,10 +379,10 @@ index bdc3d0b1..36463b9e 100644
  from . import ir_model
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 00000000..0c891a55
+index 00000000..32c7e08e
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
-@@ -0,0 +1,162 @@
+@@ -0,0 +1,166 @@
 +from odoo import api, fields, models
 +from odoo.exceptions import UserError
 +from . import ir_model
@@ -506,6 +506,10 @@ index 00000000..0c891a55
 +        access_rights = self.check_access_rights('read', raise_exception=raise_if_access_error)
 +        # access_rule = record.check_access_rule('read') # will raise error if forbidden
 +        def check_access_rule(operation):
++            if not self.env.user:
++                # cannot apply security rules for a user when there is no user
++                # example: ir_http.py _auth_method_public()
++                return
 +            if self.env.su:
 +                return
 +            invalid = self - self._filter_access_rules_python(operation)
@@ -557,10 +561,18 @@ index 9063b1f2..02a8f737 100644
 +    def sudo(self, bypass_global_rules=True):
 +        return super(IrConfigParameter, self).sudo(bypass_global_rules=bypass_global_rules)
 diff --git a/odoo/addons/base/models/ir_rule.py b/odoo/addons/base/models/ir_rule.py
-index 7bbf0305..b379fe5e 100644
+index 7bbf0305..38458b28 100644
 --- a/odoo/addons/base/models/ir_rule.py
 +++ b/odoo/addons/base/models/ir_rule.py
-@@ -113,7 +113,7 @@ class IrRule(models.Model):
+@@ -42,6 +42,7 @@ class IrRule(models.Model):
+ 
+     @api.model
+     def _eval_context(self):
++        self = self.sudo(bypass_global_rules=True)
+         """Returns a dictionary to use as evaluation context for
+            ir.rule domains.
+            Note: company_ids contains the ids of the activated companies
+@@ -113,7 +114,7 @@ class IrRule(models.Model):
          if mode not in self._MODES:
              raise ValueError('Invalid mode: %r' % (mode,))
  
@@ -569,7 +581,7 @@ index 7bbf0305..b379fe5e 100644
              return self.browse(())
  
          query = """ SELECT r.id FROM ir_rule r JOIN ir_model m ON (r.model_id=m.id)
-@@ -124,6 +124,14 @@ class IrRule(models.Model):
+@@ -124,6 +125,14 @@ class IrRule(models.Model):
                           OR r.global)
                      ORDER BY r.id
                  """.format(mode=mode)
@@ -584,6 +596,15 @@ index 7bbf0305..b379fe5e 100644
          self._cr.execute(query, (model_name, self._uid))
          return self.browse(row[0] for row in self._cr.fetchall())
  
+@@ -140,7 +149,7 @@ class IrRule(models.Model):
+ 
+         # browse user and rules as SUPERUSER_ID to avoid access errors!
+         eval_context = self._eval_context()
+-        user_groups = self.env.user.groups_id
++        user_groups = self.sudo(bypass_global_rules=True).env.user.groups_id
+         global_domains = []                     # list of domains
+         group_domains = []                      # list of domains
+         for rule in rules.sudo():
 diff --git a/odoo/addons/base/models/res_company.py b/odoo/addons/base/models/res_company.py
 index 3b20cb9d..0d0dc55c 100644
 --- a/odoo/addons/base/models/res_company.py
@@ -611,9 +632,18 @@ index 3b20cb9d..0d0dc55c 100644
 +            self = self.with_context(bypass_global_rules=True)
 +        super(Company, self)._read(fields)
 diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
-index de9b3679..d5449e83 100644
+index de9b3679..f3b72a77 100644
 --- a/odoo/addons/base/models/res_partner.py
 +++ b/odoo/addons/base/models/res_partner.py
+@@ -257,7 +257,7 @@ class Partner(models.Model):
+ 
+     @api.depends('user_ids.share', 'user_ids.active')
+     def _compute_partner_share(self):
+-        super_partner = self.env['res.users'].browse(SUPERUSER_ID).partner_id
++        super_partner = self.env['res.users'].with_context(bypass_global_rules=True).browse(SUPERUSER_ID).partner_id
+         if super_partner in self:
+             super_partner.partner_share = False
+         for partner in self - super_partner:
 @@ -524,6 +524,7 @@ class Partner(models.Model):
              self.invalidate_cache(['user_ids'], self._ids)
              for partner in self:
@@ -660,7 +690,7 @@ index 606a06e7..3404ce1a 100644
      def is_superuser(self):
          """ Return whether the environment is in superuser mode. """
 diff --git a/odoo/models.py b/odoo/models.py
-index fc18b27a..2d769c95 100644
+index fc18b27a..221b2f79 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -731,22 +761,7 @@ index fc18b27a..2d769c95 100644
          result = []
          name = self._rec_name
          if name in self._fields:
-@@ -3068,7 +3090,13 @@ Fields:
-                 self = self - self.env.records_to_compute(field)
-         else:
-             fnames = [field.name]
--        self._read(fnames)
-+        # AVOID RECURSION LOOP with sudo(bypass_global_rules=False)
-+        user_group_ids = self.env["res.users"]._fields["groups_id"]
-+        if self.env.su and \
-+            (field.name in ["company_id", "company_ids"] or field == user_group_ids):
-+            self.with_context(bypass_global_rules=True)._read(fnames)
-+        else:
-+            self._read(fnames)
- 
-     def _read(self, fields):
-         """ Read the given fields of the records in ``self`` from the database,
-@@ -3251,10 +3279,12 @@ Fields:
+@@ -3251,10 +3273,12 @@ Fields:
          """ Check the companies of the values of the given field names.
  
          :param list fnames: names of relational fields to check
@@ -761,7 +776,7 @@ index fc18b27a..2d769c95 100644
          For :class:`~odoo.addons.base.models.res_users` relational fields,
          verifies record company is in `company_ids` fields.
  
-@@ -3279,6 +3309,9 @@ Fields:
+@@ -3279,6 +3303,9 @@ Fields:
              return
  
          inconsistencies = []
@@ -771,7 +786,7 @@ index fc18b27a..2d769c95 100644
          for record in self:
              company = record.company_id if record._name != 'res.company' else record
              # The first part of the check verifies that all records linked via relation fields are compatible
-@@ -3287,9 +3320,9 @@ Fields:
+@@ -3287,9 +3314,9 @@ Fields:
                  corecord = record.sudo()[name]
                  # Special case with `res.users` since an user can belong to multiple companies.
                  if corecord._name == 'res.users' and corecord.company_ids:
@@ -783,7 +798,7 @@ index fc18b27a..2d769c95 100644
                      inconsistencies.append((record, name, corecord))
              # The second part of the check (for property / company-dependent fields) verifies that the records
              # linked via those relation fields are compatible with the company that owns the property value, i.e.
-@@ -3300,9 +3333,9 @@ Fields:
+@@ -3300,9 +3327,9 @@ Fields:
                  # Special case with `res.users` since an user can belong to multiple companies.
                  corecord = record.sudo()[name]
                  if corecord._name == 'res.users' and corecord.company_ids:
@@ -795,7 +810,7 @@ index fc18b27a..2d769c95 100644
                      inconsistencies.append((record, name, corecord))
  
          if inconsistencies:
-@@ -3339,7 +3372,7 @@ Fields:
+@@ -3339,7 +3366,7 @@ Fields:
             :raise UserError: * if current ir.rules do not permit this operation.
             :return: None if the operation is allowed
          """
@@ -804,7 +819,7 @@ index fc18b27a..2d769c95 100644
              return
  
          # SQL Alternative if computing in-memory is too slow for large dataset
-@@ -3370,7 +3403,7 @@ Fields:
+@@ -3370,7 +3397,7 @@ Fields:
  
      def _filter_access_rules(self, operation):
          """ Return the subset of ``self`` for which ``operation`` is allowed. """
@@ -813,7 +828,7 @@ index fc18b27a..2d769c95 100644
              return self
  
          if not self._ids:
-@@ -4286,7 +4319,7 @@ Fields:
+@@ -4286,7 +4313,7 @@ Fields:
  
             :param query: the current query object
          """
@@ -822,7 +837,7 @@ index fc18b27a..2d769c95 100644
              return
  
          # apply main rules on the object
-@@ -5027,7 +5060,7 @@ Fields:
+@@ -5027,7 +5054,7 @@ Fields:
          """
          return self._browse(env, self._ids, self._prefetch_ids)
  
@@ -831,7 +846,7 @@ index fc18b27a..2d769c95 100644
          """ sudo([flag=True])
  
          Returns a new version of this recordset with superuser mode enabled or
-@@ -5057,7 +5090,7 @@ Fields:
+@@ -5057,7 +5084,7 @@ Fields:
          if not isinstance(flag, bool):
              _logger.warning("deprecated use of sudo(user), use with_user(user) instead", stack_info=True)
              return self.with_user(flag)
@@ -840,6 +855,17 @@ index fc18b27a..2d769c95 100644
  
      def with_user(self, user):
          """ with_user(user)
+@@ -5304,6 +5331,10 @@ Fields:
+         return self.browse([rec.id for rec in self if func(rec)])
+ 
+     def filtered_domain(self, domain):
++        if self.env.su:
++            self = self.with_context(bypass_global_rules=True)
++            # otherwise this gives error:
++            # data = rec.mapped(key)
+         if not domain: return self
+         result = []
+         for d in reversed(domain):
 diff --git a/odoo/modules/loading.py b/odoo/modules/loading.py
 index 8093f14b..a064632d 100644
 --- a/odoo/modules/loading.py
