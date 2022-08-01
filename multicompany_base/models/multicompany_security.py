@@ -375,7 +375,7 @@ class MulticompanySecurity(models.AbstractModel):
         # Read access on NO_EDIT_MODELs.
         _logger.info('Starting _set_read_and_edit_access_to_company_manager')
         group_company_manager_id = self.env.ref('multicompany_base.group_company_manager').id
-        models_to_exclude = NO_ACCESS_MODEL + ['ir.rule']
+        models_to_exclude = NO_ACCESS_MODEL
         models = self.env['ir.model'].search([('model', 'not in', models_to_exclude)])
         for model in models:
             if model.model in NO_EDIT_MODEL:
@@ -497,10 +497,20 @@ class MulticompanySecurity(models.AbstractModel):
             })
 
     def _set_company_id_where_null(self):
+        try:
+            self = self.sudo(bypass_global_rules=True)
+        except:
+            pass
         _logger.info('Starting _set_company_id_where_null')
 
-        all_models = self.env['ir.model'].search([])
-        for model in all_models:
+        last_model_names = ['ir.property', 'ir.model.data']
+        model_names = self.env['ir.model'].search(
+            [('model', 'not in', last_model_names)]
+        ).mapped('model')
+        model_names.extend(last_model_names)
+
+        for model_name in model_names:
+            model = self.env['ir.model'].search([('model', '=', model_name)])
             if not self.env[model.model]._auto:
                 continue
             if model.model == 'ir.model.fields':
