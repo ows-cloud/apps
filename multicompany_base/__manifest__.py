@@ -16,6 +16,7 @@
     ],
     'depends': [
         'base',
+        'base_set_record_values_mixin',
         'base_setup',
         # 'mail',
     ],

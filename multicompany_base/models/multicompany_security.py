@@ -319,6 +319,7 @@ def _recursive_order_words(words_list):
 
 class MulticompanySecurity(models.AbstractModel):
     _name = 'multicompany.security'
+    _inherit = "base.set.record.values.mixin"
     _description = 'Force security between companies'
 
     def _register_hook(self, update_module=False):
@@ -364,11 +365,7 @@ class MulticompanySecurity(models.AbstractModel):
                     model=model.model, security_type=SECURITY_TYPE.lower(), do_if=do_if
                 )
                 domain = [('name', '=', values['name']), ('model_id', '=', values['model_id']), ('global', '=', True)]
-                xmlid_name = '{model}_global_{do}_rule'.format(
-                    model=model.model.replace('.','_'),
-                    do=do_if[:-3],
-                )
-                self._set_record_values('ir.rule', domain, values, xmlid_name)
+                self._set_record_values('ir.rule', domain, values)
 
     def _set_read_and_edit_access_to_company_manager(self):
         # Read and edit access on models with company data.
@@ -388,10 +385,7 @@ class MulticompanySecurity(models.AbstractModel):
             values['model_id'] = model.id
             values['name'] = '{model} - company manager, {security_do_if}'.format(model=model.model, security_do_if=security_do_if)
             domain = [('name', '=', values['name']), ('model_id', '=', values['model_id']), ('group_id', '=', values['group_id'])]
-            xmlid_name = '{model}_company_manager_access'.format(
-                model=model.model.replace('.','_'),
-            )
-            self._set_record_values('ir.model.access', domain, values, xmlid_name)
+            self._set_record_values('ir.model.access', domain, values)
             # ir.rule
             if model.model in NO_EDIT_MODEL:
                 # only system records, no need for company rule
@@ -402,10 +396,7 @@ class MulticompanySecurity(models.AbstractModel):
             values['domain_force'] = "[(1, '=', 1)]"
             values['name'] = '{model} - company manager'.format(model=model.model)
             domain = [('name', '=', values['name']), ('model_id', '=', values['model_id']), ('groups', 'in', [group_company_manager_id])]
-            xmlid_name = '{model}_company_manager_rule'.format(
-                model=model.model.replace('.','_'),
-            )
-            self._set_record_values('ir.rule', domain, values, xmlid_name)
+            self._set_record_values('ir.rule', domain, values)
 
     # low-level methods
 
@@ -421,80 +412,6 @@ class MulticompanySecurity(models.AbstractModel):
             company_field = COMPANY_FIELD['default']
         domain = domain_draft.format(company_id=company_field)
         return domain
-
-    def _set_record_values(self, model_name, domain, values, xmlid_name=None):
-        record = self.env[model_name].search(domain)
-        if len(record) > 1:
-            record = self._deduplicate_or_log_critical_error(domain, record, values.keys())
-
-        if type(record) is ValueError:
-            pass
-        elif len(record) == 0:
-            new_record = self.env[model_name].create(values)
-            # Is this important? Rather save time
-            # if xmlid_name:
-            #     self._create_external_id(new_record, xmlid_name)
-        elif len(record) == 1:
-            old_values = record.read(fields=values.keys())
-            old_values = self._delele_id_and_replace_tuple_with_first_tuple_item(old_values)
-            old_values_and_new_values = old_values
-            old_values_and_new_values.append(values)
-            if not self._values_are_equal(old_values_and_new_values):
-                record.write(values)
-
-    def _deduplicate_or_log_critical_error(self, model_search_domain, records, field_names_which_should_have_same_record_values):
-        model_name = records[0]._name
-        log_critical = False
-        list_of_values = records.read(fields=field_names_which_should_have_same_record_values)
-        list_of_values = self._delele_id_and_replace_tuple_with_first_tuple_item(list_of_values)
-        if not self._values_are_equal(list_of_values):
-            log_critical = True
-        if not log_critical:
-            # Deduplicate ...
-            record_ids = records.ids
-            record_to_keep = records.browse(record_ids.pop(0))
-            records.browse(record_ids).unlink()
-            return record_to_keep
-        else:
-            # ... or log a critical error.
-            error_msg = 'company.security deduplicate: There are {count} conflicting records of model {model_name}. Domain: "{domain}". Conflicing fields: "{fields}".'.format(
-                count=len(records), model_name=model_name, domain=model_search_domain, fields=field_names_which_should_have_same_record_values
-            )
-            _logger.critical(error_msg)
-            return ValueError(error_msg)
-
-    def _delele_id_and_replace_tuple_with_first_tuple_item(self, list_of_dict):
-        for dict in list_of_dict:
-            if 'id' in dict:
-                del dict['id']
-            for key, value in dict.items():
-                if type(value) is tuple:
-                    dict[key] = value[0]
-        return list_of_dict
-
-    def _values_are_equal(self, list_of_values):
-        for values in list_of_values:
-            if values != list_of_values[0]:
-                return False
-        return True
-
-    def _create_external_id(self, record, xmlid_name):
-        xmlid_record = self.env['ir.model.data'].search([('module','=',EXTID_MODULE_NAME), ('name','=',xmlid_name)])
-        if xmlid_record:
-            if xmlid_record.model != record._name or xmlid_record.res_id != record.id:
-                _logger.warning("xmlid {module}.{name} already exists with model {model}, res_id {res_id}!".format(
-                    module=EXTID_MODULE_NAME,
-                    name=xmlid_name,
-                    model=xmlid_record.model,
-                    res_id=xmlid_record.res_id,
-                ))
-        else:
-            self.env['ir.model.data'].create({
-                'module': EXTID_MODULE_NAME,
-                'name': xmlid_name,
-                'model': record._name,
-                'res_id': record.id
-            })
 
     def _set_company_id_where_null(self):
         try:
