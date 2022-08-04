@@ -10,7 +10,11 @@ class Company(models.Model):
 
     @api.model
     def create(self, vals):
-        new_company = super(Company, self.sudo()).create(vals)
+        try:
+            self_sudo_bypass_global_rules = self.sudo(bypass_global_rules=True)
+        except:
+            self_sudo_bypass_global_rules = self.sudo()
+        new_company = super(Company, self_sudo_bypass_global_rules).create(vals)
         new_company.sudo().partner_id.write({'company_id': new_company.id})
 
         # Give access to SUPPORT USER
@@ -20,7 +24,7 @@ class Company(models.Model):
         # Auto-configure company
         config = self.env['ir.config_parameter'].sudo().get_param('multicompany_base.force_config')
         if config in ('1', 't', 'true', 'True'):
-            self.env['multicompany.config']._configure_companies(new_company)
+            new_company.env['multicompany.config']._configure_companies(new_company)
 
         return new_company
 
