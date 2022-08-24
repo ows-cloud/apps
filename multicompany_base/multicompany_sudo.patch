@@ -24,6 +24,42 @@ index 367fb6e8..8c36304a 100644
          # Filter for the exact domain (to filter out potential subdomains) due
          # to the use of ilike.
          websites = found_websites.filtered(lambda w: _filter_domain(w, domain_name))
+diff --git a/odoo/addons/base/models/__init__.py b/odoo/addons/base/models/__init__.py
+index bdc3d0b1..4220fe48 100644
+--- a/odoo/addons/base/models/__init__.py
++++ b/odoo/addons/base/models/__init__.py
+@@ -1,6 +1,9 @@
+ # -*- coding: utf-8 -*-
+ # Part of Odoo. See LICENSE file for full copyright and licensing details.
+ 
++from . import base_sudo
++
++
+ from . import assetsbundle
+ from . import qweb
+ 
+diff --git a/odoo/addons/base/models/base_sudo.py b/odoo/addons/base/models/base_sudo.py
+new file mode 100644
+index 00000000..09d85eca
+--- /dev/null
++++ b/odoo/addons/base/models/base_sudo.py
+@@ -0,0 +1,16 @@
++from odoo import api, fields, models
++from . import ir_model
++
++
++class Base(models.AbstractModel):
++    _inherit = 'base'
++
++    # This field is used by global rules.
++    company_id = fields.Many2one(
++        'res.company',
++        string='Company',
++        store=True,
++        index=True,
++        # required=True,
++        default=lambda self: self.env.company,
++    )
 diff --git a/odoo/addons/base/models/ir_config_parameter.py b/odoo/addons/base/models/ir_config_parameter.py
 index 9063b1f2..02a8f737 100644
 --- a/odoo/addons/base/models/ir_config_parameter.py
@@ -151,14 +187,34 @@ index 3b20cb9d..be720744 100644
 +            self = self.with_context(bypass_global_rules=True)
 +        super(Company, self)._read(fields)
 diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
-index de9b3679..d48a6e58 100644
+index de9b3679..1f8535a9 100644
 --- a/odoo/addons/base/models/res_partner.py
 +++ b/odoo/addons/base/models/res_partner.py
-@@ -257,7 +257,7 @@ class Partner(models.Model):
+@@ -237,6 +237,14 @@ class Partner(models.Model):
+         ('check_name', "CHECK( (type='contact' AND name IS NOT NULL) or (type!='contact') )", 'Contacts require a name'),
+     ]
+ 
++    # This field is used by global rules.
++    company_ids = fields.Many2many('res.company', string="Companies", compute='_compute_company_ids', store=True)
++
++    @api.depends('user_ids.company_ids')
++    def _compute_company_ids(self):
++        for record in self:
++            record.company_ids = record.user_ids.mapped('company_ids')
++
+     @api.depends('is_company', 'name', 'parent_id.display_name', 'type', 'company_name')
+     def _compute_display_name(self):
+         diff = dict(show_address=None, show_address_only=None, show_email=None, html_format=None, show_vat=None)
+@@ -257,7 +265,12 @@ class Partner(models.Model):
  
      @api.depends('user_ids.share', 'user_ids.active')
      def _compute_partner_share(self):
 -        super_partner = self.env['res.users'].browse(SUPERUSER_ID).partner_id
++        # SUPSERUSER needs access to all partners.
++        # This doesn't avoid access error:
++        #     partner = partner.with_record_company()
++        if self.env.su:
++            self = self.with_context(bypass_global_rules=True)
 +        super_partner = self.env['res.users'].with_context(bypass_global_rules=True).browse(SUPERUSER_ID).partner_id
          if super_partner in self:
              super_partner.partner_share = False
