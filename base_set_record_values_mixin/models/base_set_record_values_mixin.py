@@ -6,6 +6,7 @@ _logger = logging.getLogger(__name__)
 
 class BaseSetRecordValuesMixin(models.AbstractModel):
     _name = "base.set.record.values.mixin"
+    _description = "base.set.record.values.mixin"
 
     def _set_record_values(self, model_name, domain, values, xmlid=None):
         """ Create or update record.

@@ -11,7 +11,7 @@ class HrRuleQtyRateAmount(models.Model):
         try:
             return self.env.context['params']['model']
         except:
-            raise UserError('Please save changes, then refresh the page (F5).')
+            raise UserError('Please save changes, then refresh the page (F5). If needed, use the menu Payroll / Employee Payslips, or the menu Employees / Employees / Contracts.')
 
     salary_rule_id = fields.Many2one('hr.salary.rule', string="Salary Rule", ondelete='restrict')
     analytic_account_id = fields.Many2one('account.analytic.account', string="Analytic Account", ondelete='restrict')
@@ -65,6 +65,12 @@ class HrRuleQtyRateAmount(models.Model):
 
     def get_result_dict(self, months=None, multiply_with=None, uom=None, default_amount=0):
         """ Method to use in hr.salary.rule python code.
+
+            :param months (float): how many months (assuming monthly contract)
+            :param multiply_with (string): which field to multiply, should be 'result_qty' or 'result_rate'
+            :param uom (string): unit of measure to include in the name of the payslip line
+            :param default_amount: the amount to use if record.amount is 0
+            :return: dictionary of values for payslip line
 
         If # of months is not 1:
             Set the 'months' and what to 'multiply_with' ('result_qty' or 'result_rate').

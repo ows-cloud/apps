@@ -16,6 +16,7 @@
         'hr_contract',
         'hr_holidays',
         'payroll',
+        # 'payroll_analytic_qty_rate_amount',
     ],
     'license': 'AGPL-3',
     'version': '14.0.1.0.0',

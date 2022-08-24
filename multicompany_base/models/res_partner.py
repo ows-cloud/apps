@@ -4,6 +4,8 @@ from odoo import api, fields, models
 class Partner(models.Model):
     _inherit = 'res.partner'
 
+    # Also in multicompany_sudo.patch
+
     @api.depends('user_ids.company_ids')
     def _compute_company_ids(self):
         for record in self:

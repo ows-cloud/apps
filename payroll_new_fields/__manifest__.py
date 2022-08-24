@@ -6,7 +6,7 @@
     'summary': 'payslip_line.run_id',
 
     'author': 'AppsToGROW',
-    'auto_install': True,
+    'auto_install': False,
     'category': 'Uncategorized',
     'data': [
         'hr.payslip.line.xml',

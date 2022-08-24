@@ -254,7 +254,8 @@ class HrPayslip(models.Model):
             slip.write({'state': 'done'})
         return account_moves
 
-    # deprecated, use confirm_payslip
+    # DEPRECATED, use confirm_payslip_accounting()
+
     # TODO: Create pull request in Odoo, later take away this code
     # + contract_analytic_account_id = None
     # + if slip.contract_id and slip.contract_id.analytic_account_id:

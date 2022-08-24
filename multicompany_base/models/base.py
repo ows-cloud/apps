@@ -25,6 +25,7 @@ class Base(models.AbstractModel):
 
     """
 
+    # Also in multicompany_sudo.patch
     company_id = fields.Many2one(
         'res.company',
         string='Company',
