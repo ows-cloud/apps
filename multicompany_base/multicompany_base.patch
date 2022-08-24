@@ -760,7 +760,7 @@ index f60bb5e9..fc6748c4 100644
 +            '._cr': ['._cron'],
 +            '.execute': [],
 +            '._execute': [],
-+            '.with': [],
++            '.with': ['.with_context(active_test=False)'],
 +            '._with': [],
 +            '.sql': [],
 +            '._sql': [],
