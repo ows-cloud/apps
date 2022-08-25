@@ -59,6 +59,9 @@ class MulticompanyConfig(models.AbstractModel):
                 models.Model.write(record, values)
 
         # Hide some security rules
+        # Read the system user/partner (necessary when sudo() does not bypass global rules)
+        _set(_ref('base.res_users_rule'), {'active': False})
+        _set(_ref('base.res_partner_rule'), {'active': False})
         # website_sale rules include website.company_id.id which give errors.
         _set(_ref('website_sale.product_pricelist_item_comp_rule'), {'active': False})
         _set(_ref('website_sale.product_pricelist_comp_rule'), {'active': False})
