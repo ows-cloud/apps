@@ -632,7 +632,7 @@ index 699eaa16..bff8f86d 100644
              values = self.get_values_from_terp(terp)
  
 diff --git a/odoo/addons/base/models/ir_rule.py b/odoo/addons/base/models/ir_rule.py
-index 7bbf0305..38458b28 100644
+index 7bbf0305..6111a01d 100644
 --- a/odoo/addons/base/models/ir_rule.py
 +++ b/odoo/addons/base/models/ir_rule.py
 @@ -42,6 +42,7 @@ class IrRule(models.Model):
@@ -648,7 +648,7 @@ index 7bbf0305..38458b28 100644
              raise ValueError('Invalid mode: %r' % (mode,))
  
 -        if self.env.su:
-+        if self.env.su and self.env.context.get("bypass_global_rules"):
++        if self._uid == 1 or (self.env.su and self.env.context.get("bypass_global_rules")):
              return self.browse(())
  
          query = """ SELECT r.id FROM ir_rule r JOIN ir_model m ON (r.model_id=m.id)
@@ -804,7 +804,7 @@ index 606a06e7..3404ce1a 100644
      def is_superuser(self):
          """ Return whether the environment is in superuser mode. """
 diff --git a/odoo/models.py b/odoo/models.py
-index fc18b27a..b61a46b9 100644
+index fc18b27a..fdb8c655 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -972,19 +972,20 @@ index fc18b27a..b61a46b9 100644
          """ sudo([flag=True])
  
          Returns a new version of this recordset with superuser mode enabled or
-@@ -5057,7 +5089,10 @@ Fields:
+@@ -5057,7 +5089,11 @@ Fields:
          if not isinstance(flag, bool):
              _logger.warning("deprecated use of sudo(user), use with_user(user) instead", stack_info=True)
              return self.with_user(flag)
 -        return self.with_env(self.env(su=flag))
++        # SUPERUSER should always bypass global rules
 +        # sudo() should not change bypass_global_rules from True to False
-+        if self.env.context.get('bypass_global_rules'):
++        if self._uid == SUPERUSER_ID or self.env.context.get('bypass_global_rules'):
 +            bypass_global_rules = True
 +        return self.with_env(self.env(su=flag)).with_context(bypass_global_rules=bypass_global_rules)
  
      def with_user(self, user):
          """ with_user(user)
-@@ -5304,6 +5339,10 @@ Fields:
+@@ -5304,6 +5340,10 @@ Fields:
          return self.browse([rec.id for rec in self if func(rec)])
  
      def filtered_domain(self, domain):

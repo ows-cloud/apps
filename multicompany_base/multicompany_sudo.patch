@@ -1,8 +1,8 @@
 diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
-index 9f2d4a5e..c8ad21fd 100644
+index 46d01b13..06494763 100644
 --- a/addons/mail/controllers/main.py
 +++ b/addons/mail/controllers/main.py
-@@ -276,7 +276,7 @@ class MailController(http.Controller):
+@@ -286,7 +286,7 @@ class MailController(http.Controller):
              'moderation_counter': request.env.user.moderation_counter,
              'moderation_channel_ids': request.env.user.moderation_channel_ids.ids,
              'partner_root': request.env.ref('base.partner_root').sudo().mail_partner_format(),
@@ -12,10 +12,10 @@ index 9f2d4a5e..c8ad21fd 100644
              'current_partner': request.env.user.partner_id.mail_partner_format(),
              'current_user_id': request.env.user.id,
 diff --git a/addons/website/models/website.py b/addons/website/models/website.py
-index 367fb6e8..8c36304a 100644
+index 1dd96608..c3c3ec3f 100644
 --- a/addons/website/models/website.py
 +++ b/addons/website/models/website.py
-@@ -641,7 +641,7 @@ class Website(models.Model):
+@@ -644,7 +644,7 @@ class Website(models.Model):
  
          # Sort on country_group_ids so that we fall back on a generic website:
          # websites with empty country_group_ids will be first.
@@ -72,10 +72,10 @@ index 9063b1f2..02a8f737 100644
 +    def sudo(self, bypass_global_rules=True):
 +        return super(IrConfigParameter, self).sudo(bypass_global_rules=bypass_global_rules)
 diff --git a/odoo/addons/base/models/ir_model.py b/odoo/addons/base/models/ir_model.py
-index d738d650..4dc81770 100644
+index 50999888..4a38dd40 100644
 --- a/odoo/addons/base/models/ir_model.py
 +++ b/odoo/addons/base/models/ir_model.py
-@@ -2220,6 +2220,8 @@ class IrModelData(models.Model):
+@@ -2230,6 +2230,8 @@ class IrModelData(models.Model):
  
      @api.model
      def _process_end_unlink_record(self, record):
@@ -111,7 +111,7 @@ index 699eaa16..bff8f86d 100644
              values = self.get_values_from_terp(terp)
  
 diff --git a/odoo/addons/base/models/ir_rule.py b/odoo/addons/base/models/ir_rule.py
-index 7bbf0305..38458b28 100644
+index 7bbf0305..6111a01d 100644
 --- a/odoo/addons/base/models/ir_rule.py
 +++ b/odoo/addons/base/models/ir_rule.py
 @@ -42,6 +42,7 @@ class IrRule(models.Model):
@@ -127,7 +127,7 @@ index 7bbf0305..38458b28 100644
              raise ValueError('Invalid mode: %r' % (mode,))
  
 -        if self.env.su:
-+        if self.env.su and self.env.context.get("bypass_global_rules"):
++        if self._uid == 1 or (self.env.su and self.env.context.get("bypass_global_rules")):
              return self.browse(())
  
          query = """ SELECT r.id FROM ir_rule r JOIN ir_model m ON (r.model_id=m.id)
@@ -156,7 +156,7 @@ index 7bbf0305..38458b28 100644
          group_domains = []                      # list of domains
          for rule in rules.sudo():
 diff --git a/odoo/addons/base/models/ir_ui_view.py b/odoo/addons/base/models/ir_ui_view.py
-index e9835995..df7ba6be 100644
+index e3448754..6a42ccb7 100644
 --- a/odoo/addons/base/models/ir_ui_view.py
 +++ b/odoo/addons/base/models/ir_ui_view.py
 @@ -1829,6 +1829,9 @@ actual arch.
@@ -187,10 +187,10 @@ index 3b20cb9d..be720744 100644
 +            self = self.with_context(bypass_global_rules=True)
 +        super(Company, self)._read(fields)
 diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
-index de9b3679..1f8535a9 100644
+index 07475451..00ed5c05 100644
 --- a/odoo/addons/base/models/res_partner.py
 +++ b/odoo/addons/base/models/res_partner.py
-@@ -237,6 +237,14 @@ class Partner(models.Model):
+@@ -238,6 +238,14 @@ class Partner(models.Model):
          ('check_name', "CHECK( (type='contact' AND name IS NOT NULL) or (type!='contact') )", 'Contacts require a name'),
      ]
  
@@ -205,7 +205,7 @@ index de9b3679..1f8535a9 100644
      @api.depends('is_company', 'name', 'parent_id.display_name', 'type', 'company_name')
      def _compute_display_name(self):
          diff = dict(show_address=None, show_address_only=None, show_email=None, html_format=None, show_vat=None)
-@@ -257,7 +265,12 @@ class Partner(models.Model):
+@@ -258,7 +266,12 @@ class Partner(models.Model):
  
      @api.depends('user_ids.share', 'user_ids.active')
      def _compute_partner_share(self):
@@ -220,10 +220,10 @@ index de9b3679..1f8535a9 100644
              super_partner.partner_share = False
          for partner in self - super_partner:
 diff --git a/odoo/addons/base/models/res_users.py b/odoo/addons/base/models/res_users.py
-index b66b50a3..39f9930a 100644
+index 31de10c6..fb4b2413 100644
 --- a/odoo/addons/base/models/res_users.py
 +++ b/odoo/addons/base/models/res_users.py
-@@ -680,7 +680,7 @@ class Users(models.Model):
+@@ -679,7 +679,7 @@ class Users(models.Model):
          ip = request.httprequest.environ['REMOTE_ADDR'] if request else 'n/a'
          try:
              with cls.pool.cursor() as cr:
@@ -233,7 +233,7 @@ index b66b50a3..39f9930a 100644
                      user = self.search(self._get_login_domain(login), order=self._get_login_order(), limit=1)
                      if not user:
 diff --git a/odoo/models.py b/odoo/models.py
-index fc18b27a..37b437dc 100644
+index fc18b27a..f3185807 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -1738,6 +1738,10 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -295,19 +295,20 @@ index fc18b27a..37b437dc 100644
          """ sudo([flag=True])
  
          Returns a new version of this recordset with superuser mode enabled or
-@@ -5057,7 +5066,10 @@ Fields:
+@@ -5057,7 +5066,11 @@ Fields:
          if not isinstance(flag, bool):
              _logger.warning("deprecated use of sudo(user), use with_user(user) instead", stack_info=True)
              return self.with_user(flag)
 -        return self.with_env(self.env(su=flag))
++        # SUPERUSER should always bypass global rules
 +        # sudo() should not change bypass_global_rules from True to False
-+        if self.env.context.get('bypass_global_rules'):
++        if self._uid == SUPERUSER_ID or self.env.context.get('bypass_global_rules'):
 +            bypass_global_rules = True
 +        return self.with_env(self.env(su=flag)).with_context(bypass_global_rules=bypass_global_rules)
  
      def with_user(self, user):
          """ with_user(user)
-@@ -5304,6 +5316,10 @@ Fields:
+@@ -5304,6 +5317,10 @@ Fields:
          return self.browse([rec.id for rec in self if func(rec)])
  
      def filtered_domain(self, domain):
