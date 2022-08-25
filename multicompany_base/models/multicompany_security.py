@@ -68,6 +68,7 @@ NO_EDIT_MODEL = [
     'base.module.update',
     'base.module.upgrade',
     'base.update.translations',
+    'decimal.precision',
     'ir.cron',
     'ir.logging',
     'ir.model',
