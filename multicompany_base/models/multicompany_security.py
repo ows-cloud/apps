@@ -168,8 +168,9 @@ SECURITY_RULE = {
         'edit_if': 'in_company AND in_companies',
     },
     # read partners of users with access to the company, otherwise cannot read the users
+    # system_partner ('user_ids','=',1) seems not to work.
     'RES_PARTNER_MODEL': {
-        'read_if': 'system_partner OR company_ids_in_company_ids OR in_companies/parent/child',
+        'read_if': 'system_company OR company_ids_in_company_ids OR in_companies/parent/child',
         'edit_if': 'in_company AND in_companies',
     },
     'COMPANIES_MODEL': {
