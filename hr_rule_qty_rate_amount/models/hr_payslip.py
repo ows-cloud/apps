@@ -9,22 +9,6 @@ class HrPayslip(models.Model):
                                           copy=True)
 
     # TODO: make payroll PR (set employee contract)
-    def get_payslip_vals(
-        self, date_from, date_to, employee_id=False, contract_id=False
-    ):
-        res = super(HrPayslip, self).get_payslip_vals(date_from, date_to, employee_id, contract_id)
-        if employee_id and not res['value'].get('contract_id'):
-            employee = employee = self.env["hr.employee"].browse(employee_id)
-            contract_ids = employee._get_contracts(
-                date_from=date_from, date_to=date_to
-            ).ids
-            if len(contract_ids) == 1:
-                contract = self.env["hr.contract"].browse(contract_ids[0])
-                res["value"].update({"contract_id": contract.id})
-                if contract.struct_id:
-                    res["value"].update({"struct_id": contract.struct_id.id})
-        return res
-
     # Changes are done only in the contracts loop
     @api.model
     def _get_payslip_lines(self, contract_ids, payslip_id):
