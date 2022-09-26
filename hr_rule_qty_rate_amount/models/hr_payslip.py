@@ -9,6 +9,8 @@ class HrPayslip(models.Model):
                                           copy=True)
 
     # TODO: make payroll PR (set employee contract)
+    # Maybe I should have kept the code? contract_id and struct_id are now missing on the payslips.
+
     # Changes are done only in the contracts loop
     @api.model
     def _get_payslip_lines(self, contract_ids, payslip_id):
