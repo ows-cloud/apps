@@ -4,9 +4,9 @@ from odoo import fields, models
 class AccountBankStatementLine(models.Model):
     _inherit = "account.bank.statement.line"
 
-    import_first_name = fields.Char()
-    import_last_name = fields.Char()
-    import_message = fields.Char()
+    # import_first_name = fields.Char()
+    # import_last_name = fields.Char()
+    # import_message = fields.Char()
 
     def _post_import_vipps(self):
         self._post_import_vipps_set_partner()
@@ -15,6 +15,19 @@ class AccountBankStatementLine(models.Model):
         self.ensure_one()
         Partner = self.env["res.partner"]
         # name = "{} {}".format(self.import_first_name, self.import_last_name)
+        name = self.partner_name
+        partner = Partner.search([("name", "=", name)])
+        if not partner:
+            partner = Partner.create(
+                {
+                    "name": name,
+                }
+            )
+        if len(partner) == 1:
+            self.partner_id = partner.id
+
+    def _excel_post_import_hook_for_record_line(self):
+        Partner = self.env["res.partner"]
         name = self.partner_name
         partner = Partner.search([("name", "=", name)])
         if not partner:

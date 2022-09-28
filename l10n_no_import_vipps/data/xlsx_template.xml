@@ -34,9 +34,9 @@
                     'date${datetime.strptime(value, "%d.%m.%Y").strftime("%Y-%m-%d")}',
                 'B9': 'payment_ref',
                 'G9': 'amount',
-                'O9': 'import_first_name',
-                'P9': 'import_last_name',
-                'Q9': 'import_message',
+                'O9': 'partner_name',
+                'P9': 'partner_name',
+                'Q9': 'payment_ref',
             }
         }
     },
