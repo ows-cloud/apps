@@ -1,13 +1,15 @@
 diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
-index 46d01b13..06494763 100644
+index 46d01b13..845bcd83 100644
 --- a/addons/mail/controllers/main.py
 +++ b/addons/mail/controllers/main.py
-@@ -286,7 +286,7 @@ class MailController(http.Controller):
+@@ -286,7 +286,9 @@ class MailController(http.Controller):
              'moderation_counter': request.env.user.moderation_counter,
              'moderation_channel_ids': request.env.user.moderation_channel_ids.ids,
              'partner_root': request.env.ref('base.partner_root').sudo().mail_partner_format(),
 -            'public_partner': request.env.ref('base.public_partner').sudo().mail_partner_format(),
-+            'public_partner': request.env['res.partner'].sudo(bypass_global_rules=True).env.ref('base.public_partner').mail_partner_format(),
++            'public_partner': request.env['res.users'].with_context(active_test=False).search(
++                [('groups_id', '=', request.env.ref('base.group_public').id),('company_id','=',request.env.company.id)]
++            ).ensure_one().partner_id.mail_partner_format(),
              'public_partners': [partner.mail_partner_format() for partner in request.env.ref('base.group_public').sudo().with_context(active_test=False).users.partner_id],
              'current_partner': request.env.user.partner_id.mail_partner_format(),
              'current_user_id': request.env.user.id,
