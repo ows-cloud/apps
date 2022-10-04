@@ -1,5 +1,18 @@
+diff --git a/addons/account/models/account_journal.py b/addons/account/models/account_journal.py
+index f4c2d1a8..e10519c8 100644
+--- a/addons/account/models/account_journal.py
++++ b/addons/account/models/account_journal.py
+@@ -361,7 +361,7 @@ class AccountJournal(models.Model):
+             company's name or id (in case the company's name is not ascii either).
+         """
+         def get_company_suffix():
+-            if self.company_id != self.env.ref('base.main_company'):
++            if self.company_id.id != 1:
+                 try:
+                     remove_accents(self.company_id.name).encode('ascii')
+                     return '-' + str(self.company_id.name)
 diff --git a/addons/account/models/account_move.py b/addons/account/models/account_move.py
-index 8a270111..b9db3fb7 100644
+index 3cf36696..ef2ae9e5 100644
 --- a/addons/account/models/account_move.py
 +++ b/addons/account/models/account_move.py
 @@ -56,9 +56,8 @@ class AccountMove(models.Model):
@@ -14,7 +27,7 @@ index 8a270111..b9db3fb7 100644
  
      @api.model
      def _search_default_journal(self, journal_types):
-@@ -1180,8 +1179,8 @@ class AccountMove(models.Model):
+@@ -1194,8 +1193,8 @@ class AccountMove(models.Model):
                  try:
                      if not move.posted_before:
                          move._constrains_date_sequence()
@@ -25,7 +38,7 @@ index 8a270111..b9db3fb7 100644
                  except ValidationError:
                      # Has never been posted and the name doesn't match the date: recompute it
                      pass
-@@ -2545,11 +2544,11 @@ class AccountMove(models.Model):
+@@ -2567,11 +2566,11 @@ class AccountMove(models.Model):
  
          # Search for partners in copy.
          cc_mail_addresses = email_split(msg_dict.get('cc', ''))
@@ -66,10 +79,10 @@ index 9ea1339f..1932b047 100644
          action = self.env["ir.actions.actions"]._for_xml_id("base.action_res_users")
          if self.env.ref('base.default_user', raise_if_not_found=False):
 diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
-index 9f2d4a5e..038e7e37 100644
+index 46d01b13..62e9b54d 100644
 --- a/addons/mail/controllers/main.py
 +++ b/addons/mail/controllers/main.py
-@@ -136,10 +136,12 @@ class MailController(http.Controller):
+@@ -146,10 +146,12 @@ class MailController(http.Controller):
  
      @http.route('/mail/read_followers', type='json', auth='user')
      def read_followers(self, res_model, res_id):
@@ -85,7 +98,7 @@ index 9f2d4a5e..038e7e37 100644
  
          followers = []
          follower_id = None
-@@ -172,7 +174,7 @@ class MailController(http.Controller):
+@@ -182,7 +184,7 @@ class MailController(http.Controller):
          follower = request.env['mail.followers'].sudo().browse(follower_id)
          follower.ensure_one()
          request.env[follower.res_model].check_access_rights("read")
@@ -94,7 +107,7 @@ index 9f2d4a5e..038e7e37 100644
  
          # find current model subtypes, add them to a dictionary
          subtypes = request.env['mail.message.subtype'].search([
-@@ -295,7 +297,7 @@ class MailController(http.Controller):
+@@ -305,7 +307,7 @@ class MailController(http.Controller):
  
      @http.route('/mail/get_suggested_recipients', type='json', auth='user')
      def message_get_suggested_recipients(self, model, res_ids):
@@ -250,7 +263,7 @@ index 15c629e8..a3829669 100644
          if not companies:
              companies = self.env['res.company'].search([])
 diff --git a/addons/product/models/product_template.py b/addons/product/models/product_template.py
-index 5bb5f477..754c8d6d 100644
+index 14bf40a1..21cb8d3e 100644
 --- a/addons/product/models/product_template.py
 +++ b/addons/product/models/product_template.py
 @@ -21,7 +21,7 @@ class ProductTemplate(models.Model):
@@ -277,10 +290,10 @@ index a52be154..66bfb199 100644
              return buy_route.ids
          return []
 diff --git a/addons/web/controllers/main.py b/addons/web/controllers/main.py
-index bcac8f45..adad03ec 100644
+index dd14feb8..ae725ee4 100644
 --- a/addons/web/controllers/main.py
 +++ b/addons/web/controllers/main.py
-@@ -1591,6 +1591,10 @@ class Binary(http.Controller):
+@@ -1587,6 +1587,10 @@ class Binary(http.Controller):
      def upload_attachment(self, model, id, ufile, callback=None):
          files = request.httprequest.files.getlist('ufile')
          Model = request.env['ir.attachment']
@@ -310,10 +323,10 @@ index a11ddef1..f0b883e0 100644
          return res
  
 diff --git a/addons/website/models/website.py b/addons/website/models/website.py
-index 367fb6e8..4ecfd71a 100644
+index 1dd96608..d504d3a7 100644
 --- a/addons/website/models/website.py
 +++ b/addons/website/models/website.py
-@@ -299,6 +299,7 @@ class Website(models.Model):
+@@ -302,6 +302,7 @@ class Website(models.Model):
              new_menu = menu.copy({
                  'parent_id': t_menu.id,
                  'website_id': self.id,
@@ -560,10 +573,10 @@ index 3b20cb9d..6a29e43a 100644
          # Make sure that the selected currency is enabled
          if vals.get('currency_id'):
 diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
-index de9b3679..d5449e83 100644
+index 07475451..ea2a6083 100644
 --- a/odoo/addons/base/models/res_partner.py
 +++ b/odoo/addons/base/models/res_partner.py
-@@ -524,6 +524,7 @@ class Partner(models.Model):
+@@ -525,6 +525,7 @@ class Partner(models.Model):
              self.invalidate_cache(['user_ids'], self._ids)
              for partner in self:
                  if partner.active and partner.user_ids:
@@ -572,10 +585,10 @@ index de9b3679..d5449e83 100644
          # res.partner must only allow to set the company_id of a partner if it
          # is the same as the company of all users that inherit from this partner
 diff --git a/odoo/addons/base/models/res_users.py b/odoo/addons/base/models/res_users.py
-index b66b50a3..60fa9ee9 100644
+index 31de10c6..4376d060 100644
 --- a/odoo/addons/base/models/res_users.py
 +++ b/odoo/addons/base/models/res_users.py
-@@ -659,6 +659,7 @@ class Users(models.Model):
+@@ -658,6 +658,7 @@ class Users(models.Model):
      def check_super(self, passwd):
          return check_super(passwd)
  
@@ -742,7 +755,7 @@ index d17caac0..3ab7c967 100644
  
      @lazy_property
 diff --git a/odoo/tools/safe_eval.py b/odoo/tools/safe_eval.py
-index f60bb5e9..fc6748c4 100644
+index ce47edb9..c010c0da 100644
 --- a/odoo/tools/safe_eval.py
 +++ b/odoo/tools/safe_eval.py
 @@ -326,6 +326,38 @@ def safe_eval(expr, globals_dict=None, locals_dict=None, mode="eval", nocopy=Fal

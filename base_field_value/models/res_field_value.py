@@ -51,6 +51,7 @@ def _validate(value, data_type, date_format=None):
         
     return new_value
     
+# TODO: base_custom_info should handle 'reference' data type.
 data_type_selection = [('string','Text'),('boolean','True/False'),('integer','Number'),('float','Decimal'),('date','Date'),('selection','Selection'),('reference','Reference')]
 
 class ResField(models.Model):
@@ -82,7 +83,7 @@ class ResField(models.Model):
         help="""TODO: javascript widget to select res_field_value.reference_value only from this model in dropdown menu.
         (object.one2many('res.field.value'): selection function runs only once for the object, not once per res.field.value.)""")
     default_value = fields.Char("Default Value")
-    auto_create = fields.Boolean("Create on new object")
+    property_auto_create = fields.Boolean("Create on new object", company_dependent=True)
     company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.company)
     country_id = fields.Many2one('res.country', string='Country')
     active = fields.Boolean(default=True)
@@ -181,6 +182,15 @@ class ResFieldValue(models.Model):
     reference_value = fields.Reference('_get_reference_model', string="Reference")
     value = fields.Char()
     model = fields.Char(required=True, readonly=True, index=True, default=_compute_default_model)
+    # TODO: Replace this module with base_sparse_field?
+    # Reference ok
+    # Date error:
+
+    # from odoo.addons.base_sparse_field.models.fields import Serialized
+    # company_colors = fields.Serialized() # field to store JSON
+    # color_navbar_bg = fields.Char("Navbar Background Color", sparse="company_colors") # no extra column in the database
+
+    # TODO: res_id = fields.Many2oneReference(model_field="model")
     res_id = fields.Integer(required=True, readonly=True, index=True, ondelete='restrict') # '''ondelete SHOULD NOT be 'cascade', see the write method''')
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True, store=True, index=True, default=lambda self: self.env.company)
     company_country_id = fields.Many2one('res.country', string='Company Country', related='company_id.country_id', store=False, readonly=True)

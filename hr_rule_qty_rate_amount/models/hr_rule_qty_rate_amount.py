@@ -8,10 +8,11 @@ class HrRuleQtyRateAmount(models.Model):
 
     @api.model
     def _compute_default_model(self):
-        try:
-            return self.env.context['params']['model']
-        except:
-            raise UserError('Please save changes, then refresh the page (F5). If needed, use the menu Payroll / Employee Payslips, or the menu Employees / Employees / Contracts.')
+        #try:
+        #    return self.env.context['params']['model']
+        #except:
+        #    raise UserError('Please save changes, then refresh the page (F5). If needed, use the menu Payroll / Employee Payslips, or the menu Employees / Employees / Contracts.')
+        return self.salary_rule_id.qty_rate_amount_from
 
     salary_rule_id = fields.Many2one('hr.salary.rule', string="Salary Rule", ondelete='restrict')
     analytic_account_id = fields.Many2one('account.analytic.account', string="Analytic Account", ondelete='restrict')

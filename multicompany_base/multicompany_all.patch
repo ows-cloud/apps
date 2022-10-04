@@ -1,3 +1,16 @@
+diff --git a/addons/account/models/account_journal.py b/addons/account/models/account_journal.py
+index f4c2d1a8..e10519c8 100644
+--- a/addons/account/models/account_journal.py
++++ b/addons/account/models/account_journal.py
+@@ -361,7 +361,7 @@ class AccountJournal(models.Model):
+             company's name or id (in case the company's name is not ascii either).
+         """
+         def get_company_suffix():
+-            if self.company_id != self.env.ref('base.main_company'):
++            if self.company_id.id != 1:
+                 try:
+                     remove_accents(self.company_id.name).encode('ascii')
+                     return '-' + str(self.company_id.name)
 diff --git a/addons/account/models/account_move.py b/addons/account/models/account_move.py
 index 3cf36696..ef2ae9e5 100644
 --- a/addons/account/models/account_move.py
