@@ -96,10 +96,22 @@ class MulticompanyConfig(models.AbstractModel):
             (4, company_manager.id, 0),
         ]})
 
-        # Internal User
+        # Public Group
+        _set(_ref('base.group_public'), {'implied_ids': [
+            (3, _id(_ref('account.group_show_line_subtotals_tax_excluded')), 0),
+            (3, _id(_ref('account.group_show_line_subtotals_tax_included')), 0),
+        ]})
+        # Portal Group
+        _set(_ref('base.group_portal'), {'implied_ids': [
+            (3, _id(_ref('account.group_show_line_subtotals_tax_excluded')), 0),
+            (3, _id(_ref('account.group_show_line_subtotals_tax_included')), 0),
+        ]})
+        # Internal User Group
         _set(_ref('base.group_user'), {'implied_ids': [
-            (3, _id(_ref('sale.group_delivery_invoice_address')), 0),
+            (3, _id(_ref('account.group_show_line_subtotals_tax_excluded')), 0),
+            (3, _id(_ref('account.group_show_line_subtotals_tax_included')), 0),
             (3, _id(_ref('analytic.group_analytic_accounting')), 0),
+            (3, _id(_ref('sale.group_delivery_invoice_address')), 0),
             (3, _id(_ref('website.group_multi_website')), 0),
         ]})
 
@@ -125,16 +137,19 @@ class MulticompanyConfig(models.AbstractModel):
     def _configure_companies(self, companies):
         for company in companies:
             self = self._prepare(company)
-            # --------------------------------------------------
-            # General company mail.channel may be confusing in a parent/child environment. Skipping this for now.
-            # self._create_a_company_mail_channel_for_all_employees()
-            # Bad idea to copy all system sequences with code
-            # self._copy_system_sequences_with_code(company.id)
-            self._create_default_user()
-            public_user = self._create_public_user()
-            self._create_website_and_crm_team(public_user)
-            self._create_product_category()
-            # --------------------------------------------------
+            self._configure_company()
+
+    def _configure_company(self):
+        # --------------------------------------------------
+        # General company mail.channel may be confusing in a parent/child environment. Skipping this for now.
+        # self._create_a_company_mail_channel_for_all_employees()
+        # Bad idea to copy all system sequences with code
+        # self._copy_system_sequences_with_code(company.id)
+        self._create_default_user()
+        public_user = self._create_public_user()
+        self._create_website_and_crm_team(public_user)
+        self._create_product_category()
+        # --------------------------------------------------
 
     def _prepare(self, company):
         self = self.with_user(
