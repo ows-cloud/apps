@@ -400,7 +400,10 @@ class MulticompanySecurity(models.AbstractModel):
             self._set_record_values('ir.model.access', domain, values)
             # ir.rule
             if model.model in NO_EDIT_MODEL:
-                # only system records, no need for company rule
+                # only system records -> no need for company-manager rule
+                continue
+            if not self.env['ir.rule'].search([('global', '=', False), ('model_id', '=', model.id)]):
+                # no non-global rules -> no need for company-manager rule
                 continue
             values = copy.deepcopy(SECURITY_DO_IF['read_and_edit_if'])
             values['groups'] = [(4, group_company_manager_id), 0]
