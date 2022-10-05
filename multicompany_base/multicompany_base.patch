@@ -347,6 +347,19 @@ index 0eb1eb3d..fff647d2 100644
      'data': [
          'views/assets.xml',
          'views/website_livechat.xml',
+diff --git a/addons/website_sale/controllers/main.py b/addons/website_sale/controllers/main.py
+index d62f7aa3..f52b12f3 100644
+--- a/addons/website_sale/controllers/main.py
++++ b/addons/website_sale/controllers/main.py
+@@ -883,7 +883,7 @@ class WebsiteSale(http.Controller):
+             errors=[],
+             partner=order.partner_id.id,
+             order=order,
+-            payment_action_id=request.env.ref('payment.action_payment_acquirer').id,
++            payment_action_id=request.env['ir.actions.act_window'].sudo().env.ref('payment.action_payment_acquirer').id,
+             return_url= '/shop/payment/validate',
+             bootstrap_formatting= True
+         )
 diff --git a/addons/website_sale/models/website.py b/addons/website_sale/models/website.py
 index 2e530271..6c9626b5 100644
 --- a/addons/website_sale/models/website.py
@@ -360,6 +373,19 @@ index 2e530271..6c9626b5 100644
          try:
              team = self.env.ref('sales_team.salesteam_website_sales')
              return team if team.active else None
+diff --git a/addons/website_sale_delivery/controllers/main.py b/addons/website_sale_delivery/controllers/main.py
+index abd484c0..b9ce9c89 100644
+--- a/addons/website_sale_delivery/controllers/main.py
++++ b/addons/website_sale_delivery/controllers/main.py
+@@ -107,7 +107,7 @@ class WebsiteSaleDelivery(WebsiteSale):
+             values['deliveries'] = delivery_carriers.sudo()
+ 
+         values['delivery_has_storable'] = has_storable_products
+-        values['delivery_action_id'] = request.env.ref('delivery.action_delivery_carrier_form').id
++        values['delivery_action_id'] = request.env['ir.actions.act_window'].sudo().env.ref('delivery.action_delivery_carrier_form').id
+         return values
+ 
+     def _update_website_sale_delivery_return(self, order, **post):
 diff --git a/odoo/addons/base/models/__init__.py b/odoo/addons/base/models/__init__.py
 index bdc3d0b1..36463b9e 100644
 --- a/odoo/addons/base/models/__init__.py
@@ -374,10 +400,10 @@ index bdc3d0b1..36463b9e 100644
  from . import ir_model
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 00000000..63e95a8f
+index 00000000..8b299885
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
-@@ -0,0 +1,172 @@
+@@ -0,0 +1,174 @@
 +from odoo import api, fields, models
 +from odoo.exceptions import UserError
 +from . import ir_model
@@ -498,14 +524,14 @@ index 00000000..63e95a8f
 +        - self.env.ref('xmlid'): .access_control() is added to the api.
 +        - create() & write() for security reasons.
 +        """
++        # access_rights will always return True in superuser mode.
 +        access_rights = self.check_access_rights('read', raise_exception=raise_if_access_error)
++
 +        # access_rule = record.check_access_rule('read') # will raise error if forbidden
 +        def check_access_rule(operation):
 +            if not self.env.user:
 +                # cannot apply security rules for a user when there is no user
 +                # example: ir_http.py _auth_method_public()
-+                return
-+            if self.env.su:
 +                return
 +            invalid = self - self._filter_access_rules_python(operation)
 +            if not invalid:
@@ -513,6 +539,8 @@ index 00000000..63e95a8f
 +            forbidden = invalid.exists()
 +            if forbidden:
 +                return 'forbidden'
++            else:
++                return 'How can invalid evalutate True and forbidden evaluate False?'
 +        access_rule = check_access_rule('read')
 +
 +        # Success if check_access_rights returns True and check_access_rule returns None
@@ -551,7 +579,7 @@ index 00000000..63e95a8f
 +        company = self.record_company()
 +        return self.with_company(company) if company else self
 diff --git a/odoo/addons/base/models/res_company.py b/odoo/addons/base/models/res_company.py
-index 3b20cb9d..6a29e43a 100644
+index 3b20cb9d..8fc69f73 100644
 --- a/odoo/addons/base/models/res_company.py
 +++ b/odoo/addons/base/models/res_company.py
 @@ -119,7 +119,7 @@ class Company(models.Model):
@@ -572,6 +600,15 @@ index 3b20cb9d..6a29e43a 100644
  
          # Make sure that the selected currency is enabled
          if vals.get('currency_id'):
+@@ -295,7 +295,7 @@ class Company(models.Model):
+     @api.model
+     def _get_main_company(self):
+         try:
+-            main_company = self.sudo().env.ref('base.main_company')
++            main_company = self.sudo().env.ref('base.main_company', raise_if_not_found=False)
+         except ValueError:
+             main_company = self.env['res.company'].sudo().search([], limit=1, order="id")
+ 
 diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
 index 07475451..ea2a6083 100644
 --- a/odoo/addons/base/models/res_partner.py

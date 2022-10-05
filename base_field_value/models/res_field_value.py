@@ -83,7 +83,8 @@ class ResField(models.Model):
         help="""TODO: javascript widget to select res_field_value.reference_value only from this model in dropdown menu.
         (object.one2many('res.field.value'): selection function runs only once for the object, not once per res.field.value.)""")
     default_value = fields.Char("Default Value")
-    property_auto_create = fields.Boolean("Create on new object", company_dependent=True)
+    auto_create = fields.Boolean("Create on new object")
+    # property_auto_create = fields.Boolean("Create on new object", company_dependent=True)
     company_id = fields.Many2one('res.company', string='Company', required=True, store=True, index=True, default=lambda self: self.env.company)
     country_id = fields.Many2one('res.country', string='Country')
     active = fields.Boolean(default=True)
