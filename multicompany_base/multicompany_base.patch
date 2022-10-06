@@ -650,7 +650,7 @@ index 606a06e7..3404ce1a 100644
      def is_superuser(self):
          """ Return whether the environment is in superuser mode. """
 diff --git a/odoo/models.py b/odoo/models.py
-index fc18b27a..374dc36e 100644
+index fc18b27a..e91f0b1f 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -759,6 +759,15 @@ index fc18b27a..374dc36e 100644
                      inconsistencies.append((record, name, corecord))
  
          if inconsistencies:
+@@ -5320,7 +5343,7 @@ Fields:
+             else:
+                 (key, comparator, value) = d
+                 if comparator in ('child_of', 'parent_of'):
+-                    result.append(self.search([('id', 'in', self.ids), d]))
++                    result.append(self.with_context(active_test=False).search([('id', 'in', self.ids), d]))
+                     continue
+                 if key.endswith('.id'):
+                     key = key[:-3]
 diff --git a/odoo/modules/loading.py b/odoo/modules/loading.py
 index 8093f14b..a064632d 100644
 --- a/odoo/modules/loading.py

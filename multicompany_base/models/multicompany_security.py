@@ -163,6 +163,7 @@ SECURITY_RULE = {
         'edit_if': 'in_company AND in_companies',
     },
     # read users with access to the company
+    # 2022-10-06: Can read users of parent company only in vscode debug. Why not in vscode normal?
     'RES_USERS_MODEL': {
         'read_if': 'system_user OR company_ids_in_company_ids OR in_companies/parent/child',
         'edit_if': 'in_company AND in_companies',
