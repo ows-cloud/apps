@@ -335,20 +335,6 @@ index 14bf40a1..21cb8d3e 100644
  
      @tools.ormcache()
      def _get_default_uom_id(self):
-diff --git a/addons/purchase_stock/models/product.py b/addons/purchase_stock/models/product.py
-index a52be154..66bfb199 100644
---- a/addons/purchase_stock/models/product.py
-+++ b/addons/purchase_stock/models/product.py
-@@ -11,8 +11,7 @@ class ProductTemplate(models.Model):
- 
-     @api.model
-     def _get_buy_route(self):
--        buy_route_id = self.env.ref('purchase_stock.route_warehouse0_buy', raise_if_not_found=False).id
--        buy_route = self.env['stock.location.route'].search([('id', '=', buy_route_id)])
-+        buy_route = self.env.ref('purchase_stock.route_warehouse0_buy', raise_if_not_found=False)
-         if buy_route:
-             return buy_route.ids
-         return []
 diff --git a/addons/web/controllers/main.py b/addons/web/controllers/main.py
 index dd14feb8..ae725ee4 100644
 --- a/addons/web/controllers/main.py
