@@ -505,7 +505,8 @@ class MulticompanySecurity(models.AbstractModel):
             for related_model_name, ids in related_models_and_record_ids.items():
 
                 related_record_ids =  [tup[1] for tup in ids if tup[1]]
-                related_records = self.env[related_model_name].sudo().browse(related_record_ids)
+                # Related records may not exist. Search for existing related records.
+                related_records = self.env[related_model_name].sudo().search([('id', 'in', related_record_ids)])
                 related_companies = related_records.mapped('company_id')
                 for related_company in related_companies:
                     related_records_with_this_company = related_records.filtered(lambda r: r.company_id == related_company)
