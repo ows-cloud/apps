@@ -9,5 +9,5 @@ class Base(models.AbstractModel):
         for line in self:
             for param in params:
                 if param.code in line.payment_ref:
-                    param_value = self.get_time_dependent_parameter(param.code, line.date)
+                    param_value = self.get_time_dependent_parameter(param.code, "date")
                     line.payment_ref.replace(param.code, param_value)
