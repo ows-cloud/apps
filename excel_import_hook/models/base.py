@@ -8,4 +8,4 @@ class Base(models.AbstractModel):
             for line in getattr(record, one2many_field_name):
                 for name in _excel_post_import_:
                     method = "_excel_post_import_{}".format(name)
-                    api.call_kw(self, method, [line.ids], {})
+                    api.call_kw(line, method, [line.ids], {})

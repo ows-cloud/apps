@@ -12,7 +12,7 @@
     "depends": [
         "account",
         "base_time_dependent_parameter",
-        "excel_import_export",
+        "excel_import_hook",
     ],
     "data": [
     ],
