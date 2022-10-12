@@ -62,8 +62,26 @@ index 08b94805..abeb7f45 100644
          except AccessError:
              pass
          return suggestions
+diff --git a/addons/stock/models/res_company.py b/addons/stock/models/res_company.py
+index 61641494..ce04b565 100644
+--- a/addons/stock/models/res_company.py
++++ b/addons/stock/models/res_company.py
+@@ -175,11 +175,12 @@ class Company(models.Model):
+     @api.model
+     def create(self, vals):
+         company = super(Company, self).create(vals)
++        company = company.with_company(company)
+         company.sudo()._create_per_company_locations()
+         company.sudo()._create_per_company_sequences()
+         company.sudo()._create_per_company_picking_types()
+         company.sudo()._create_per_company_rules()
+-        self.env['stock.warehouse'].sudo().create({
++        company.env['stock.warehouse'].sudo().create({
+             'name': company.name,
+             'code': self.env.context.get('default_code') or company.name[:5],
+             'company_id': company.id,
 diff --git a/addons/website/models/website.py b/addons/website/models/website.py
-index 1dd96608..c3c3ec3f 100644
+index fecccced..8bd58a25 100644
 --- a/addons/website/models/website.py
 +++ b/addons/website/models/website.py
 @@ -644,7 +644,7 @@ class Website(models.Model):
