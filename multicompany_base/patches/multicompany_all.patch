@@ -385,18 +385,23 @@ index 8ca87a20..c09195b1 100644
          'report/ir_module_report_templates.xml',
          'wizard/base_module_update_views.xml',
 diff --git a/odoo/addons/base/models/__init__.py b/odoo/addons/base/models/__init__.py
-index 4220fe48..7852b0c9 100644
+index bdc3d0b1..09774435 100644
 --- a/odoo/addons/base/models/__init__.py
 +++ b/odoo/addons/base/models/__init__.py
-@@ -5,6 +5,7 @@ from . import base_sudo
+@@ -1,6 +1,12 @@
+ # -*- coding: utf-8 -*-
+ # Part of Odoo. See LICENSE file for full copyright and licensing details.
  
- 
- from . import assetsbundle
 +from . import base
++try:
++    from . import base_sudo
++except:
++    pass
++
+ from . import assetsbundle
  from . import qweb
  
- from . import ir_model
-diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
+ diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
 index 00000000..8b299885
 --- /dev/null
