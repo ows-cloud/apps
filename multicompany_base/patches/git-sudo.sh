@@ -15,4 +15,4 @@ git diff $branch_sudo $branch_all > $patch_all
 
 cd $path_patches
 git add ./*
-git commit -m $COMMIT_MESSAGE
+git commit -m "$COMMIT_MESSAGE"
