@@ -290,6 +290,37 @@ index 813a0d94..df95d986 100644
          out = """<script language="javascript" type="text/javascript">
                      var win = window.top.window;
                      win.jQuery(win).trigger(%s, %s);
+diff --git a/addons/web_editor/controllers/main.py b/addons/web_editor/controllers/main.py
+index 92d79774..c50d7d84 100644
+--- a/addons/web_editor/controllers/main.py
++++ b/addons/web_editor/controllers/main.py
+@@ -279,8 +279,8 @@ class Web_Editor(http.Controller):
+ 
+     def _clean_context(self):
+         # avoid allowed_company_ids which may erroneously restrict based on website
++        # NO! WEBSITES NEED allowed_company_ids, OTHERWISE api.Environment.company WILL USE self.user.company_id
+         context = dict(request.context)
+-        context.pop('allowed_company_ids', None)
+         request.context = context
+ 
+     @http.route("/web_editor/get_assets_editor_resources", type="json", auth="user", website=True)
+diff --git a/addons/website/models/ir_http.py b/addons/website/models/ir_http.py
+index b758caba..0d31542e 100644
+--- a/addons/website/models/ir_http.py
++++ b/addons/website/models/ir_http.py
+@@ -180,6 +180,12 @@ class Http(models.AbstractModel):
+                 env = api.Environment(cr, SUPERUSER_ID, {})
+                 request.website_routing = env['website'].get_current_website().id
+ 
++        website_id = request.context.get('website_id')
++        if website_id:
++            company = request.env['website'].browse(website_id).record_company()
++            if company:
++                request.env.company = company
++
+         response = super(Http, cls)._dispatch()
+ 
+         if not is_rerouting:
 diff --git a/addons/website/models/ir_rule.py b/addons/website/models/ir_rule.py
 index a11ddef1..f0b883e0 100644
 --- a/addons/website/models/ir_rule.py
