@@ -334,7 +334,7 @@ index 0eb1eb3d..fff647d2 100644
          'views/assets.xml',
          'views/website_livechat.xml',
 diff --git a/addons/website_sale/controllers/main.py b/addons/website_sale/controllers/main.py
-index 652ada90..8d42dd89 100644
+index 0963a6d5..3ae0d718 100644
 --- a/addons/website_sale/controllers/main.py
 +++ b/addons/website_sale/controllers/main.py
 @@ -883,7 +883,7 @@ class WebsiteSale(http.Controller):
@@ -401,7 +401,7 @@ index bdc3d0b1..09774435 100644
  from . import assetsbundle
  from . import qweb
  
- diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
+diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
 index 00000000..8b299885
 --- /dev/null
@@ -581,6 +581,19 @@ index 00000000..8b299885
 +    def with_record_company(self):
 +        company = self.record_company()
 +        return self.with_company(company) if company else self
+diff --git a/odoo/addons/base/models/ir_rule.py b/odoo/addons/base/models/ir_rule.py
+index 7bbf0305..b8369823 100644
+--- a/odoo/addons/base/models/ir_rule.py
++++ b/odoo/addons/base/models/ir_rule.py
+@@ -215,7 +215,7 @@ class IrRule(models.Model):
+         return res
+ 
+     def _make_access_error(self, operation, records):
+-        _logger.info('Access Denied by record rules for operation: %s on record ids: %r, uid: %s, model: %s', operation, records.ids[:6], self._uid, records._name)
++        _logger.info('Access Denied by record rules for operation: %s on record ids: %r, uid: %s, model: %s, company_id: %s', operation, records.ids[:6], self._uid, records._name, self.env.company.id)
+ 
+         model = records._name
+         description = self.env['ir.model']._get(model).name or model
 diff --git a/odoo/addons/base/models/res_company.py b/odoo/addons/base/models/res_company.py
 index 3b20cb9d..8fc69f73 100644
 --- a/odoo/addons/base/models/res_company.py

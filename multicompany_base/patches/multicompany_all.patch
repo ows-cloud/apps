@@ -79,7 +79,7 @@ index 9ea1339f..1932b047 100644
          action = self.env["ir.actions.actions"]._for_xml_id("base.action_res_users")
          if self.env.ref('base.default_user', raise_if_not_found=False):
 diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
-index a08b6293..8d474e87 100644
+index 46d01b13..62e9b54d 100644
 --- a/addons/mail/controllers/main.py
 +++ b/addons/mail/controllers/main.py
 @@ -146,10 +146,12 @@ class MailController(http.Controller):
@@ -107,7 +107,7 @@ index a08b6293..8d474e87 100644
  
          # find current model subtypes, add them to a dictionary
          subtypes = request.env['mail.message.subtype'].search([
-@@ -311,7 +313,7 @@ class MailController(http.Controller):
+@@ -305,7 +307,7 @@ class MailController(http.Controller):
  
      @http.route('/mail/get_suggested_recipients', type='json', auth='user')
      def message_get_suggested_recipients(self, model, res_ids):
@@ -309,7 +309,7 @@ index a11ddef1..f0b883e0 100644
          return res
  
 diff --git a/addons/website/models/website.py b/addons/website/models/website.py
-index 8bd58a25..cb4be576 100644
+index fecccced..0e6b9fb3 100644
 --- a/addons/website/models/website.py
 +++ b/addons/website/models/website.py
 @@ -302,6 +302,7 @@ class Website(models.Model):
@@ -334,7 +334,7 @@ index 0eb1eb3d..fff647d2 100644
          'views/assets.xml',
          'views/website_livechat.xml',
 diff --git a/addons/website_sale/controllers/main.py b/addons/website_sale/controllers/main.py
-index 652ada90..8d42dd89 100644
+index 0963a6d5..3ae0d718 100644
 --- a/addons/website_sale/controllers/main.py
 +++ b/addons/website_sale/controllers/main.py
 @@ -883,7 +883,7 @@ class WebsiteSale(http.Controller):
@@ -401,7 +401,7 @@ index bdc3d0b1..09774435 100644
  from . import assetsbundle
  from . import qweb
  
- diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
+diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
 index 00000000..8b299885
 --- /dev/null
@@ -581,8 +581,21 @@ index 00000000..8b299885
 +    def with_record_company(self):
 +        company = self.record_company()
 +        return self.with_company(company) if company else self
+diff --git a/odoo/addons/base/models/ir_rule.py b/odoo/addons/base/models/ir_rule.py
+index 7bbf0305..b8369823 100644
+--- a/odoo/addons/base/models/ir_rule.py
++++ b/odoo/addons/base/models/ir_rule.py
+@@ -215,7 +215,7 @@ class IrRule(models.Model):
+         return res
+ 
+     def _make_access_error(self, operation, records):
+-        _logger.info('Access Denied by record rules for operation: %s on record ids: %r, uid: %s, model: %s', operation, records.ids[:6], self._uid, records._name)
++        _logger.info('Access Denied by record rules for operation: %s on record ids: %r, uid: %s, model: %s, company_id: %s', operation, records.ids[:6], self._uid, records._name, self.env.company.id)
+ 
+         model = records._name
+         description = self.env['ir.model']._get(model).name or model
 diff --git a/odoo/addons/base/models/res_company.py b/odoo/addons/base/models/res_company.py
-index be720744..13cb2e71 100644
+index 3b20cb9d..8fc69f73 100644
 --- a/odoo/addons/base/models/res_company.py
 +++ b/odoo/addons/base/models/res_company.py
 @@ -119,7 +119,7 @@ class Company(models.Model):
@@ -613,10 +626,10 @@ index be720744..13cb2e71 100644
              main_company = self.env['res.company'].sudo().search([], limit=1, order="id")
  
 diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
-index 00ed5c05..7007844f 100644
+index 07475451..ea2a6083 100644
 --- a/odoo/addons/base/models/res_partner.py
 +++ b/odoo/addons/base/models/res_partner.py
-@@ -538,6 +538,7 @@ class Partner(models.Model):
+@@ -525,6 +525,7 @@ class Partner(models.Model):
              self.invalidate_cache(['user_ids'], self._ids)
              for partner in self:
                  if partner.active and partner.user_ids:
@@ -625,7 +638,7 @@ index 00ed5c05..7007844f 100644
          # res.partner must only allow to set the company_id of a partner if it
          # is the same as the company of all users that inherit from this partner
 diff --git a/odoo/addons/base/models/res_users.py b/odoo/addons/base/models/res_users.py
-index fb4b2413..8c5af3be 100644
+index 31de10c6..4376d060 100644
 --- a/odoo/addons/base/models/res_users.py
 +++ b/odoo/addons/base/models/res_users.py
 @@ -658,6 +658,7 @@ class Users(models.Model):
@@ -653,7 +666,7 @@ index 606a06e7..3404ce1a 100644
      def is_superuser(self):
          """ Return whether the environment is in superuser mode. """
 diff --git a/odoo/models.py b/odoo/models.py
-index f3185807..52a74f7f 100644
+index fc18b27a..e91f0b1f 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -713,7 +726,7 @@ index f3185807..52a74f7f 100644
          finally:
              psycopg2.extensions.set_wait_callback(callback)
          self.env['ir.model.data'].invalidate_cache(fnames=fields)
-@@ -3255,10 +3273,12 @@ Fields:
+@@ -3251,10 +3269,12 @@ Fields:
          """ Check the companies of the values of the given field names.
  
          :param list fnames: names of relational fields to check
@@ -728,7 +741,7 @@ index f3185807..52a74f7f 100644
          For :class:`~odoo.addons.base.models.res_users` relational fields,
          verifies record company is in `company_ids` fields.
  
-@@ -3283,6 +3303,9 @@ Fields:
+@@ -3279,6 +3299,9 @@ Fields:
              return
  
          inconsistencies = []
@@ -738,7 +751,7 @@ index f3185807..52a74f7f 100644
          for record in self:
              company = record.company_id if record._name != 'res.company' else record
              # The first part of the check verifies that all records linked via relation fields are compatible
-@@ -3291,9 +3314,9 @@ Fields:
+@@ -3287,9 +3310,9 @@ Fields:
                  corecord = record.sudo()[name]
                  # Special case with `res.users` since an user can belong to multiple companies.
                  if corecord._name == 'res.users' and corecord.company_ids:
@@ -750,7 +763,7 @@ index f3185807..52a74f7f 100644
                      inconsistencies.append((record, name, corecord))
              # The second part of the check (for property / company-dependent fields) verifies that the records
              # linked via those relation fields are compatible with the company that owns the property value, i.e.
-@@ -3304,9 +3327,9 @@ Fields:
+@@ -3300,9 +3323,9 @@ Fields:
                  # Special case with `res.users` since an user can belong to multiple companies.
                  corecord = record.sudo()[name]
                  if corecord._name == 'res.users' and corecord.company_ids:
@@ -762,7 +775,7 @@ index f3185807..52a74f7f 100644
                      inconsistencies.append((record, name, corecord))
  
          if inconsistencies:
-@@ -5337,7 +5360,7 @@ Fields:
+@@ -5320,7 +5343,7 @@ Fields:
              else:
                  (key, comparator, value) = d
                  if comparator in ('child_of', 'parent_of'):
@@ -772,7 +785,7 @@ index f3185807..52a74f7f 100644
                  if key.endswith('.id'):
                      key = key[:-3]
 diff --git a/odoo/modules/loading.py b/odoo/modules/loading.py
-index b374a873..f54e2fa2 100644
+index 8093f14b..a064632d 100644
 --- a/odoo/modules/loading.py
 +++ b/odoo/modules/loading.py
 @@ -568,7 +568,10 @@ def load_modules(db, force_demo=False, status=None, update_module=False):
