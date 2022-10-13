@@ -1,5 +1,7 @@
 source git-config.sh
 cd $path_odoo
+git reset --hard
+git clean -f
 
 git checkout $branch_main
 git branch -D $branch_base
