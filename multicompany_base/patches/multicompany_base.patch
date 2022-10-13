@@ -308,6 +308,20 @@ index a11ddef1..f0b883e0 100644
          res['website'] = is_frontend and Website.get_current_website() or Website
          return res
  
+diff --git a/addons/website/models/ir_ui_view.py b/addons/website/models/ir_ui_view.py
+index c0b89582..4f485c59 100644
+--- a/addons/website/models/ir_ui_view.py
++++ b/addons/website/models/ir_ui_view.py
+@@ -511,6 +511,9 @@ class View(models.Model):
+             ], limit=1)
+             if website_specific_view:
+                 self = website_specific_view
++        if current_website:
++            company = current_website.record_company()
++            self = self.with_company(company) if company else self
+         super(View, self).save(value, xpath=xpath)
+ 
+     # --------------------------------------------------------------------------
 diff --git a/addons/website/models/website.py b/addons/website/models/website.py
 index fecccced..0e6b9fb3 100644
 --- a/addons/website/models/website.py
@@ -403,10 +417,10 @@ index bdc3d0b1..09774435 100644
  
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 00000000..8b299885
+index 00000000..8c1eec87
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
-@@ -0,0 +1,174 @@
+@@ -0,0 +1,177 @@
 +from odoo import api, fields, models
 +from odoo.exceptions import UserError
 +from . import ir_model
@@ -563,6 +577,9 @@ index 00000000..8b299885
 +    In patches to fix controllers,
 +    the methods .record_company() and .with_record_company() are often very useful.
 +    Then sudo() is only one place here, not in every controller patch.
++    TODO: 
++    Set the active company as env.company in a central place, so controllers will know the company by default?
++    request.httprequest.cookies.get("cids") - The first cid is the active company.
 +    """
 +
 +    def record_company(self):
