@@ -56,6 +56,9 @@ COMPANY_READ_SYSTEM_MODEL = [
     'stock.location',
     'uom.uom',
     'website.menu',
+    'xlsx.template',
+    'xlsx.template.export',
+    'xlsx.template.import',
 ]
 
 NO_EDIT_MODEL = [
