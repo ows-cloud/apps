@@ -77,7 +77,6 @@ NO_EDIT_MODEL = [
     'ir.model',
     'ir.model.access',
     'ir.model.constraint',
-    'ir.model.fields',
     'ir.model.fields.selection',
     'ir.model.relation',
     'ir.module.category',
@@ -131,6 +130,7 @@ SECURITY_DOMAIN_WORD = {
     'in_companies/parent/child': "'|',('{company_id}','in',company_ids),'|',('{company_id}','parent_of',company_ids),('{company_id}','child_of',company_ids)",
     'in_company': "('{company_id}','=',company_id)",
     'in_company/parent/child': "'|',('{company_id}','=',company_id),'|',('{company_id}','parent_of',company_id),('{company_id}','child_of',company_id)",
+    'json': "('serialization_field_id', '>', 0)",
     'system_company': "('{company_id}','=',1)",
     'system_user': "('id','=',1)",
     'system_partner': "('user_ids','=',1)",
@@ -166,6 +166,7 @@ SECURITY_RULE = {
         'edit_if': 'in_company AND in_companies',
     },
     # read users with access to the company
+    # 2022-10-06: Can read users of parent company only in vscode debug. Why not in vscode normal?
     'RES_USERS_MODEL': {
         'read_if': 'system_user OR company_ids_in_company_ids OR in_companies/parent/child',
         'edit_if': 'in_company AND in_companies',
@@ -188,6 +189,11 @@ SECURITY_RULE = {
     'COMPANY_READ_SYSTEM_MODEL': {
         'read_if': 'system_company OR in_companies/parent/child',
         'edit_if': 'in_company AND in_companies',
+    },
+    # Relevant if some fields will use JSON format
+    'IR_MODEL_FIELDS_MODEL': {
+        'read_if': 'system_company OR in_companies/parent/child',
+        'edit_if': 'in_company AND in_companies AND json',
     },
     'NO_EDIT_MODEL': {
         'edit_if': 'system_company AND ( in_company AND in_companies )',
@@ -239,6 +245,8 @@ SECURITY_DO_IF = {
 def _get_security_type(model_name):
     if model_name == 'bus.presence':
         return 'BUS_PRESENCE_MODEL'
+    elif model_name == 'ir.model.fields':
+        return 'IR_MODEL_FIELDS_MODEL'
     elif model_name == 'res.company':
         return 'RES_COMPANY_MODEL'
     elif model_name == 'res.partner':
@@ -365,6 +373,7 @@ class MulticompanySecurity(models.AbstractModel):
             SECURITY_TYPE = _get_security_type(model.model)
             for do_if, domain_words in SECURITY_RULE[SECURITY_TYPE].items():
                 values = copy.deepcopy(SECURITY_DO_IF[do_if])
+                values["auto_secure"] = True
                 values['groups'] = []
                 values['model_id'] = model.id
                 values['domain_force'] = self._words2domain(do_if=do_if, words=domain_words, model=model.model)
@@ -395,7 +404,10 @@ class MulticompanySecurity(models.AbstractModel):
             self._set_record_values('ir.model.access', domain, values)
             # ir.rule
             if model.model in NO_EDIT_MODEL:
-                # only system records, no need for company rule
+                # only system records -> no need for company-manager rule
+                continue
+            if not self.env['ir.rule'].search([('global', '=', False), ('model_id', '=', model.id)]):
+                # no non-global rules -> no need for company-manager rule
                 continue
             values = copy.deepcopy(SECURITY_DO_IF['read_and_edit_if'])
             values['groups'] = [(4, group_company_manager_id), 0]
@@ -496,7 +508,8 @@ class MulticompanySecurity(models.AbstractModel):
             for related_model_name, ids in related_models_and_record_ids.items():
 
                 related_record_ids =  [tup[1] for tup in ids if tup[1]]
-                related_records = self.env[related_model_name].sudo().browse(related_record_ids)
+                # Related records may not exist. Search for existing related records.
+                related_records = self.env[related_model_name].sudo().search([('id', 'in', related_record_ids)])
                 related_companies = related_records.mapped('company_id')
                 for related_company in related_companies:
                     related_records_with_this_company = related_records.filtered(lambda r: r.company_id == related_company)

@@ -1,6 +1,6 @@
 In the xlsx.template, set:
-post_import_hook = "${object.excel_post_import_hook(one2many_field_name)}"
+post_import_hook = "${object.excel_post_import_hook('line_ids', ['name1', 'name2'])}"
 
-In python, inherit:
-_excel_post_import_hook_for_record()
-_excel_post_import_hook_for_record_line()
+In python, create:
+_excel_post_import_hook_name1()
+_excel_post_import_hook_name2()

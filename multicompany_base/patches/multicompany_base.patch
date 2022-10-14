@@ -1,5 +1,18 @@
+diff --git a/addons/account/models/account_journal.py b/addons/account/models/account_journal.py
+index a0c994d0..8d512929 100644
+--- a/addons/account/models/account_journal.py
++++ b/addons/account/models/account_journal.py
+@@ -361,7 +361,7 @@ class AccountJournal(models.Model):
+             company's name or id (in case the company's name is not ascii either).
+         """
+         def get_company_suffix():
+-            if self.company_id != self.env.ref('base.main_company'):
++            if self.company_id.id != 1:
+                 try:
+                     remove_accents(self.company_id.name).encode('ascii')
+                     return '-' + str(self.company_id.name)
 diff --git a/addons/account/models/account_move.py b/addons/account/models/account_move.py
-index 8a270111..b9db3fb7 100644
+index c46a4550..10d9c776 100644
 --- a/addons/account/models/account_move.py
 +++ b/addons/account/models/account_move.py
 @@ -56,9 +56,8 @@ class AccountMove(models.Model):
@@ -14,7 +27,7 @@ index 8a270111..b9db3fb7 100644
  
      @api.model
      def _search_default_journal(self, journal_types):
-@@ -1180,8 +1179,8 @@ class AccountMove(models.Model):
+@@ -1200,8 +1199,8 @@ class AccountMove(models.Model):
                  try:
                      if not move.posted_before:
                          move._constrains_date_sequence()
@@ -25,7 +38,7 @@ index 8a270111..b9db3fb7 100644
                  except ValidationError:
                      # Has never been posted and the name doesn't match the date: recompute it
                      pass
-@@ -2545,11 +2544,11 @@ class AccountMove(models.Model):
+@@ -2575,11 +2574,11 @@ class AccountMove(models.Model):
  
          # Search for partners in copy.
          cc_mail_addresses = email_split(msg_dict.get('cc', ''))
@@ -66,10 +79,10 @@ index 9ea1339f..1932b047 100644
          action = self.env["ir.actions.actions"]._for_xml_id("base.action_res_users")
          if self.env.ref('base.default_user', raise_if_not_found=False):
 diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
-index 9f2d4a5e..038e7e37 100644
+index 46d01b13..62e9b54d 100644
 --- a/addons/mail/controllers/main.py
 +++ b/addons/mail/controllers/main.py
-@@ -136,10 +136,12 @@ class MailController(http.Controller):
+@@ -146,10 +146,12 @@ class MailController(http.Controller):
  
      @http.route('/mail/read_followers', type='json', auth='user')
      def read_followers(self, res_model, res_id):
@@ -85,7 +98,7 @@ index 9f2d4a5e..038e7e37 100644
  
          followers = []
          follower_id = None
-@@ -172,7 +174,7 @@ class MailController(http.Controller):
+@@ -182,7 +184,7 @@ class MailController(http.Controller):
          follower = request.env['mail.followers'].sudo().browse(follower_id)
          follower.ensure_one()
          request.env[follower.res_model].check_access_rights("read")
@@ -94,7 +107,7 @@ index 9f2d4a5e..038e7e37 100644
  
          # find current model subtypes, add them to a dictionary
          subtypes = request.env['mail.message.subtype'].search([
-@@ -295,7 +297,7 @@ class MailController(http.Controller):
+@@ -305,7 +307,7 @@ class MailController(http.Controller):
  
      @http.route('/mail/get_suggested_recipients', type='json', auth='user')
      def message_get_suggested_recipients(self, model, res_ids):
@@ -104,7 +117,7 @@ index 9f2d4a5e..038e7e37 100644
              records.check_access_rule('read')
              records.check_access_rights('read')
 diff --git a/addons/mail/models/mail_thread.py b/addons/mail/models/mail_thread.py
-index 70db9998..60587cc0 100644
+index 12cf1080..02b9e714 100644
 --- a/addons/mail/models/mail_thread.py
 +++ b/addons/mail/models/mail_thread.py
 @@ -1052,6 +1052,9 @@ class MailThread(models.AbstractModel):
@@ -237,7 +250,7 @@ index 00000000..117ef56a
 +
 +</odoo>
 diff --git a/addons/point_of_sale/models/pos_config.py b/addons/point_of_sale/models/pos_config.py
-index 15c629e8..a3829669 100644
+index a26104ab..6b745f3b 100644
 --- a/addons/point_of_sale/models/pos_config.py
 +++ b/addons/point_of_sale/models/pos_config.py
 @@ -654,6 +654,8 @@ class PosConfig(models.Model):
@@ -250,7 +263,7 @@ index 15c629e8..a3829669 100644
          if not companies:
              companies = self.env['res.company'].search([])
 diff --git a/addons/product/models/product_template.py b/addons/product/models/product_template.py
-index 5bb5f477..754c8d6d 100644
+index 14bf40a1..21cb8d3e 100644
 --- a/addons/product/models/product_template.py
 +++ b/addons/product/models/product_template.py
 @@ -21,7 +21,7 @@ class ProductTemplate(models.Model):
@@ -262,25 +275,11 @@ index 5bb5f477..754c8d6d 100644
  
      @tools.ormcache()
      def _get_default_uom_id(self):
-diff --git a/addons/purchase_stock/models/product.py b/addons/purchase_stock/models/product.py
-index a52be154..66bfb199 100644
---- a/addons/purchase_stock/models/product.py
-+++ b/addons/purchase_stock/models/product.py
-@@ -11,8 +11,7 @@ class ProductTemplate(models.Model):
- 
-     @api.model
-     def _get_buy_route(self):
--        buy_route_id = self.env.ref('purchase_stock.route_warehouse0_buy', raise_if_not_found=False).id
--        buy_route = self.env['stock.location.route'].search([('id', '=', buy_route_id)])
-+        buy_route = self.env.ref('purchase_stock.route_warehouse0_buy', raise_if_not_found=False)
-         if buy_route:
-             return buy_route.ids
-         return []
 diff --git a/addons/web/controllers/main.py b/addons/web/controllers/main.py
-index bcac8f45..adad03ec 100644
+index 813a0d94..df95d986 100644
 --- a/addons/web/controllers/main.py
 +++ b/addons/web/controllers/main.py
-@@ -1591,6 +1591,10 @@ class Binary(http.Controller):
+@@ -1586,6 +1586,10 @@ class Binary(http.Controller):
      def upload_attachment(self, model, id, ufile, callback=None):
          files = request.httprequest.files.getlist('ufile')
          Model = request.env['ir.attachment']
@@ -291,6 +290,37 @@ index bcac8f45..adad03ec 100644
          out = """<script language="javascript" type="text/javascript">
                      var win = window.top.window;
                      win.jQuery(win).trigger(%s, %s);
+diff --git a/addons/web_editor/controllers/main.py b/addons/web_editor/controllers/main.py
+index 92d79774..c50d7d84 100644
+--- a/addons/web_editor/controllers/main.py
++++ b/addons/web_editor/controllers/main.py
+@@ -279,8 +279,8 @@ class Web_Editor(http.Controller):
+ 
+     def _clean_context(self):
+         # avoid allowed_company_ids which may erroneously restrict based on website
++        # NO! WEBSITES NEED allowed_company_ids, OTHERWISE api.Environment.company WILL USE self.user.company_id
+         context = dict(request.context)
+-        context.pop('allowed_company_ids', None)
+         request.context = context
+ 
+     @http.route("/web_editor/get_assets_editor_resources", type="json", auth="user", website=True)
+diff --git a/addons/website/models/ir_http.py b/addons/website/models/ir_http.py
+index b758caba..0d31542e 100644
+--- a/addons/website/models/ir_http.py
++++ b/addons/website/models/ir_http.py
+@@ -180,6 +180,12 @@ class Http(models.AbstractModel):
+                 env = api.Environment(cr, SUPERUSER_ID, {})
+                 request.website_routing = env['website'].get_current_website().id
+ 
++        website_id = request.context.get('website_id')
++        if website_id:
++            company = request.env['website'].browse(website_id).record_company()
++            if company:
++                request.env.company = company
++
+         response = super(Http, cls)._dispatch()
+ 
+         if not is_rerouting:
 diff --git a/addons/website/models/ir_rule.py b/addons/website/models/ir_rule.py
 index a11ddef1..f0b883e0 100644
 --- a/addons/website/models/ir_rule.py
@@ -309,11 +339,25 @@ index a11ddef1..f0b883e0 100644
          res['website'] = is_frontend and Website.get_current_website() or Website
          return res
  
+diff --git a/addons/website/models/ir_ui_view.py b/addons/website/models/ir_ui_view.py
+index c0b89582..4f485c59 100644
+--- a/addons/website/models/ir_ui_view.py
++++ b/addons/website/models/ir_ui_view.py
+@@ -511,6 +511,9 @@ class View(models.Model):
+             ], limit=1)
+             if website_specific_view:
+                 self = website_specific_view
++        if current_website:
++            company = current_website.record_company()
++            self = self.with_company(company) if company else self
+         super(View, self).save(value, xpath=xpath)
+ 
+     # --------------------------------------------------------------------------
 diff --git a/addons/website/models/website.py b/addons/website/models/website.py
-index 367fb6e8..4ecfd71a 100644
+index fecccced..0e6b9fb3 100644
 --- a/addons/website/models/website.py
 +++ b/addons/website/models/website.py
-@@ -299,6 +299,7 @@ class Website(models.Model):
+@@ -302,6 +302,7 @@ class Website(models.Model):
              new_menu = menu.copy({
                  'parent_id': t_menu.id,
                  'website_id': self.id,
@@ -334,6 +378,19 @@ index 0eb1eb3d..fff647d2 100644
      'data': [
          'views/assets.xml',
          'views/website_livechat.xml',
+diff --git a/addons/website_sale/controllers/main.py b/addons/website_sale/controllers/main.py
+index 0963a6d5..3ae0d718 100644
+--- a/addons/website_sale/controllers/main.py
++++ b/addons/website_sale/controllers/main.py
+@@ -883,7 +883,7 @@ class WebsiteSale(http.Controller):
+             errors=[],
+             partner=order.partner_id.id,
+             order=order,
+-            payment_action_id=request.env.ref('payment.action_payment_acquirer').id,
++            payment_action_id=request.env['ir.actions.act_window'].sudo().env.ref('payment.action_payment_acquirer').id,
+             return_url= '/shop/payment/validate',
+             bootstrap_formatting= True
+         )
 diff --git a/addons/website_sale/models/website.py b/addons/website_sale/models/website.py
 index 2e530271..6c9626b5 100644
 --- a/addons/website_sale/models/website.py
@@ -347,24 +404,54 @@ index 2e530271..6c9626b5 100644
          try:
              team = self.env.ref('sales_team.salesteam_website_sales')
              return team if team.active else None
+diff --git a/addons/website_sale_delivery/controllers/main.py b/addons/website_sale_delivery/controllers/main.py
+index abd484c0..b9ce9c89 100644
+--- a/addons/website_sale_delivery/controllers/main.py
++++ b/addons/website_sale_delivery/controllers/main.py
+@@ -107,7 +107,7 @@ class WebsiteSaleDelivery(WebsiteSale):
+             values['deliveries'] = delivery_carriers.sudo()
+ 
+         values['delivery_has_storable'] = has_storable_products
+-        values['delivery_action_id'] = request.env.ref('delivery.action_delivery_carrier_form').id
++        values['delivery_action_id'] = request.env['ir.actions.act_window'].sudo().env.ref('delivery.action_delivery_carrier_form').id
+         return values
+ 
+     def _update_website_sale_delivery_return(self, order, **post):
+diff --git a/odoo/addons/base/__manifest__.py b/odoo/addons/base/__manifest__.py
+index 8ca87a20..c09195b1 100644
+--- a/odoo/addons/base/__manifest__.py
++++ b/odoo/addons/base/__manifest__.py
+@@ -47,7 +47,6 @@ The kernel of Odoo, needed for all installation.
+         'views/ir_qweb_widget_templates.xml',
+         'views/ir_module_views.xml',
+         'data/ir_module_category_data.xml',
+-        'data/ir_module_module.xml',
+         'report/ir_module_reports.xml',
+         'report/ir_module_report_templates.xml',
+         'wizard/base_module_update_views.xml',
 diff --git a/odoo/addons/base/models/__init__.py b/odoo/addons/base/models/__init__.py
-index bdc3d0b1..36463b9e 100644
+index bdc3d0b1..09774435 100644
 --- a/odoo/addons/base/models/__init__.py
 +++ b/odoo/addons/base/models/__init__.py
-@@ -2,6 +2,7 @@
+@@ -1,6 +1,12 @@
+ # -*- coding: utf-8 -*-
  # Part of Odoo. See LICENSE file for full copyright and licensing details.
  
- from . import assetsbundle
 +from . import base
++try:
++    from . import base_sudo
++except:
++    pass
++
+ from . import assetsbundle
  from . import qweb
  
- from . import ir_model
 diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
 new file mode 100644
-index 00000000..63e95a8f
+index 00000000..8c1eec87
 --- /dev/null
 +++ b/odoo/addons/base/models/base.py
-@@ -0,0 +1,172 @@
+@@ -0,0 +1,177 @@
 +from odoo import api, fields, models
 +from odoo.exceptions import UserError
 +from . import ir_model
@@ -485,14 +572,14 @@ index 00000000..63e95a8f
 +        - self.env.ref('xmlid'): .access_control() is added to the api.
 +        - create() & write() for security reasons.
 +        """
++        # access_rights will always return True in superuser mode.
 +        access_rights = self.check_access_rights('read', raise_exception=raise_if_access_error)
++
 +        # access_rule = record.check_access_rule('read') # will raise error if forbidden
 +        def check_access_rule(operation):
 +            if not self.env.user:
 +                # cannot apply security rules for a user when there is no user
 +                # example: ir_http.py _auth_method_public()
-+                return
-+            if self.env.su:
 +                return
 +            invalid = self - self._filter_access_rules_python(operation)
 +            if not invalid:
@@ -500,6 +587,8 @@ index 00000000..63e95a8f
 +            forbidden = invalid.exists()
 +            if forbidden:
 +                return 'forbidden'
++            else:
++                return 'How can invalid evalutate True and forbidden evaluate False?'
 +        access_rule = check_access_rule('read')
 +
 +        # Success if check_access_rights returns True and check_access_rule returns None
@@ -519,6 +608,9 @@ index 00000000..63e95a8f
 +    In patches to fix controllers,
 +    the methods .record_company() and .with_record_company() are often very useful.
 +    Then sudo() is only one place here, not in every controller patch.
++    TODO: 
++    Set the active company as env.company in a central place, so controllers will know the company by default?
++    request.httprequest.cookies.get("cids") - The first cid is the active company.
 +    """
 +
 +    def record_company(self):
@@ -537,8 +629,21 @@ index 00000000..63e95a8f
 +    def with_record_company(self):
 +        company = self.record_company()
 +        return self.with_company(company) if company else self
+diff --git a/odoo/addons/base/models/ir_rule.py b/odoo/addons/base/models/ir_rule.py
+index 7bbf0305..b8369823 100644
+--- a/odoo/addons/base/models/ir_rule.py
++++ b/odoo/addons/base/models/ir_rule.py
+@@ -215,7 +215,7 @@ class IrRule(models.Model):
+         return res
+ 
+     def _make_access_error(self, operation, records):
+-        _logger.info('Access Denied by record rules for operation: %s on record ids: %r, uid: %s, model: %s', operation, records.ids[:6], self._uid, records._name)
++        _logger.info('Access Denied by record rules for operation: %s on record ids: %r, uid: %s, model: %s, company_id: %s', operation, records.ids[:6], self._uid, records._name, self.env.company.id)
+ 
+         model = records._name
+         description = self.env['ir.model']._get(model).name or model
 diff --git a/odoo/addons/base/models/res_company.py b/odoo/addons/base/models/res_company.py
-index 3b20cb9d..6a29e43a 100644
+index 3b20cb9d..8fc69f73 100644
 --- a/odoo/addons/base/models/res_company.py
 +++ b/odoo/addons/base/models/res_company.py
 @@ -119,7 +119,7 @@ class Company(models.Model):
@@ -559,11 +664,20 @@ index 3b20cb9d..6a29e43a 100644
  
          # Make sure that the selected currency is enabled
          if vals.get('currency_id'):
+@@ -295,7 +295,7 @@ class Company(models.Model):
+     @api.model
+     def _get_main_company(self):
+         try:
+-            main_company = self.sudo().env.ref('base.main_company')
++            main_company = self.sudo().env.ref('base.main_company', raise_if_not_found=False)
+         except ValueError:
+             main_company = self.env['res.company'].sudo().search([], limit=1, order="id")
+ 
 diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
-index de9b3679..d5449e83 100644
+index 07475451..ea2a6083 100644
 --- a/odoo/addons/base/models/res_partner.py
 +++ b/odoo/addons/base/models/res_partner.py
-@@ -524,6 +524,7 @@ class Partner(models.Model):
+@@ -525,6 +525,7 @@ class Partner(models.Model):
              self.invalidate_cache(['user_ids'], self._ids)
              for partner in self:
                  if partner.active and partner.user_ids:
@@ -572,10 +686,10 @@ index de9b3679..d5449e83 100644
          # res.partner must only allow to set the company_id of a partner if it
          # is the same as the company of all users that inherit from this partner
 diff --git a/odoo/addons/base/models/res_users.py b/odoo/addons/base/models/res_users.py
-index b66b50a3..60fa9ee9 100644
+index 31de10c6..4376d060 100644
 --- a/odoo/addons/base/models/res_users.py
 +++ b/odoo/addons/base/models/res_users.py
-@@ -659,6 +659,7 @@ class Users(models.Model):
+@@ -658,6 +658,7 @@ class Users(models.Model):
      def check_super(self, passwd):
          return check_super(passwd)
  
@@ -600,7 +714,7 @@ index 606a06e7..3404ce1a 100644
      def is_superuser(self):
          """ Return whether the environment is in superuser mode. """
 diff --git a/odoo/models.py b/odoo/models.py
-index fc18b27a..374dc36e 100644
+index fc18b27a..e91f0b1f 100644
 --- a/odoo/models.py
 +++ b/odoo/models.py
 @@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
@@ -709,6 +823,15 @@ index fc18b27a..374dc36e 100644
                      inconsistencies.append((record, name, corecord))
  
          if inconsistencies:
+@@ -5320,7 +5343,7 @@ Fields:
+             else:
+                 (key, comparator, value) = d
+                 if comparator in ('child_of', 'parent_of'):
+-                    result.append(self.search([('id', 'in', self.ids), d]))
++                    result.append(self.with_context(active_test=False).search([('id', 'in', self.ids), d]))
+                     continue
+                 if key.endswith('.id'):
+                     key = key[:-3]
 diff --git a/odoo/modules/loading.py b/odoo/modules/loading.py
 index 8093f14b..a064632d 100644
 --- a/odoo/modules/loading.py
@@ -726,7 +849,7 @@ index 8093f14b..a064632d 100644
  
          # STEP 9: save installed/updated modules for post-install tests
 diff --git a/odoo/modules/registry.py b/odoo/modules/registry.py
-index d17caac0..3ab7c967 100644
+index 6a09da86..10311d1a 100644
 --- a/odoo/modules/registry.py
 +++ b/odoo/modules/registry.py
 @@ -282,7 +282,10 @@ class Registry(Mapping):
@@ -742,7 +865,7 @@ index d17caac0..3ab7c967 100644
  
      @lazy_property
 diff --git a/odoo/tools/safe_eval.py b/odoo/tools/safe_eval.py
-index f60bb5e9..fc6748c4 100644
+index ce47edb9..c010c0da 100644
 --- a/odoo/tools/safe_eval.py
 +++ b/odoo/tools/safe_eval.py
 @@ -326,6 +326,38 @@ def safe_eval(expr, globals_dict=None, locals_dict=None, mode="eval", nocopy=Fal

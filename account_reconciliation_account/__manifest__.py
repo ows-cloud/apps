@@ -1,18 +1,17 @@
-# Copyright 2022 AppsToGROW - Henrik Norlin
+# Copyright 2019 AppsToGROW - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': 'JSON field',
-    'summary': 'JSON field on all models',
+    'name': 'Account Reconciliation Account',
+    'summary': '',
 
     'author': 'AppsToGROW',
-    'category': 'Administration',
+    'category': 'account',
     'data': [
     ],
     'depends': [
-        'base_sparse_field',
+        'account_reconciliation_widget',
     ],
-    'development_status': 'Alpha',
     'license': 'AGPL-3',
     'version': '14.0.1.0.0',
     'website': 'http://www.appstogrow.co',

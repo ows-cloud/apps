@@ -5,7 +5,12 @@ from odoo import api, fields, models
 class Users(models.Model):
     _inherit = 'res.users'
 
+    def _default_groups(self):
+        default_user = self.with_context(active_test=False).search([("default_user", "=", True), ("company_id", "=", self.env.company.id)])
+        return default_user.groups_id if default_user else []
+
     default_user = fields.Boolean('Default User Template')
+    groups_id = fields.Many2many(default=_default_groups)
 
     _sql_constraints = [('default_user_uniq', 'unique(default_user, company_id)', 'Default User must be unique per company!')]
 

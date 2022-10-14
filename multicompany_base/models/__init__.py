@@ -1,12 +1,15 @@
-from . import base
-from . import base_partner_merge_automatic_wizard
-from . import ir_attachment
-from . import ir_model_data
-from . import ir_ui_view
-from . import multicompany_config
-from . import multicompany_security
-from . import res_company
-from . import res_config_settings
-from . import res_partner
-from . import res_users
-from . import res_users_apikeys
+from . import (
+    base,
+    base_partner_merge_automatic_wizard,
+    ir_attachment,
+    ir_model_data,
+    ir_rule,
+    ir_ui_view,
+    multicompany_config,
+    multicompany_security,
+    res_company,
+    res_config_settings,
+    res_partner,
+    res_users,
+    res_users_apikeys,
+)

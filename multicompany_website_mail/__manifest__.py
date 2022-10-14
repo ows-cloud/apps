@@ -9,7 +9,7 @@
     'auto_install': True,
     'category': 'Uncategorized',
     'data': [
-        'res.company.xml',
+        'views/res.company.xml',
     ],
     'depends': [
         'website',

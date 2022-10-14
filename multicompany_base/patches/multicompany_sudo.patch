@@ -1,18 +1,87 @@
+diff --git a/addons/auth_signup/models/res_partner.py b/addons/auth_signup/models/res_partner.py
+index 27586358..16673dd3 100644
+--- a/addons/auth_signup/models/res_partner.py
++++ b/addons/auth_signup/models/res_partner.py
+@@ -51,7 +51,6 @@ class ResPartner(models.Model):
+ 
+         res = dict.fromkeys(self.ids, False)
+         for partner in self:
+-            base_url = partner.get_base_url()
+             # when required, make sure the partner has a valid signup token
+             if self.env.context.get('signup_valid') and not partner.user_ids:
+                 partner.sudo().signup_prepare()
+@@ -93,6 +92,7 @@ class ResPartner(models.Model):
+ 
+             signup_url = "/web/%s?%s" % (route, werkzeug.urls.url_encode(query))
+             if not self.env.context.get('relative_url'):
++                base_url = partner.get_base_url()
+                 signup_url = werkzeug.urls.url_join(base_url, signup_url)
+             res[partner.id] = signup_url
+ 
 diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
-index 46d01b13..06494763 100644
+index 46d01b13..a08b6293 100644
 --- a/addons/mail/controllers/main.py
 +++ b/addons/mail/controllers/main.py
-@@ -286,7 +286,7 @@ class MailController(http.Controller):
+@@ -274,6 +274,12 @@ class MailController(http.Controller):
+ 
+     @http.route('/mail/init_messaging', type='json', auth='user')
+     def mail_init_messaging(self):
++        try:
++            public_partner = request.env.ref('base.public_partner').sudo().mail_partner_format(),
++        except:
++            public_partner = request.env['res.users'].with_context(active_test=False).search(
++                [('groups_id', '=', request.env.ref('base.group_public').id),('company_id','=',request.env.company.id)]
++            ).ensure_one().partner_id.mail_partner_format()
+         values = {
+             'needaction_inbox_counter': request.env['res.partner'].get_needaction_count(),
+             'starred_counter': request.env['res.partner'].get_starred_count(),
+@@ -286,7 +292,7 @@ class MailController(http.Controller):
              'moderation_counter': request.env.user.moderation_counter,
              'moderation_channel_ids': request.env.user.moderation_channel_ids.ids,
              'partner_root': request.env.ref('base.partner_root').sudo().mail_partner_format(),
 -            'public_partner': request.env.ref('base.public_partner').sudo().mail_partner_format(),
-+            'public_partner': request.env['res.partner'].sudo(bypass_global_rules=True).env.ref('base.public_partner').mail_partner_format(),
++            'public_partner': public_partner,
              'public_partners': [partner.mail_partner_format() for partner in request.env.ref('base.group_public').sudo().with_context(active_test=False).users.partner_id],
              'current_partner': request.env.user.partner_id.mail_partner_format(),
              'current_user_id': request.env.user.id,
+diff --git a/addons/mail/models/res_partner.py b/addons/mail/models/res_partner.py
+index 08b94805..abeb7f45 100644
+--- a/addons/mail/models/res_partner.py
++++ b/addons/mail/models/res_partner.py
+@@ -118,7 +118,12 @@ class Partner(models.Model):
+         """
+         suggestions = []
+         try:
+-            suggestions.append([partner.mail_partner_format() for partner in self.env.ref('base.group_user').users.partner_id])
++            partners = self.env.ref('base.group_user').users.partner_id
++            company_ids = self.env.user.sudo(bypass_global_rules=True).company_ids.ids
++            partners.env.companies = self.env['res.company'].sudo(bypass_global_rules=True).search(
++                ['|',('id','in',company_ids),'|',('id','parent_of',company_ids),('id','child_of',company_ids)]
++            )
++            suggestions.append([partner.mail_partner_format() for partner in partners])
+         except AccessError:
+             pass
+         return suggestions
+diff --git a/addons/stock/models/res_company.py b/addons/stock/models/res_company.py
+index 61641494..ce04b565 100644
+--- a/addons/stock/models/res_company.py
++++ b/addons/stock/models/res_company.py
+@@ -175,11 +175,12 @@ class Company(models.Model):
+     @api.model
+     def create(self, vals):
+         company = super(Company, self).create(vals)
++        company = company.with_company(company)
+         company.sudo()._create_per_company_locations()
+         company.sudo()._create_per_company_sequences()
+         company.sudo()._create_per_company_picking_types()
+         company.sudo()._create_per_company_rules()
+-        self.env['stock.warehouse'].sudo().create({
++        company.env['stock.warehouse'].sudo().create({
+             'name': company.name,
+             'code': self.env.context.get('default_code') or company.name[:5],
+             'company_id': company.id,
 diff --git a/addons/website/models/website.py b/addons/website/models/website.py
-index 1dd96608..c3c3ec3f 100644
+index fecccced..8bd58a25 100644
 --- a/addons/website/models/website.py
 +++ b/addons/website/models/website.py
 @@ -644,7 +644,7 @@ class Website(models.Model):
@@ -24,20 +93,6 @@ index 1dd96608..c3c3ec3f 100644
          # Filter for the exact domain (to filter out potential subdomains) due
          # to the use of ilike.
          websites = found_websites.filtered(lambda w: _filter_domain(w, domain_name))
-diff --git a/odoo/addons/base/models/__init__.py b/odoo/addons/base/models/__init__.py
-index bdc3d0b1..4220fe48 100644
---- a/odoo/addons/base/models/__init__.py
-+++ b/odoo/addons/base/models/__init__.py
-@@ -1,6 +1,9 @@
- # -*- coding: utf-8 -*-
- # Part of Odoo. See LICENSE file for full copyright and licensing details.
- 
-+from . import base_sudo
-+
-+
- from . import assetsbundle
- from . import qweb
- 
 diff --git a/odoo/addons/base/models/base_sudo.py b/odoo/addons/base/models/base_sudo.py
 new file mode 100644
 index 00000000..09d85eca

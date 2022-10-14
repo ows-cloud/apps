@@ -51,10 +51,7 @@
                         </tree>
                     </field>
                 </xpath>
-                <xpath expr="//field[@name='line_ids']/tree/field[@name='category_id']" position="after">
-                    <field name="analytic_account_id"/>
-                </xpath>
-                <xpath expr="//field[@name='line_ids']/form/group/field[@name='category_id']" position="after">
+                <xpath expr="//field[@name='dynamic_filtered_payslip_lines']/tree/field[@name='category_id']" position="after">
                     <field name="analytic_account_id"/>
                 </xpath>
             </field>
