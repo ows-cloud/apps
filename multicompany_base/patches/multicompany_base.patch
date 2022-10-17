@@ -848,6 +848,20 @@ index 8093f14b..a064632d 100644
          env['base'].flush()
  
          # STEP 9: save installed/updated modules for post-install tests
+diff --git a/odoo/modules/module.py b/odoo/modules/module.py
+index f445b8d1..56767908 100644
+--- a/odoo/modules/module.py
++++ b/odoo/modules/module.py
+@@ -411,7 +411,8 @@ def get_modules():
+ 
+         def is_really_module(name):
+             for mname in MANIFEST_NAMES:
+-                if os.path.isfile(opj(dir, name, mname)):
++                # Patch removing 'test_' should not be in multicompany_base, but another place ...
++                if os.path.isfile(opj(dir, name, mname)) and name[:5] != 'test_':
+                     return True
+         return [
+             clean(it)
 diff --git a/odoo/modules/registry.py b/odoo/modules/registry.py
 index 6a09da86..10311d1a 100644
 --- a/odoo/modules/registry.py
