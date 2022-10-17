@@ -10,13 +10,14 @@
     "website": "https://github.com/OCA/server-tools",
     "category": "Tools",
     "depends": [
-        "account",
-        "base_time_dependent_parameter",
+        "account_reconciliation_account",
+        "base_sparse_field",
+        "base_time_parameter",
         "excel_import_hook",
     ],
     "data": [
     ],
     "installable": True,
-    "development_status": "Beta",
+    "development_status": "Alpha",
     "maintainers": ["appstogrow"],
 }

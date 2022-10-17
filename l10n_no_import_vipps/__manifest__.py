@@ -11,8 +11,7 @@
         'data/xlsx_template.xml',
     ],
     'depends': [
-        "account",
-        'excel_import_export',
+        "account_statement_excel_import",
     ],
     'license': 'AGPL-3',
     'version': '14.0.1.0.0',

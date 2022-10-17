@@ -40,7 +40,7 @@
             }
         }
     },
-    '__POST_IMPORT__': '${object.post_import_vipps()}',
+    '__POST_IMPORT__': '${object.excel_post_import("line_ids", ["set_text", "set_partner", "time_parameter"])}',
 }
         </field>
     </record>
