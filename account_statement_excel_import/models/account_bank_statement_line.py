@@ -39,7 +39,11 @@ class Base(models.AbstractModel):
         params = self.env["base.time.parameter"].search([])
         for line in self:
             for param in params:
-                if not param.code in line.payment_ref:
+                if param.code and param.code in line.payment_ref:
+                    key = param.code
+                elif param.name and param.name in line.payment_ref:
+                    key = param.name
+                else:
                     continue
                 value = param._get_value(line.date)
                 if not value:
@@ -47,4 +51,4 @@ class Base(models.AbstractModel):
                 elif type(value) == type(self.env["account.account"]):
                     line.counterpart_account_id = value
                     value = line.counterpart_account_id.name
-                line.payment_ref = line.payment_ref.replace(param.code, value)
+                line.payment_ref = line.payment_ref.replace(key, value)
