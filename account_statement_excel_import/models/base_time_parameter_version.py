@@ -1,5 +1,6 @@
 from odoo import api, fields, models
 
+""" Select account.account """
 
 class TimeParameterVersion(models.Model):
     _inherit = "base.time.parameter.version"
@@ -10,8 +11,9 @@ class TimeParameterVersion(models.Model):
 
     @api.model
     def _value_reference_selection(self):
-        models = self.env.context.get("selection_models", []).append("account.account")
+        selection_models = self.env.context.get("selection_models", [])
+        selection_models.append("account.account")
         return super(
             TimeParameterVersion,
-            self.with_context(selection_models=models)
+            self.with_context(selection_models=selection_models)
         )._value_reference_selection()

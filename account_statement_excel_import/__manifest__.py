@@ -16,6 +16,7 @@
         "excel_import_hook",
     ],
     "data": [
+        "views/base_time_parameter_views.xml",
     ],
     "installable": True,
     "development_status": "Alpha",

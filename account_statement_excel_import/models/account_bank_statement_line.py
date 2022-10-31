@@ -36,6 +36,28 @@ class Base(models.AbstractModel):
 
     def _excel_post_import_time_parameter(self):
         # Replace label keyword with time-related value.
+        # If time-related account:
+        # - Set counterpart_account_id.
+        # - Create a reconciliation model for the account if it doesn't exist.
+
+        def create_rec_model_if_not_exists(account):
+            RecModel = self.env["account.reconcile.model"]
+            rec_model = RecModel.search(
+                [
+                    ("rule_type", "=", "writeoff_suggestion"),
+                    ("match_counterpart_account_id", "=", account.id),
+                ]
+            )
+            if not rec_model:
+                rec_model = RecModel.create(
+                    {
+                        "name": account.name,
+                        "rule_type": "writeoff_suggestion",
+                        "match_counterpart_account_id": account.id,
+                    }
+                )
+                rec_model.set_counterpart_line()
+
         params = self.env["base.time.parameter"].search([])
         for line in self:
             for param in params:
@@ -45,10 +67,13 @@ class Base(models.AbstractModel):
                     key = param.name
                 else:
                     continue
+
                 value = param._get_value(line.date)
                 if not value:
                     continue
                 elif type(value) == type(self.env["account.account"]):
                     line.counterpart_account_id = value
                     value = line.counterpart_account_id.name
+                    create_rec_model_if_not_exists(line.counterpart_account_id)
+
                 line.payment_ref = line.payment_ref.replace(key, value)
