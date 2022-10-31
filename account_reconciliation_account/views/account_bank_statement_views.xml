@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bank_statement_form" model="ir.ui.view">
+        <field name="name">account.bank.statement.form (line) counterpart_account_id</field>
+        <field name="model">account.bank.statement</field>
+        <field name="inherit_id" ref="account.view_bank_statement_form" />
+        <field name="arch" type="xml">
+            <field name="foreign_currency_id" position="before">
+                <field name="counterpart_account_id" optional="hidden" />
+            </field>
+        </field>
+    </record>
+</odoo>
