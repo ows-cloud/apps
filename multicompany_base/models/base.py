@@ -35,11 +35,24 @@ class Base(models.AbstractModel):
         default=lambda self: self.env.company,
     )
 
-    @api.returns(None, lambda value: value[0])
+    def sudo_bypass_global_rules(self):
+        try:
+            return self.sudo(bypass_global_rules=True)
+        except:
+            return self.sudo()
+
     def copy_data(self, default=None):
-        if default and 'company_id' not in default:
-            default['company_id'] = self.env.company.id
-        return super(Base, self).copy_data(default)
+        vals = super(Base, self).copy_data(default)[0]
+
+        if "website_id" in vals.keys():
+            vals["company_id"] = self.sudo_bypass_global_rules().env["website"].browse(default["website_id"]).company_id.id
+        elif "company_id" not in vals.keys():
+            try:
+                vals['company_id'] = self.env.company.id
+            except:
+                pass
+
+        return [vals]
 
     """
     XMLID FOR MULTICOMPANY
