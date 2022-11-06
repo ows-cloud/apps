@@ -35,12 +35,6 @@ class Base(models.AbstractModel):
         default=lambda self: self.env.company,
     )
 
-    def sudo_bypass_global_rules(self):
-        try:
-            return self.sudo(bypass_global_rules=True)
-        except:
-            return self.sudo()
-
     def copy_data(self, default=None):
         vals = super(Base, self).copy_data(default)[0]
 
