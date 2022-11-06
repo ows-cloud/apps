@@ -60,11 +60,11 @@ for record in records:
         <field name="code">MLS</field>
         <field name="name">Manual Lines Structure</field>
         <field
+            name="rule_ids"
             eval="[(6, 0, [
                 ref('hr_salary_rule_payslip_wage'),
                 ref('hr_salary_rule_contract_wage'),
             ])]"
-            name="rule_ids"
         />
         <field name="company_id" ref="base.main_company" />
     </record>

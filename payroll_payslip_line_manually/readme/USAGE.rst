@@ -20,27 +20,31 @@ Salary Rule input from Contract or Payslip
 
 Python Condition
 
-```record = contract.line_manually_ids
-if record:
-    record = record.filtered(lambda x: x.salary_rule_id.id == rule.id)
-result = bool(record)```
+.. code-block:: python
+
+    record = contract.line_manually_ids
+    if record:
+        record = record.filtered(lambda x: x.salary_rule_id.id == rule.id)
+    result = bool(record)
 
 Python Code
 
-```result_list = []
-records = contract.line_manually_ids.filtered(
-    lambda x: x.salary_rule_id.id == rule.id
-)
-for record in records:
-    result_list.append(
-        record.get_result_dict(
-            # optional arguments:
-            # months=1.5 (float),
-            # multiply_with="result_qty" or "result_rate",
-            # uom="hours" (string),
-            # default_amount=10.0 (float),
+.. code-block:: python
+
+    result_list = []
+    records = contract.line_manually_ids.filtered(
+        lambda x: x.salary_rule_id.id == rule.id
+    )
+    for record in records:
+        result_list.append(
+            record.get_result_dict(
+                # optional arguments:
+                # months=1.5 (float),
+                # multiply_with="result_qty" or "result_rate",
+                # uom="hours" (string),
+                # default_amount=10.0 (float),
+            )
         )
-    )```
 
 This code is for a contract rule. For a payslip rule, replace `contract` with `payslip`.
 

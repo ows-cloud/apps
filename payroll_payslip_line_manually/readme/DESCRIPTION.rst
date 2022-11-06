@@ -1,7 +1,7 @@
 This module adds analytic account and lets users register payslip lines manually.
 
-* In the payslip, there is a new section "Manual payslip lines".
-* In the contract, there is a new tab "Recurring payslip lines".
+* On the payslip, there is a new section "Manual payslip lines".
+* On the contract, there is a new tab "Recurring payslip lines".
 * "Compute Sheet" will create payslip lines from the manual/recurring lines.
 
 This way, a payroll user may register the exact values of a payslip line:
