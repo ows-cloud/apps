@@ -433,10 +433,7 @@ class MulticompanySecurity(models.AbstractModel):
         return domain
 
     def _set_company_id_where_null(self):
-        try:
-            self = self.sudo(bypass_global_rules=True)
-        except:
-            pass
+        self = self.sudo_bypass_global_rules()
         _logger.info('Starting _set_company_id_where_null')
 
         last_model_names = ['ir.property', 'ir.model.data']
@@ -454,7 +451,7 @@ class MulticompanySecurity(models.AbstractModel):
                 self.env.cr.execute(sql)
                 continue
 
-            records_with_no_company = self.env[model.model].with_context(active_test=False,).sudo().search([('company_id', '=', False)])
+            records_with_no_company = self.env[model.model].with_context(active_test=False,).sudo_bypass_global_rules().search([('company_id', '=', False)])
             if not records_with_no_company:
                 continue
 
@@ -495,13 +492,13 @@ class MulticompanySecurity(models.AbstractModel):
 
             related_field_name = base.FIELD_NAME_TO_GET_COMPANY.get(model.model)
             if not related_field_name:
-                records_with_no_company.sudo().write({'company_id': self.env.company.id})
+                records_with_no_company.sudo_bypass_global_rules().write({'company_id': self.env.company.id})
                 continue
 
             related_field = self.env[model.model]._fields[related_field_name]
             related_models_and_record_ids = defaultdict(lambda: []) # {'res.partner': [(1001, 1), (1002, 2), (1003, 3)]}
             for record in records_with_no_company:
-                [(related_model_name, related_record_id)] = base._get_model_name_and_res_id(related_field, record)
+                [(related_model_name, related_record_id)] = base._get_model_name_and_res_id(record, related_field, record)
                 if related_model_name and related_record_id:
                     related_models_and_record_ids[related_model_name].append((record.id, related_record_id))
 
@@ -509,7 +506,7 @@ class MulticompanySecurity(models.AbstractModel):
 
                 related_record_ids =  [tup[1] for tup in ids if tup[1]]
                 # Related records may not exist. Search for existing related records.
-                related_records = self.env[related_model_name].sudo().search([('id', 'in', related_record_ids)])
+                related_records = self.env[related_model_name].sudo_bypass_global_rules().search([('id', 'in', related_record_ids)])
                 related_companies = related_records.mapped('company_id')
                 for related_company in related_companies:
                     related_records_with_this_company = related_records.filtered(lambda r: r.company_id == related_company)
@@ -517,13 +514,13 @@ class MulticompanySecurity(models.AbstractModel):
                     # Option 1
                     # records_with_no_company.filtered(lambda r: id in update_record_ids).sudo().write({'company_id': related_company.id})
                     # Option 2
-                    self.env[model.model].sudo().browse(update_record_ids).write({'company_id': related_company.id})
+                    self.env[model.model].sudo_bypass_global_rules().browse(update_record_ids).write({'company_id': related_company.id})
 
                 record_ids_with_no_related_record = [tup[0] for tup in ids if not tup[1]]
                 # Option 1
                 # records_with_no_company.filtered(lambda r: id in record_ids_with_no_related_record).sudo().write({'company_id': self.env.company.id})
                 # Option 2
-                self.env[model.model].sudo().browse(record_ids_with_no_related_record).write({'company_id': self.env.company.id})
+                self.env[model.model].sudo_bypass_global_rules().browse(record_ids_with_no_related_record).write({'company_id': self.env.company.id})
 
     def _update_rule_domains_to_1_where_false_except_partner(self):
         _logger.info('Starting _update_rule_domains_to_1_where_false_except_partner')
