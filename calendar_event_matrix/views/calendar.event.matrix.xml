@@ -27,34 +27,29 @@
                 <h1>
                     <field name="name" />
                 </h1>
-                <field name="date_action" />
-                <button
-          name="add_date"
-          type="object"
-          string="Add date"
-          class="btn btn-primary"
-        />
-                <button
-          name="remove_date"
-          type="object"
-          string="Remove date"
-          class="btn btn-secondary"
-        />
-                <p />
-                <field name="date_from" />
-                <!-- <field name="date_to"/> -->
-                <button
-          name="show_matrix"
-          type="object"
-          string="Show attendees from date"
-          class="oe_highlight"
-          context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_show_form'}"
-        />
-                <!-- <button name="show_matrix" type="object" string="Count attendees from date" class="oe_highlight" context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_count_form'}"/>
-                <field name="matrix_partner_id"/>
-                <button name="show_matrix" type="object" string="Show person status from date" class="oe_highlight" context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_boolean_form'}"/>
-                -->
-                <p />
+                <div attrs="{'invisible' : [('row_ids', '=', [])]}">
+                    <field name="date_action" />
+                    <button
+                        name="add_date"
+                        type="object"
+                        string="Add date"
+                        class="btn btn-primary"
+                    />
+                    <button
+                        name="remove_date"
+                        type="object"
+                        string="Remove date"
+                        class="btn btn-secondary"
+                    />
+                    <p />
+                    <button
+                        name="show_matrix"
+                        type="object"
+                        string="Show attendees"
+                        class="oe_highlight"
+                        context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_show_form'}"
+                    />
+                </div>
                 <notebook>
                     <page name="matrix_rows" string="Rows">
                         <field name="row_ids">
@@ -131,28 +126,40 @@
         <field name="arch" type="xml">
             <page name="matrix_rows" position="before">
                 <page name="partner_show" string="Attendees">
+                    <div invisible="1">
+                        <field name="date_from" />
+                        <field name="date_to"/>
+                        <button
+                            name="show_matrix"
+                            type="object"
+                            string="Show attendees from date"
+                            class="oe_highlight"
+                            context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_show_form'}"
+                        />
+                        <button name="show_matrix" type="object" string="Count attendees from date" class="oe_highlight" context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_count_form'}"/>
+                        <field name="matrix_partner_id"/>
+                        <button name="show_matrix" type="object" string="Show person status from date" class="oe_highlight" context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_boolean_form'}"/>
+                    </div>    
                     <field
-            name="event_ids"
-            widget="x2many_2d_matrix"
-            field_x_axis="start_date_str"
-            field_y_axis="matrix_row_id"
-            field_value="partner_ids"
-          >
-                        <tree
-              default_order="start_date_str,matrix_row_sequence"
-            >
+                        name="event_ids"
+                        widget="x2many_2d_matrix"
+                        field_x_axis="start_date_str"
+                        field_y_axis="matrix_row_id"
+                        field_value="partner_ids"
+                    >
+                        <tree default_order="start_date_str,matrix_row_sequence">
                             <field name="start_date_str" />
                             <field name="matrix_row_id" />
                             <field name="matrix_row_sequence" invisible="1" />
                             <field
-                name="matrix_available_partner_ids"
-                invisible="1"
-              />
+                                name="matrix_available_partner_ids"
+                                invisible="1"
+                            />
                             <field
-                name="partner_ids"
-                widget="many2many_tags"
-                domain="[('id', 'in', matrix_available_partner_ids)]"
-              />
+                                name="partner_ids"
+                                widget="many2many_tags"
+                                domain="[('id', 'in', matrix_available_partner_ids)]"
+                            />
                         </tree>
                     </field>
                 </page>
