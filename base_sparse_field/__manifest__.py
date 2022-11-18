@@ -11,7 +11,7 @@
         Henrik Norlin added support for date and datetime in fields.py
     """,
     'category': 'Hidden',
-    'version': '1.0',
+    'version': '14.0.2.0.0',
     'depends': ['base'],
     'data': [
         'security/ir.model.access.csv',
