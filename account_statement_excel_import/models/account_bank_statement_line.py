@@ -1,5 +1,4 @@
-from odoo import api, fields, models
-from odoo.addons.base_sparse_field.models.fields import Serialized
+from odoo import fields, models
 
 
 class Base(models.AbstractModel):
@@ -9,7 +8,7 @@ class Base(models.AbstractModel):
     import_first_name = fields.Char(string="Import First Name", sparse="json")
     import_last_name = fields.Char(string="Import Last Name", sparse="json")
     import_message = fields.Char(string="Import Message", sparse="json")
-    
+
     def _excel_post_import_set_partner(self):
         Partner = self.env["res.partner"]
         for line in self:
@@ -32,7 +31,9 @@ class Base(models.AbstractModel):
     def _excel_post_import_set_text(self):
         for line in self:
             if line.import_message:
-                line.payment_ref = "{}, {}".format(line.payment_ref, line.import_message)
+                line.payment_ref = "{}, {}".format(
+                    line.payment_ref, line.import_message
+                )
 
     def _excel_post_import_time_parameter(self):
         # Replace label keyword with time-related value.
@@ -74,6 +75,7 @@ class Base(models.AbstractModel):
                 elif type(value) == type(self.env["account.account"]):
                     line.counterpart_account_id = value
                     value = line.counterpart_account_id.name
+                    # Create a reconciliation model
                     create_rec_model_if_not_exists(line.counterpart_account_id)
 
                 line.payment_ref = line.payment_ref.replace(key, value)

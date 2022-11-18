@@ -27,16 +27,18 @@
                 <h1>
                     <field name="name"/>
                 </h1>
+                <field name="date_action"/>
+                <button name="add_date" type="object" string="Add date" class="btn btn-primary"/>
+                <button name="remove_date" type="object" string="Remove date" class="btn btn-secondary"/>
+                <p/>
                 <field name="date_from"/>
-                <field name="date_to"/>
+                <!-- <field name="date_to"/> -->
                 <button name="show_matrix" type="object" string="Show attendees from date" class="oe_highlight" context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_show_form'}"/>
-                <button name="show_matrix" type="object" string="Count attendees from date" class="oe_highlight" context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_count_form'}"/>
+                <!-- <button name="show_matrix" type="object" string="Count attendees from date" class="oe_highlight" context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_count_form'}"/>
                 <field name="matrix_partner_id"/>
                 <button name="show_matrix" type="object" string="Show person status from date" class="oe_highlight" context="{'view_ref': 'calendar_event_matrix.view_calendar_event_matrix_boolean_form'}"/>
+                -->
                 <p/>
-                <field name="date_action"/>
-                <button name="add_date" type="object" string="Add date" class="oe_highlight"/>
-                <button name="remove_date" type="object" string="Remove date" class="oe_highlight"/>
                 <notebook>
                     <page name="matrix_rows" string="Rows">
                         <field name="row_ids">
