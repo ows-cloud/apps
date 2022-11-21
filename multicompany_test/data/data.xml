@@ -13,7 +13,7 @@
         </record>
 
         <!-- TEST USER -->
-        <record id="test_user" model="res.users">
+        <record id="test_user" model="res.users" context="{'no_reset_password': True}">
             <field name="login">TEST_USER</field>
             <field name="name">TEST USER</field>
             <field name="company_id" ref="test_company" />
@@ -25,7 +25,11 @@
         </record>
 
         <!-- TEST ADMIN USER -->
-        <record id="test_admin_user" model="res.users">
+        <record
+            id="test_admin_user"
+            model="res.users"
+            context="{'no_reset_password': True}"
+        >
             <field name="login">TEST_ADMIN_USER</field>
             <field name="name">TEST ADMIN USER</field>
             <field name="company_id" ref="test_company" />

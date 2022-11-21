@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 MODELS_WITH_REPLACE_RECORD_ID = [
@@ -53,14 +53,13 @@ class Base(models.AbstractModel):
 
         return [vals]
 
-    """
-    XMLID FOR MULTICOMPANY
-    Replace res_id if 'replace_record_id' exists.
-    """
-
     @api.model
     def xmlid_lookup(self, xmlid):
-        id, model, res_id = super(Base, self).xmlid_lookup(xmlid)
+        """
+        XMLID FOR MULTICOMPANY
+        Replace res_id if 'replace_record_id' exists.
+        """
+        this_id, model, res_id = super(Base, self).xmlid_lookup(xmlid)
         if model in MODELS_WITH_REPLACE_RECORD_ID:
             try:
                 # 'replace_record_id' might not exist
@@ -93,4 +92,4 @@ class Base(models.AbstractModel):
                         )
             except:
                 pass
-        return id, model, res_id
+        return this_id, model, res_id

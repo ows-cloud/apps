@@ -62,8 +62,9 @@ class Users(models.Model):
         user_id = str(self.env.user.id)
         now = str(datetime.now())
         company_id = str(self.env.company.id)
-        sql = """INSERT INTO res_users_log (id, create_uid, create_date, write_uid, write_date, company_id)
-        VALUES (nextval('res_users_log_id_seq'), {}, '{}', {}, '{}', {});""".format(
+        sql = """INSERT INTO res_users_log (
+            id, create_uid, create_date, write_uid, write_date, company_id
+        ) VALUES (nextval('res_users_log_id_seq'), {}, '{}', {}, '{}', {});""".format(
             user_id, now, user_id, now, company_id
         )
         self.env.cr.execute(sql)

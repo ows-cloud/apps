@@ -13,8 +13,10 @@ class MulticompanyConfig(models.AbstractModel):
     """
     Sometimes Odoo assumes that a user has access to a specific record.
     With forced security, the user might not have access.
-    The configuration will search for specific records, as admin user logged into one specific company.
-    The search will include all records permitted by the security rules, including inactive records and parent/child companies.
+    The configuration will search for specific records,
+    as admin user logged into one specific company.
+    The search will include all records permitted by the security rules,
+    including inactive records and parent/child companies.
     - Exception: Search for company website
     If not found, create (or copy) a new record for the company.
     """
@@ -37,7 +39,8 @@ class MulticompanyConfig(models.AbstractModel):
 
     def _configure_system(self):
 
-        # The system pricelist should be archived, so that websites will get the company's pricelist.
+        # The system pricelist should be archived,
+        # so that websites will get the company's pricelist.
         # 20.11.2022 It is archived in production database.
         product_list = self.env.ref("product.list0", raise_if_not_found=False)
         if product_list:
@@ -45,7 +48,8 @@ class MulticompanyConfig(models.AbstractModel):
 
         # If active, new websites will get default crm.team which is not accessable.
         # EDIT: Patch will check if multicompany_base is installed.
-        # website_salesteam = self.env.ref('sales_team.salesteam_website_sales', raise_if_not_found=False)
+        # website_salesteam = self.env.ref(
+        #   'sales_team.salesteam_website_sales', raise_if_not_found=False)
         # if website_salesteam:
         #     website_salesteam.active = False
 
@@ -61,7 +65,8 @@ class MulticompanyConfig(models.AbstractModel):
                 models.Model.write(record, values)
 
         # Hide some security rules
-        # Read the system user/partner (necessary when sudo() does not bypass global rules)
+        # Read the system user/partner
+        # (necessary when sudo() does not bypass global rules)
         _set(_ref("base.res_users_rule"), {"active": False})
         _set(_ref("base.res_partner_rule"), {"active": False})
         # website_sale rules include website.company_id.id which give errors.
@@ -166,7 +171,8 @@ class MulticompanyConfig(models.AbstractModel):
 
     def _configure_company(self):
         # --------------------------------------------------
-        # General company mail.channel may be confusing in a parent/child environment. Skipping this for now.
+        # General company mail.channel may be confusing in a parent/child environment.
+        #   Skipping this for now.
         # self._create_a_company_mail_channel_for_all_employees()
         # Bad idea to copy all system sequences with code
         # self._copy_system_sequences_with_code(company.id)
@@ -212,7 +218,6 @@ class MulticompanyConfig(models.AbstractModel):
             )
 
     def _copy_system_sequences_with_code(self):
-        self.env.company.id
         system_sequences_with_code = (
             self._env("ir.sequence")
             .sudo()
@@ -266,7 +271,8 @@ class MulticompanyConfig(models.AbstractModel):
                 "password": "",
                 "active": False,
                 "groups_id": [(6, None, [self._ref("base.group_public").id])],
-                # <field name="image_1920" type="base64" file="base/static/img/public_user-image.png"/>
+                # <field name="image_1920" type="base64"
+                #   file="base/static/img/public_user-image.png"/>
                 # <field name="partner_id" ref="public_partner"/>
             },
         )
@@ -318,7 +324,8 @@ class MulticompanyConfig(models.AbstractModel):
         return product_category
 
     #
-    # _insert_first_record and "blank" methods to use after failing to return a record(set).
+    # _insert_first_record
+    # and "blank" methods to use after failing to return a record(set).
     #
 
     def _insert_first_record(self, model, search=[(1, "=", 1)], values={}, copy=False):
@@ -326,7 +333,9 @@ class MulticompanyConfig(models.AbstractModel):
         model (string): the model to insert the first record
         search (list):  the search domain to see if a record already exists
         values (dict):  values to insert into the first record
-        copy (string):  optional external reference or 'model,res_id' of an existing record to 'copy' (otherwise 'create')
+        copy (string):  optional external reference
+            or 'model,res_id' of an existing record
+            to 'copy' (otherwise 'create')
         """
         company_id = self.env.company.id
         values["company_id"] = company_id
@@ -343,7 +352,7 @@ class MulticompanyConfig(models.AbstractModel):
         )
         records = self._env(model).search(search)
         if not records.exists():
-            if copy == False:
+            if copy is False:
                 record = self._env(model).create(values)
                 return record
             elif "," in copy:

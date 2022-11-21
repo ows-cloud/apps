@@ -4,14 +4,13 @@
 {
     "name": "multicompany_base",
     "summary": "",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Uncategorized",
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
         "views/ir.actions.server.xml",
         "views/ir.model.data.xml",
-        # "views/res.company.xml",
     ],
     "depends": [
         "base",

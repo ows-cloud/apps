@@ -14,7 +14,8 @@ _logger = logging.getLogger(__name__)
 EXTID_MODULE_NAME = "__multicompany_security__"
 
 COMPANIES_MODEL = [
-    "base_import.import",  # Import write() compares company_id with stored user.company_id instead of context company_id.
+    "base_import.import",  # Import write() compares company_id with
+    # stored user.company_id instead of context company_id.
 ]
 
 COMPANY_READ_SYSTEM_MODEL = [
@@ -22,7 +23,8 @@ COMPANY_READ_SYSTEM_MODEL = [
     "account.account.type",
     "account.chart.template",
     "account.fiscal.position.template",
-    "account.payment.term",  # to avoid error with ref('account.account_payment_term_immediate').sudo() in website_sale
+    "account.payment.term",  # to avoid error with
+    # ref('account.account_payment_term_immediate').sudo() in website_sale
     "account.tax.template",
     "crm.team",  # to avoid error: access_control() failed
     "ir.actions.act_url",
@@ -48,8 +50,8 @@ COMPANY_READ_SYSTEM_MODEL = [
     "mis.report.kpi.expression",
     "mis.report.style",
     "mis.report.subreport",
-    "res.field",  # https://github.com/apps2grow/apps/tree/14.0/base_field_value
-    "res.field.selection_value",  # https://github.com/apps2grow/apps/tree/14.0/base_field_value
+    "res.field",  # Will be replaced by base_custom_info
+    "res.field.selection_value",  # Will be replaced by base_custom_info
     "stock.location",
     "uom.uom",
     "website.menu",
@@ -121,9 +123,19 @@ SECURITY_DOMAIN_WORD = {
     "OR": "'|'",
     "false": "('{company_id}','=',False)",
     "in_companies": "('{company_id}','in',company_ids)",
-    "in_companies/parent/child": "'|',('{company_id}','in',company_ids),'|',('{company_id}','parent_of',company_ids),('{company_id}','child_of',company_ids)",
+    "in_companies/parent/child": """
+        '|',
+        ('{company_id}','in',company_ids),
+        '|',
+        ('{company_id}','parent_of',company_ids),
+        ('{company_id}','child_of',company_ids)""",
     "in_company": "('{company_id}','=',company_id)",
-    "in_company/parent/child": "'|',('{company_id}','=',company_id),'|',('{company_id}','parent_of',company_id),('{company_id}','child_of',company_id)",
+    "in_company/parent/child": """
+        '|',
+        ('{company_id}','=',company_id),
+        '|',
+        ('{company_id}','parent_of',company_id),
+        ('{company_id}','child_of',company_id)""",
     "json": "('serialization_field_id', '>', 0)",
     "system_company": "('{company_id}','=',1)",
     "system_user": "('id','=',1)",
@@ -141,9 +153,11 @@ COMPANY_FIELD = {
 }
 
 """
-All records which a user can browse, are available on relational fields when the user is creating or editing a record.
+All records which a user can browse, are available on relational fields
+when the user is creating or editing a record.
 A user may lose access to a record by setting another user as the owner.
-If a manager can read another company than his own companies, the manager can switch to this company.
+If a manager can read another company than his own companies,
+the manager can switch to this company.
 This is a security risk (specially for parent/child).
 """
 SECURITY_RULE = {
@@ -153,13 +167,15 @@ SECURITY_RULE = {
     "BUS_PRESENCE_MODEL": {
         "edit_if": "user_id",
     },
-    # A company manager can change to any company which he/she can browse. Don't allow changing to parent/child company.
+    # A company manager can change to any company which he/she can browse.
+    # Don't allow changing to parent/child company.
     "RES_COMPANY_MODEL": {
         "read_if": "in_companies",
         "edit_if": "in_company AND in_companies",
     },
     # read users with access to the company
-    # 2022-10-06: Can read users of parent company only in vscode debug. Why not in vscode normal?
+    # 2022-10-06: Can read users of parent company only in vscode debug.
+    # Why not in vscode normal?
     "RES_USERS_MODEL": {
         "read_if": "system_user OR company_ids_in_company_ids OR in_companies/parent/child",
         "edit_if": "in_company AND in_companies",
@@ -260,7 +276,7 @@ def _get_security_type(model_name):
 
 
 def _assert_security_domain_words_and_order(words_list):
-    type = ""
+    this_type = ""
     last_type = ""
     parenthesis_counter = 0
     first = 0
@@ -269,21 +285,21 @@ def _assert_security_domain_words_and_order(words_list):
         assert word in SECURITY_DOMAIN_WORD, word + " not in " + str(words_list)
 
         if word == "(":
-            type = "parenthesis"
+            this_type = "parenthesis"
             parenthesis_counter += 1
         elif word == ")":
-            type = "parenthesis"
+            this_type = "parenthesis"
             parenthesis_counter -= 1
         elif word in ("AND", "OR"):
-            type = "operator"
+            this_type = "operator"
         else:
-            type = "expression"
+            this_type = "expression"
 
         assert parenthesis_counter >= 0
-        assert type != last_type
+        assert this_type != last_type
 
         if count in (first, last):
-            assert type in ("parenthesis", "expression")
+            assert this_type in ("parenthesis", "expression")
 
     # There should be max one operator type inside a parenthesis.
     # This assert is done in the _recursive_order_words method.
@@ -364,15 +380,17 @@ class MulticompanySecurity(models.AbstractModel):
         self._update_system_records()
         return True
 
-    def set_company_manager_security(self):
-        # So time consuming. Takes 23 seconds, while global rules take 5 seconds to update.
-        self._set_read_and_edit_access_to_company_manager()
+    # """ Deprecated. If needed, add ir.model.access """
+    # def set_company_manager_security(self):
+    #     # So time consuming.
+    #     # Takes 23 seconds, while global rules take 5 seconds to update.
+    #     self._set_read_and_edit_access_to_company_manager()
 
     def _set_global_security_rules_on_all_models_except_ir_rule_and_ir_translation(
         self,
     ):
         _logger.info(
-            "Starting _set_global_security_rules_on_all_models_except_ir_rule_and_ir_translation"
+            """Starting _set_global_security_rules_on_all_models_except_ir_rule_..."""
         )
         models = self.env["ir.model"].search(
             [("model", "!=", "ir.rule"), ("model", "!=", "ir.translation")]
@@ -508,25 +526,32 @@ class MulticompanySecurity(models.AbstractModel):
 
             # relation_field_name = RELATED_RECORD.get(model.model)
             # if not relation_field_name:
-            #     records_with_no_company.sudo().write({'company_id': self.env.company.id})
+            #     records_with_no_company.sudo().write(
+            #       {'company_id': self.env.company.id})
             #     continue
 
             # relation_field = self.env[model.model]._fields[relation_field_name]
             # if relation_field.type == 'many2one_reference':
-            #     relation_model_names = set(records_with_no_company.mapped(relation_field.model_field))
+            #     relation_model_names = set(
+            #       records_with_no_company.mapped(relation_field.model_field))
             #     for relation_model_name in relation_model_names:
-            #         records_filtered_model = records_with_no_company.filtered(lambda r: getattr(r, relation_field.model_field) == relation_model_name)
-            #         relation_ids = list(set(records_filtered_model.mapped(relation_field_name)))
+            #         records_filtered_model = records_with_no_company.filtered(
+            #           lambda r: getattr(
+            #               r, relation_field.model_field) == relation_model_name)
+            #         relation_ids = list(set(
+            #           records_filtered_model.mapped(relation_field_name)))
             #         relations = self.env[relation_model_name].browse(relation_ids)
             #         for relation in relations:
             #             related_company = relation.company_id
-            #             records_filtered = records_filtered_model.filtered(lambda r: getattr(r, relation_field_name) == relation.id)
+            #             records_filtered = records_filtered_model.filtered(
+            #               lambda r: getattr(r, relation_field_name) == relation.id)
             #             records_filtered.sudo().write({'company_id': related_company.id})
             # else:
             #     relations = records_with_no_company.mapped(relation_field_name)
             #     for relation in relations:
             #         related_company = relation.company_id
-            #         records_filtered = records_with_no_company.filtered(lambda r: getattr(r, relation_field_name) == relation.id)
+            #         records_filtered = records_with_no_company.filtered(
+            #           lambda r: getattr(r, relation_field_name) == relation.id)
             #         records_filtered.sudo().write({'company_id': related_company.id})
 
             # C) Another way to loop
@@ -571,7 +596,9 @@ class MulticompanySecurity(models.AbstractModel):
                         if tup[1] in related_records_with_this_company.ids
                     ]
                     # Option 1
-                    # records_with_no_company.filtered(lambda r: id in update_record_ids).sudo().write({'company_id': related_company.id})
+                    # records_with_no_company.filtered(
+                    #   lambda r: id in update_record_ids
+                    # ).sudo().write({'company_id': related_company.id})
                     # Option 2
                     self.env[model.model].sudo_bypass_global_rules().browse(
                         update_record_ids
@@ -581,7 +608,9 @@ class MulticompanySecurity(models.AbstractModel):
                     tup[0] for tup in ids if not tup[1]
                 ]
                 # Option 1
-                # records_with_no_company.filtered(lambda r: id in record_ids_with_no_related_record).sudo().write({'company_id': self.env.company.id})
+                # records_with_no_company.filtered(
+                #   lambda r: id in record_ids_with_no_related_record
+                # ).sudo().write({'company_id': self.env.company.id})
                 # Option 2
                 self.env[model.model].sudo_bypass_global_rules().browse(
                     record_ids_with_no_related_record
@@ -634,7 +663,8 @@ class MulticompanySecurity(models.AbstractModel):
     # TODO
     # def _get_and_fix_name_and_find_model_of_all_sql_views(self):
     #     # Get views
-    #     self.env.cr.execute("select table_name from information_schema.views where table_schema = 'public';")
+    #     self.env.cr.execute(
+    # "select table_name from information_schema.views where table_schema = 'public';")
     #     views = [v[0] for v in self.env.cr.fetchall()]
     #     # Fix view names
     #     views_fixed = []
@@ -647,6 +677,8 @@ class MulticompanySecurity(models.AbstractModel):
     #     models = [m.model.replace('.','_') for m in self.env['ir.model'].search([])]
     #     for view in views_fixed:
     #         if view not in models:
-    #             raise UserError("There is no model corresponding with view '%s'! \n Cancelling _get_and_fix_name_and_find_model_of_all_sql_views" % (view))
+    #             raise UserError(
+    # "There is no model corresponding with view '%s'! \n
+    # Cancelling _get_and_fix_name_and_find_model_of_all_sql_views" % (view))
 
     #     return views_fixed

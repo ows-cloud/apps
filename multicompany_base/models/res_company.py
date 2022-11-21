@@ -58,9 +58,15 @@ class Company(models.Model):
             ):
                 continue
             table_name = model._table
-            sql = "SELECT company_id, '{}' as table_name, date_trunc('year', create_date) AS sql_year, count(id) as no_of_records FROM {} GROUP BY company_id, sql_year;".format(
-                table_name, table_name
-            )
+            sql = """
+                SELECT
+                    company_id,
+                    '{}' as table_name,
+                    date_trunc('year', create_date) AS sql_year,
+                    count(id) as no_of_records
+                FROM {}
+                GROUP BY company_id, sql_year;
+                """.format(table_name, table_name)
             self.env.cr.execute(sql)
             sql_result = self.env.cr.fetchall()
             for row in sql_result:

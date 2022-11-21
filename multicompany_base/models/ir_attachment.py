@@ -1,6 +1,6 @@
 import os
 
-from odoo import api, models
+from odoo import _, api, models
 from odoo.exceptions import UserError
 
 
@@ -29,5 +29,5 @@ class IrAttachment(models.Model):
             os.makedirs(dirname)
         # prevent sha-1 collision
         if os.path.isfile(full_path) and not self._same_content(bin_data, full_path):
-            raise UserError("The attachment is colliding with an existing file.")
+            raise UserError(_("The attachment is colliding with an existing file."))
         return fname, full_path

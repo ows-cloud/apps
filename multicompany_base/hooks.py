@@ -22,7 +22,6 @@ def post_init_hook(cr, registry):
     )
     if not support_user:
         companies = env["res.company"].sudo().search([])
-        companies.ids
         support_user = (
             env["res.users"]
             .sudo()
@@ -39,7 +38,7 @@ def post_init_hook(cr, registry):
                 }
             )
         )
-        xmlid = env["ir.model.data"].create(
+        env["ir.model.data"].create(
             {
                 "module": "__multicompany_base__",
                 "name": "support_user",

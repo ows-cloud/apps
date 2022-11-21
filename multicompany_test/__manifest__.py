@@ -4,7 +4,7 @@
 {
     "name": "multicompany_test",
     "summary": "Company & User",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "data/data.xml",
