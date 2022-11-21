@@ -1,8 +1,8 @@
-from odoo import _, api, fields, models
+from odoo import fields, models
 
 
 class Company(models.Model):
-    _inherit = 'res.company'
+    _inherit = "res.company"
 
     """
     User Interface TODO
@@ -17,10 +17,15 @@ class Company(models.Model):
                 To prevent this, you may create a new company and set the previous alias_company_name there.
     """
 
-    alias_company_name = fields.Char("Alias Company Name",
-        help="Email Alias will get a dot plus the Alias Company Name, like alias_name.alias_company_name@alias_domain"
+    alias_company_name = fields.Char(
+        "Alias Company Name",
+        help="Email Alias will get a dot plus the Alias Company Name, like alias_name.alias_company_name@alias_domain",
     )
 
     _sql_constraints = [
-        ('alias_company_name_unique', 'UNIQUE(alias_company_name)', 'Unfortunately this company alias is already used, please choose a unique one')
+        (
+            "alias_company_name_unique",
+            "UNIQUE(alias_company_name)",
+            "Unfortunately this company alias is already used, please choose a unique one",
+        )
     ]

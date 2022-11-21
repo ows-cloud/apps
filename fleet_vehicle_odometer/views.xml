@@ -1,19 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data>
-    
+
         <record model="ir.ui.view" id="view_fleet_vehicle_odometer_pivot">
             <field name="name">fleet.vehicle.odometer.pivot</field>
             <field name="model">fleet.vehicle.odometer</field>
             <field name="mode">primary</field>
-            <field name="priority" eval="20"/>
+            <field name="priority" eval="20" />
             <field name="arch" type="xml">
                 <pivot>
 
                 </pivot>
             </field>
         </record>
-        
+
         <!-- view_mode: added 'pivot' -->
         <record id='fleet.fleet_vehicle_odometer_action' model='ir.actions.act_window'>
             <field name="name">Vehicles Odometer</field>
@@ -25,7 +25,7 @@
                 Create a new odometer log
               </p>
               <p>
-                You can add various odometer entries for all vehicles. 
+                You can add various odometer entries for all vehicles.
               </p>
             </field>
         </record>

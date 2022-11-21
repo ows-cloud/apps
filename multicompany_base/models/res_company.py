@@ -66,7 +66,9 @@ class Company(models.Model):
                     count(id) as no_of_records
                 FROM {}
                 GROUP BY company_id, sql_year;
-                """.format(table_name, table_name)
+                """.format(
+                table_name, table_name
+            )
             self.env.cr.execute(sql)
             sql_result = self.env.cr.fetchall()
             for row in sql_result:

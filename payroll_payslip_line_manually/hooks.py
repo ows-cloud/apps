@@ -1,6 +1,6 @@
 from openupgradelib import openupgrade
 
-from odoo import api, SUPERUSER_ID
+from odoo import SUPERUSER_ID, api
 
 
 def pre_init_hook(cr):
@@ -10,16 +10,22 @@ def pre_init_hook(cr):
         cr,
         [
             ("hr_rule_qty_rate_amount", "hr_payslip_line_manually"),
-        ]
+        ],
     )
     openupgrade.rename_fields(
         env,
         [
-            ("hr.salary.rule", "hr_salary_rule", "qty_rate_amount_from", "line_manually_model"),
+            (
+                "hr.salary.rule",
+                "hr_salary_rule",
+                "qty_rate_amount_from",
+                "line_manually_model",
+            ),
             ("hr.payslip", "hr_payslip", "qty_rate_amount_ids", "line_manually_ids"),
             ("hr.contract", "hr_contract", "qty_rate_amount_ids", "line_manually_ids"),
-        ]
+        ],
     )
+
 
 def post_init_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
@@ -34,4 +40,6 @@ def post_init_hook(cr, registry):
                 "qty_rate_amount_ids", "line_manually_ids"
             )
     # Uninstall hr_rule_qty_rate_amount
-    env['ir.module.module'].search([('name', '=', 'hr_rule_qty_rate_amount')]).button_immediate_uninstall()
+    env["ir.module.module"].search(
+        [("name", "=", "hr_rule_qty_rate_amount")]
+    ).button_immediate_uninstall()

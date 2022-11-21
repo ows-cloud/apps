@@ -1,9 +1,10 @@
 from odoo import api, fields, models
 from odoo.tools.safe_eval import safe_eval
 
+
 # This might be useful to update python code in salary rules.
 def replace_lines(text, line_format):
-    """ Replace lines with new lines in text.
+    """Replace lines with new lines in text.
     NB! Make sure that old_line_format matches ONLY the desired lines!!!
 
     :param text: The text with lines to replace.
@@ -25,7 +26,7 @@ def replace_lines(text, line_format):
     for old_line_format, new_line_format in line_format:
         old_regex = old_line_format.replace("{", "(?P<").replace("}", ">.*)")
         new_text = []
-        for old_line in text.split('\n'):
+        for old_line in text.split("\n"):
             match = re.search(old_regex, old_line)
             if match:
                 new_line = new_line_format.format(**match.groupdict())

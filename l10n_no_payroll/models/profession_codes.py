@@ -1,4 +1,3 @@
-# -*- coding: iso-8859-1 -*-
 
 profession_codes = """5223;102;ABONNEMENTSELGER
 1233;101;ABONNEMENTSJEF

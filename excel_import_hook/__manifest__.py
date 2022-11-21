@@ -10,8 +10,7 @@
     "website": "https://github.com/OCA/server-tools",
     "category": "Tools",
     "depends": ["excel_import_export"],
-    "data": [
-    ],
+    "data": [],
     "installable": True,
     "development_status": "Beta",
     "maintainers": ["appstogrow"],

@@ -1,8 +1,8 @@
-from odoo import api, fields, models, _
+from odoo import models
 
 
 class MailMessage(models.Model):
-    _inherit = 'mail.message'
+    _inherit = "mail.message"
 
     def create(self, vals_list):
         """
@@ -15,12 +15,12 @@ class MailMessage(models.Model):
         if type(vals_list) is dict:
             vals_list = [vals_list]
         for vals_dict in vals_list:
-            if not vals_dict.get('company_id'):
+            if not vals_dict.get("company_id"):
                 try:
-                    model = vals_dict['model']
-                    res_id = vals_dict['res_id']
+                    model = vals_dict["model"]
+                    res_id = vals_dict["res_id"]
                     record = self.env[model].browse(res_id)
-                    vals_dict['company_id'] = record.ensure_one().company_id.id
+                    vals_dict["company_id"] = record.ensure_one().company_id.id
                 except:
                     pass
         return super(MailMessage, self).create(vals_list)

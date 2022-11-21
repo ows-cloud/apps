@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <!--
     <record id="view_calendar_event_tree_mobile" model="ir.ui.view">
@@ -13,7 +13,7 @@
                     <field name="name" string="Subject" readonly="1"/>
                     <field name="start" string="Start Date"/>
                     <field name="duration" widget="float_time" readonly="1"/>
-                </tree>  
+                </tree>
               </tree>
         </field>
     </record>

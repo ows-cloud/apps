@@ -4,7 +4,6 @@
 {
     "name": "Account Reconciliation Account",
     "summary": "",
-
     "author": "AppsToGROW",
     "category": "account",
     "data": [

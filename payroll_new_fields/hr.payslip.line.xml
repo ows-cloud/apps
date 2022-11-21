@@ -5,10 +5,7 @@
             <field name="model">hr.payslip.line</field>
             <field name="priority" eval="10" />
             <field name="arch" type="xml">
-                <tree
-                    string="Salary Structure"
-                    decoration-info="total == 0"
-                >
+                <tree string="Salary Structure" decoration-info="total == 0">
                     <field name="category_id" />
                     <field name="employee_id" />
                     <field name="sequence" />
@@ -20,7 +17,7 @@
                     <field name="total" sum="Total" />
                     <field name="amount_select" invisible="1" />
                     <field name="register_id" invisible="1" />
-                    <field name="date_from"/>
+                    <field name="date_from" />
                 </tree>
             </field>
         </record>
@@ -28,7 +25,7 @@
             <field name="name">hr.payslip.line.pivot</field>
             <field name="model">hr.payslip.line</field>
             <field name="mode">primary</field>
-            <field name="priority" eval="20"/>
+            <field name="priority" eval="20" />
             <field name="arch" type="xml">
                 <pivot>
                     <field name="salary_rule_id" type="row" />
@@ -39,12 +36,12 @@
         <record id="hr_payslip_line_view_search" model="ir.ui.view">
             <field name="name">hr.payslip.line.search.hr_new_fields</field>
             <field name="model">hr.payslip.line</field>
-            <field name="inherit_id" ref="payroll.hr_payslip_line_view_search"/>
-            <field name="priority" eval="20"/>
+            <field name="inherit_id" ref="payroll.hr_payslip_line_view_search" />
+            <field name="priority" eval="20" />
             <field name="arch" type="xml">
                 <search position="inside">
-                    <field name="date_from"/>
-                    <field name="payslip_run_id"/>
+                    <field name="date_from" />
+                    <field name="payslip_run_id" />
                 </search>
             </field>
         </record>
@@ -54,10 +51,12 @@
             <field name="res_model">hr.payslip.line</field>
             <field name="view_mode">tree,pivot</field>
         </record>
-        <menuitem id="menu_hr_payslip_line"
-                  name="Payslip Lines"
-                  sequence="11"
-                  parent="payroll.payroll_menu_root"
-                  action="action_hr_payslip_line"/>
+        <menuitem
+            id="menu_hr_payslip_line"
+            name="Payslip Lines"
+            sequence="11"
+            parent="payroll.payroll_menu_root"
+            action="action_hr_payslip_line"
+        />
     </data>
 </odoo>

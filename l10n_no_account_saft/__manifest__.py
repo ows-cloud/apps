@@ -2,25 +2,22 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': 'Norway - SAF-T',
-    'summary': '',
-    'version': '14.0.1.0.0',
-
-
-    'author': 'AppsToGROW',
-    'category': 'Localization',
-    'data': [
-        'security/ir.rule.csv',
-        'security/ir.model.access.csv',
-        'views/views.xml',
+    "name": "Norway - SAF-T",
+    "summary": "",
+    "version": "14.0.1.0.0",
+    "author": "AppsToGROW",
+    "category": "Localization",
+    "data": [
+        "security/ir.rule.csv",
+        "security/ir.model.access.csv",
+        "views/views.xml",
     ],
-    'depends': [
-        'account',
+    "depends": [
+        "account",
     ],
-    'license': 'AGPL-3',
-    'website': 'http://www.appstogrow.co',
-
-    'description': '''
+    "license": "AGPL-3",
+    "website": "http://www.appstogrow.co",
+    "description": """
 Docdumentation of SAF-T (Standard Audit File – Tax)
 https://www.skatteetaten.no/bedrift-og-organisasjon/starte-og-drive/rutiner-regnskap-og-kassasystem/saf-t-regnskap/dokumentasjon/
 
@@ -35,5 +32,5 @@ I had to remove this element from the XSD:
 <xs:element name="MovementPostingTime" type="xs:time" minOccurs="0">
 python3 gends_run_gen_odoo.py -p /home/ag/.local/bin/generateDS.py -d ./saft -l saft -x 1 saft_1.10.xsd
 replace 'brl_currency_id' with 'saft_currency_id'
-''',
+""",
 }

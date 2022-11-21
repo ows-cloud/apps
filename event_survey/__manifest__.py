@@ -2,28 +2,26 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': 'Event Registration Survey',
-    'summary': 'Registration Survey for attendees',
-
-    'author': 'AppsToGROW',
-    'category': 'Administration',
-    'data': [
-        'security/security.xml',
-        'views/views.xml',
-        'views/templates.xml',
-        'data/email_template_data.xml',
-        'data/server_action.xml',
+    "name": "Event Registration Survey",
+    "summary": "Registration Survey for attendees",
+    "author": "AppsToGROW",
+    "category": "Administration",
+    "data": [
+        "security/security.xml",
+        "views/views.xml",
+        "views/templates.xml",
+        "data/email_template_data.xml",
+        "data/server_action.xml",
     ],
-    'depends': [
-        'website_event_sale',
-        'survey_action',
+    "depends": [
+        "website_event_sale",
+        "survey_action",
     ],
-    'development_status': 'Alpha',
-    'license': 'AGPL-3',
-    'version': '14.0.1.0.0',
-    'website': 'http://www.appstogrow.co',
-
-    'description': '''
+    "development_status": "Alpha",
+    "license": "AGPL-3",
+    "version": "14.0.1.0.0",
+    "website": "http://www.appstogrow.co",
+    "description": """
 Successful event survey implementation depends on
 
 1) Survey
@@ -58,8 +56,8 @@ FYI:
 - The product name and the ticket & event display names are written on the sales order.
 BUGS:
 (Tested in 12.0 as public user, not logged in.)
-- In the end, the cart is not emptied! 
+- In the end, the cart is not emptied!
 - The partner being used is the admin? or technical_user? instead of the event_partner.
-- The public user can change the partner contact info! 
-    ''',
+- The public user can change the partner contact info!
+    """,
 }

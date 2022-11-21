@@ -5,13 +5,13 @@ index 07c91be9..c214cf8d 100644
 @@ -681,6 +681,7 @@ class AccountMove(models.Model):
                      line.tax_tag_ids = [(5, 0, 0)]
                  continue
- 
+
 +            line = line.with_context(tax_date=line.date)
              compute_all_vals = _compute_base_line_taxes(line)
- 
+
              # Assign tags on base line
 @@ -3468,6 +3469,7 @@ class AccountMoveLine(models.Model):
- 
+
      def _get_price_total_and_subtotal(self, price_unit=None, quantity=None, discount=None, currency=None, product=None, partner=None, taxes=None, move_type=None):
          self.ensure_one()
 +        self = self.with_context(tax_date=self.date)

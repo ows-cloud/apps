@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?>
-
 <odoo>
 
 <record id="view_account_type_form" model="ir.ui.view">
@@ -9,8 +8,8 @@
     <field name="arch" type="xml">
         <data>
             <field name="type" position="after">
-                <field name="internal_group"/>
-                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="internal_group" />
+                <field name="company_id" groups="base.group_multi_company" />
             </field>
         </data>
     </field>

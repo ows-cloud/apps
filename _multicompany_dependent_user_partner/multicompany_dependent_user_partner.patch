@@ -43,14 +43,14 @@ index 24f70cdec..a0fd5edae 100644
 -                            AND date_from <= %%s AND date_to >= %%s''' % field, (now, now))
 +                            AND date_from <= %%s AND date_to >= %%s''' % (field, self.env.company.id), (now, now))
          return [r[0] for r in self.env.cr.fetchall()]
- 
+
      def _clean_leave_responsible_users(self):
 diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
 index 4ecd87d3d..165e23be5 100644
 --- a/addons/mail/controllers/main.py
 +++ b/addons/mail/controllers/main.py
 @@ -128,10 +128,12 @@ class MailController(http.Controller):
- 
+
      @http.route('/mail/read_followers', type='json', auth='user')
      def read_followers(self, res_model, res_id):
 +        record = request.env[res_model].browse(res_id)
@@ -62,7 +62,7 @@ index 4ecd87d3d..165e23be5 100644
 +        record.check_access_rights("read")
 +        record.with_my_company().check_access_rule("read")
 +        follower_recs = request.env['mail.followers'].with_company(company).search([('res_model', '=', res_model), ('res_id', '=', res_id)])
- 
+
          followers = []
          follower_id = None
 @@ -290,7 +292,7 @@ class MailController(http.Controller):
@@ -139,13 +139,13 @@ index 8dc087770..dfd55f7e7 100644
 +++ b/addons/mail/models/mail_message.py
 @@ -250,6 +250,8 @@ class Message(models.Model):
              return ids
- 
+
          pid = self.env.user.partner_id.id
 +        if not pid:
 +            raise UserError("For '{}' user in '{}' company, please register name and language.".format(self.env.user.login, self.env.company.name))
          author_ids, partner_ids, channel_ids, allowed_ids = set([]), set([]), set([]), set([])
          model_ids = {}
- 
+
 diff --git a/addons/mail/models/res_users.py b/addons/mail/models/res_users.py
 index bd4a3f5bf..7f77d5073 100644
 --- a/addons/mail/models/res_users.py
@@ -167,7 +167,7 @@ index bd4a3f5bf..7f77d5073 100644
 +            if channels:
 +                channels._subscribe_users()
          return write_res
- 
+
      def unlink(self):
 diff --git a/odoo/addons/base/__init__.py b/odoo/addons/base/__init__.py
 index bba009035..f02b17eb3 100644
@@ -180,8 +180,8 @@ index bba009035..f02b17eb3 100644
 +from odoo import api, SUPERUSER_ID
 +from openupgradelib import openupgrade
 +from psycopg2 import sql
- 
- 
+
+
 +def pre_init(cr):
 +    """user.partner_id -> company_dependent"""
 +
@@ -262,12 +262,12 @@ index 2e295332d..bd97cc389 100644
 @@ -136,7 +135,7 @@ insert into res_partner (id, name, company_id, create_date) VALUES (1, 'My Compa
  insert into ir_model_data (name, module, model, noupdate, res_id) VALUES ('main_partner', 'base', 'res.partner', true, 1);
  select setval('res_partner_id_seq', 1);
- 
+
 -insert into res_users (id, login, password, active, partner_id, company_id, create_date) VALUES (1, '__system__', NULL, false, 1, 1, now() at time zone 'UTC');
 +insert into res_users (id, login, password, active, company_id, create_date) VALUES (1, '__system__', NULL, false, 1, now() at time zone 'UTC');
  insert into ir_model_data (name, module, model, noupdate, res_id) VALUES ('user_root', 'base', 'res.users', true, 1);
  select setval('res_users_id_seq', 1);
- 
+
 diff --git a/odoo/addons/base/models/ir_property.py b/odoo/addons/base/models/ir_property.py
 index 525751302..5a8c41db3 100644
 --- a/odoo/addons/base/models/ir_property.py
@@ -275,7 +275,7 @@ index 525751302..5a8c41db3 100644
 @@ -61,6 +61,21 @@ class Property(models.Model):
                              default='many2one',
                              index=True)
- 
+
 +    user_id = fields.Integer("The User", compute='_compute_user_partner_id', store=True, index=True,
 +        help="user_id and partner_id are necessary to join res.users with company_dependent res.partner using standard query.")
 +    partner_id = fields.Integer("The Company Partner", compute='_compute_user_partner_id', store=True, index=True,
@@ -300,7 +300,7 @@ index 34f35ac82..d7ae99231 100644
 +++ b/odoo/addons/base/models/res_users.py
 @@ -283,6 +283,7 @@ class Users(models.Model):
          return image_process(image, colorize=True)
- 
+
      partner_id = fields.Many2one('res.partner', required=True, ondelete='restrict', auto_join=True,
 +        company_dependent=True,
          string='Related Partner', help='Partner-related data of the user')
@@ -321,18 +321,18 @@ index 34f35ac82..d7ae99231 100644
 +                    field_record = self.env['ir.model.fields'].search([('model', '=', 'res.users'), ('name', '=', 'partner_id')]).ensure_one()
 +                    self.env['ir.property'].search([('fields_id', '=', field_record.id), ('company_id', '>', 0)]).write({'company_id': False})
          return users
- 
+
      def write(self, values):
 @@ -571,11 +582,6 @@ class Users(models.Model):
                  self = self.sudo().with_context(binary_field_real_user=self.env.user)
- 
+
          res = super(Users, self).write(values)
 -        if 'company_id' in values:
 -            for user in self:
 -                # if partner is global we keep it that way
 -                if user.partner_id.company_id and user.partner_id.company_id.id != values['company_id']:
 -                    user.partner_id.write({'company_id': user.company_id.id})
- 
+
          if 'company_id' in values or 'company_ids' in values:
              # Reset lazy properties `company` & `companies` on all envs
 @@ -1002,6 +1008,69 @@ class Users(models.Model):
@@ -459,5 +459,5 @@ index a1589a009..fc582d29c 100644
 +                        alias, parent_fname, parent_model._table, 'id', parent_fname,
 +                    )
                  push(leaf, parent_model, parent_alias)
- 
+
              elif left == 'id' and operator in HIERARCHY_FUNCS:

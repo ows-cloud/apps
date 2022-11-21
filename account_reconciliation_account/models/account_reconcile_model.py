@@ -1,4 +1,4 @@
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 
 
 class ReconcileModel(models.Model):
@@ -18,7 +18,10 @@ class ReconcileModel(models.Model):
         self.write({"line_ids": [(5, 0, 0), (0, 0, line)]})
 
     def _is_applicable_for(self, st_line, partner):
-        if self.match_counterpart_account_id and st_line.counterpart_account_id != self.match_counterpart_account_id:
+        if (
+            self.match_counterpart_account_id
+            and st_line.counterpart_account_id != self.match_counterpart_account_id
+        ):
             return False
         else:
             return super()._is_applicable_for(st_line, partner)

@@ -1,8 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data>
         <!-- eval="([1]) -> call ag.security(1,).set_company_id_to_1_where_null() -->
-        <function model="l10n_no_payroll.tabelltrekk" name="l10n_no_import_tax_deduction" eval="([1])"/>
-        <function model="hr.job" name="l10n_no_import_profession" eval="([1])"/>
+        <function
+            model="l10n_no_payroll.tabelltrekk"
+            name="l10n_no_import_tax_deduction"
+            eval="([1])"
+        />
+        <function model="hr.job" name="l10n_no_import_profession" eval="([1])" />
     </data>
 </odoo>

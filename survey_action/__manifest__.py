@@ -2,24 +2,22 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': "Survey Action",
-    'summary': 'Action after completed survey',
-
-    'author': 'AppsToGROW',
-    'category': 'Administration',
-    'data': [
-        'views/views.xml',
+    "name": "Survey Action",
+    "summary": "Action after completed survey",
+    "author": "AppsToGROW",
+    "category": "Administration",
+    "data": [
+        "views/views.xml",
     ],
-    'depends': [
-        'survey',
-        'base_technical_user',
+    "depends": [
+        "survey",
+        "base_technical_user",
     ],
-    'development_status': 'Alpha',
-    'license': 'AGPL-3',
-    'version': '14.0.1.0.0',
-    'website': 'http://www.appstogrow.co',
-
-    'description': """
+    "development_status": "Alpha",
+    "license": "AGPL-3",
+    "version": "14.0.1.0.0",
+    "website": "http://www.appstogrow.co",
+    "description": """
 Successful event survey implementation depends on
 
 1) Survey

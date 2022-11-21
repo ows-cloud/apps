@@ -1,5 +1,4 @@
-from odoo import api, fields, models
-from odoo.exceptions import UserError
+from odoo import fields, models
 
 
 class Company(models.Model):
@@ -15,7 +14,7 @@ class Company(models.Model):
     )
 
     def write(self, values):
-        res = super(Company, self).write(values)
+        super(Company, self).write(values)
         if values.get("group_show_line_subtotals"):
             Conf = self.env["multicompany.config"]
             for company in self:

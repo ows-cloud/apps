@@ -1,16 +1,22 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <odoo>
     <data>
 
         <record id="event_subscription" model="mail.template">
             <field name="name">Event: Registration with link to survey</field>
-            <field name="model_id" ref="event.model_event_registration"/>
-            <field name="email_from">${(object.event_id.organizer_id.email or object.event_id.user_id.email or '')|safe}</field>
-            <field name="email_to" >${object.partner_id.email or object.email|safe}</field>
+            <field name="model_id" ref="event.model_event_registration" />
+            <field
+                name="email_from"
+            >${(object.event_id.organizer_id.email or object.event_id.user_id.email or '')|safe}</field>
+            <field
+                name="email_to"
+            >${object.partner_id.email or object.email|safe}</field>
             <field name="lang">${object.partner_id.lang}</field>
             <field name="reply_to">${object.event_id.reply_to|safe}</field>
             <field name="subject">Your registration at ${object.event_id.name}</field>
-            <field name="body_html"><![CDATA[
+            <field
+                name="body_html"
+            ><![CDATA[
 <div style="background:#F3F5F6;color:#515166;padding:25px 0px;font-family:Arial,Helvetica,sans-serif;font-size:14px;">
 % set date_begin = format_tz(object.event_id.date_begin, tz='UTC', format='%Y%m%dT%H%M%SZ')
 % set date_end = format_tz(object.event_id.date_end, tz='UTC', format='%Y%m%dT%H%M%SZ')
@@ -35,7 +41,7 @@
             <tr>
                 <td style="padding:15px 20px 0px 20px;">
                     <h2 style="font-weight:300;">
-                        Hi ${object.name}, 
+                        Hi ${object.name},
                     </h2>
                     <h2 style="font-weight:300;">
                         Here is your order confirmation for

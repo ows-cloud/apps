@@ -1,5 +1,4 @@
-from odoo import api, fields, models, _
-import re
+from odoo import api, models
 
 
 class AccountMove(models.Model):
@@ -17,9 +16,10 @@ class AccountMove(models.Model):
 
     @api.model
     def message_new(self, msg_dict, custom_values=None):
-        journal = self.env['account.journal'].browse(custom_values.get('journal_id'))
-        if journal and journal.type == 'purchase':
-            return self.env['account.invoice.import'].message_new(msg_dict, custom_values)
+        journal = self.env["account.journal"].browse(custom_values.get("journal_id"))
+        if journal and journal.type == "purchase":
+            return self.env["account.invoice.import"].message_new(
+                msg_dict, custom_values
+            )
 
         return super(AccountMove, self).message_new(msg_dict, custom_values)
-

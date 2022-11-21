@@ -4,7 +4,6 @@
 {
     "name": "multicompany_account",
     "summary": "Company Tax B2B/B2C",
-
     "author": "AppsToGROW",
     "auto_install": True,
     "category": "Uncategorized",

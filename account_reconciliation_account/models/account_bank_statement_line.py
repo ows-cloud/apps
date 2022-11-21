@@ -1,11 +1,12 @@
-from odoo import api, fields, models, _
+from odoo import fields, models
 
 
 class BankStatementLine(models.Model):
     _inherit = "account.bank.statement.line"
 
-    counterpart_account_id = fields.Many2one("account.account",
+    counterpart_account_id = fields.Many2one(
+        "account.account",
         string="Counterpart Account",
-        domain=[('deprecated', '=', False)],
+        domain=[("deprecated", "=", False)],
         help="This field may be used at the statement line creation/import to suggest a reconciliation account.",
     )
