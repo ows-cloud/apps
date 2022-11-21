@@ -2,16 +2,20 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "Mail Alias Multicompany",
-    "summary": "alias_name.alias_company_name@alias_domain",
+    "name": "Migration Info",
+    "summary": "Migration status etc.",
     "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
-        "views/res.company.xml",
+        "security/ir.model.access.csv",
+        "views/ir_module_module.xml",
+        "views/views.xml",
+        "views/templates.xml",
     ],
-    "depends": [
-        "mail",
+    "demo": [
+        "demo/demo.xml",
     ],
+    "depends": ["base"],
     "license": "AGPL-3",
     "version": "14.0.1.0.0",
     "website": "http://www.appstogrow.co",
