@@ -32,14 +32,15 @@ class MulticompanyConfig(models.AbstractModel):
 
         all_companies = self.env['res.company'].sudo().search([])
         self._configure_companies(all_companies)
-        return 
+        return
 
     def _configure_system(self):
 
         # The system pricelist should be archived, so that websites will get the company's pricelist.
-        # product_list = self.env.ref('product.list0', raise_if_not_found=False)
-        # if product_list:
-        #     product_list.active = False
+        # 20.11.2022 It is archived in production database.
+        product_list = self.env.ref('product.list0', raise_if_not_found=False)
+        if product_list:
+            product_list.active = False
 
         # If active, new websites will get default crm.team which is not accessable.
         # EDIT: Patch will check if multicompany_base is installed.
@@ -114,25 +115,6 @@ class MulticompanyConfig(models.AbstractModel):
             (3, _id(_ref('sale.group_delivery_invoice_address')), 0),
             (3, _id(_ref('website.group_multi_website')), 0),
         ]})
-
-        # Support User
-        support_user = self.env.ref('__multicompany_base__.support_user', raise_if_not_found=False)
-        if not support_user:
-            companies = self.env['res.company'].sudo().search([])
-            company_ids = companies.ids
-            support_user = self.env['res.users'].sudo().create({
-                'login': 'support',
-                'lang': 'en_US',
-                'name': 'Support User',
-                'company_ids': [(6, 0, companies.ids)],
-            })
-            xmlid = self.env['ir.model.data'].create({
-                'module': '__multicompany_base__',
-                'name': 'support_user',
-                'model': 'res.users',
-                'res_id': support_user.id,
-            })
-        support_user.write({'groups_id': [(4, company_manager.id, 0)]})
 
     def _configure_companies(self, companies):
         for company in companies:

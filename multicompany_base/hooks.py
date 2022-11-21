@@ -8,12 +8,33 @@ def post_init_hook(cr, registry):
     # SET PARAMETERS
     ICP = env['ir.config_parameter'].sudo()
     default_settings = [
-        ('multicompany_base.force_security', '0'),
-        ('multicompany_base.force_config', '0'),
+        ('multicompany_base.force_security', '1'),
+        ('multicompany_base.force_config', '1'),
     ]
     for key, value in default_settings:
         if not ICP.get_param(key):
             ICP.set_param(key, value)
+    # SUPPORT USER
+    support_user = env.ref('__multicompany_base__.support_user', raise_if_not_found=False)
+    if not support_user:
+        companies = env['res.company'].sudo().search([])
+        company_ids = companies.ids
+        support_user = env['res.users'].sudo().create({
+            'login': 'support',
+            'lang': 'en_US',
+            'name': 'Support User',
+            'company_ids': [(6, 0, companies.ids)],
+            'groups_id': [
+                (4, env.ref("multicompany_base.group_company_manager").id),
+                (4, env.ref("base.group_partner_manager").id),
+            ],
+        })
+        xmlid = env['ir.model.data'].create({
+            'module': '__multicompany_base__',
+            'name': 'support_user',
+            'model': 'res.users',
+            'res_id': support_user.id,
+        })
 
 def WARNING_DELETE_RULES_uninstall_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})

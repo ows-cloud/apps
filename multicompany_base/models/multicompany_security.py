@@ -52,7 +52,6 @@ COMPANY_READ_SYSTEM_MODEL = [
     'mis.report.subreport',
     'res.field',                    # https://github.com/apps2grow/apps/tree/14.0/base_field_value
     'res.field.selection_value',    # https://github.com/apps2grow/apps/tree/14.0/base_field_value
-    # 'res.partner', # to avoid error: access_control() failed - res.partner has a separate configuration below
     'stock.location',
     'uom.uom',
     'website.menu',
@@ -86,15 +85,12 @@ NO_EDIT_MODEL = [
     'ir.rule',
     'ir.server.object.lines',
     'mail.message.subtype',
-    'res.bank',
     'res.country',
     'res.country.state',
     'res.country.group',
     'res.currency',
     'res.groups',
     'res.lang',
-    'res.partner.industry',
-    'res.request.link',
     # APPS
     'account.payment.method',
     'account.tax.group',
