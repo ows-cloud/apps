@@ -51,7 +51,7 @@ This code is for a contract rule. For a payslip rule, replace `contract` with `p
 Usage in Contract or Payslip
 ----------------------------
 
-* A) In the menu, go to Employees - Employees - Contracts and open a contract.
-* B) In the menu, go to Payroll - Employee Payslips and open a payslip.
+* A: In the menu, go to Employees - Employees - Contracts and open a contract.
+* B: In the menu, go to Payroll - Employee Payslips and open a payslip.
 * Go to Salary Rules, add a line and set Salary Rule and Quantity.
 * Analytic Account and Amount is optional (see the default_amount argument).

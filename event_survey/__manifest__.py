@@ -4,8 +4,7 @@
 {
     "name": "Event Registration Survey",
     "summary": "Registration Survey for attendees",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "security/security.xml",

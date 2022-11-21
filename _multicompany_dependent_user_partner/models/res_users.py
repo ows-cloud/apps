@@ -1,4 +1,4 @@
-from odoo import models
+from odoo import _, models
 from odoo.exceptions import UserError
 
 
@@ -16,14 +16,14 @@ class Users(models.Model):
             if not user.partner_id:
                 if len(users) > 1:
                     raise UserError(
-                        "You cannot update multiple users when not all users have a related partner for the company."
+                        _("You cannot update multiple users when not all users have a related partner for the company.")
                     )
                 vals = user._create_partner(vals)
                 user.flush()
         if "partner_id" in vals and vals["partner_id"]:
             if len(users) > 1:
                 raise UserError(
-                    "You cannot update multiple users with the same partner."
+                    _("You cannot update multiple users with the same partner.")
                 )
         return vals
 

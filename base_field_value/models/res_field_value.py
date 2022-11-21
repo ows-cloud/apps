@@ -43,9 +43,9 @@ def _validate(value, data_type, date_format=None):
     elif data_type == "date":
         formats = ["%Y-%m-%d", date_format]
         _logger.debug("formats: " + str(formats) + ", value = " + str(value))
-        for format in formats:
+        for my_format in formats:
             try:
-                new_value = datetime.strptime(value, format).strftime("%Y-%m-%d")
+                new_value = datetime.strptime(value, my_format).strftime("%Y-%m-%d")
                 break
             except:
                 pass
@@ -346,5 +346,3 @@ class ResFieldValue(models.Model):
             "The object's fields must be unique!",
         ),
     ]
-
-

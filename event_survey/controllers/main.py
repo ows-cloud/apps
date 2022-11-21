@@ -39,10 +39,10 @@ class EventSurveyController(http.Controller):
         EventTicket = request.env["event.event.ticket"]
 
         order = request.website.sale_get_order()
-        input = Input.sudo().search([("order_id", "=", order.id)])
+        my_input = Input.sudo().search([("order_id", "=", order.id)])
         attendees = []
 
-        for count, user_input in enumerate(input, start=1):
+        for count, user_input in enumerate(my_input, start=1):
             name = InputLine.search(
                 [
                     ("user_input_id", "=", user_input.id),
@@ -246,9 +246,9 @@ class EventSurveyController(http.Controller):
     def delete(self, survey, token, **post):
         domain = [("token", "=", token), ("survey_id", "=", survey.id)]
         user_input = request.env["survey.user_input"].search(domain)
-        for input in user_input:
-            if input.sudo().order_id.state == "draft":
-                input.sudo().unlink()
+        for myinput in user_input:
+            if myinput.sudo().order_id.state == "draft":
+                myinput.sudo().unlink()
 
         return request.redirect(
             "/event/%s/registration_survey_list" % slugify(survey.event_id)

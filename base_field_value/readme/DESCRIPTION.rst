@@ -34,4 +34,3 @@
 
         field_value_ids = fields.One2many('res.field.value', 'res_id', string='Fields', default=_compute_default_field_value_ids,
             domain=[('model','=','res.users')], copy=True)
-

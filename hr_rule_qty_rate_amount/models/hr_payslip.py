@@ -33,9 +33,9 @@ class HrPayslip(models.Model):
             return localdict
 
         class BrowsableObject(object):
-            def __init__(self, employee_id, dict, env):
+            def __init__(self, employee_id, my_dict, env):
                 self.employee_id = employee_id
-                self.dict = dict
+                self.dict = my_dict
                 self.env = env
 
             def __getattr__(self, attr):

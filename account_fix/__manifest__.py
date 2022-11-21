@@ -4,8 +4,7 @@
 {
     "name": "Account Regex Fix",
     "summary": "Journal Sequence",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "views/account.account.type.xml",

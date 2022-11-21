@@ -32,7 +32,7 @@ class HrPayslipLine(models.Model):
                         ).value
                     except:
                         raise UserError(
-                            "Contract {} (id {}) is missing field l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer.".format(
+                            _("Contract {} (id {}) is missing field l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer.").format(
                                 line.contract_id.name, line.contract_id.id
                             )
                         )

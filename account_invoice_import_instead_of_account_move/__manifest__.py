@@ -4,7 +4,7 @@
 {
     "name": "Import with account.invoice.import instead of account.move",
     "summary": "override message_new",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         # 'views/account.move.xml',

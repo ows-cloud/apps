@@ -4,7 +4,7 @@
 {
     "name": "multicompany_account",
     "summary": "Company Tax B2B/B2C",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, Odoo Community Association (OCA)",
     "auto_install": True,
     "category": "Uncategorized",
     "data": [

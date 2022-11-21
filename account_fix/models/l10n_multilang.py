@@ -1,6 +1,6 @@
 from odoo import models
 
-"""Migration before uninstall l10n_multilang"""
+# """Migration before uninstall l10n_multilang"""
 
 FIELDS = [
     ("account.account", "name"),

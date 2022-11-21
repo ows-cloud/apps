@@ -4,8 +4,7 @@
 {
     "name": "Fleet vehicle odometer",
     "summary": "Analytic Fleet",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "auto_install": True,
     "category": "Administration",
     "data": [

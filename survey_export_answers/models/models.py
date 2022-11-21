@@ -36,13 +36,13 @@ class SurveySurvey(models.Model):
 
         csv = '"id",' + ",".join(['"%s"' % tup[1] for tup in question_list]) + "\n"
 
-        for id, user_answers in all_answers:
-            csv_answers = ['"%s"' % id]
-            for key, question, type, t3, t4, t5, t6 in question_list:
+        for my_id, user_answers in all_answers:
+            csv_answers = ['"%s"' % my_id]
+            for key, question, my_type, t3, t4, t5, t6 in question_list:
                 csv_answer = ""
                 question_answer = user_answers.get(key, [])
                 if question_answer:
-                    if type in ("simple_choice", "multiple_choice", "matrix"):
+                    if my_type in ("simple_choice", "multiple_choice", "matrix"):
                         answer_labels = self.env["survey.question.answer"].browse(
                             question_answer
                         )

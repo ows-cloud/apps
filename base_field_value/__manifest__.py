@@ -4,8 +4,7 @@
 {
     "name": "Field Value",
     "summary": "Add field/value to any object",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "security/ir.model.access.csv",

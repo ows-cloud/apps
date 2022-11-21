@@ -1,6 +1,6 @@
 from odoo import api, fields, models
 
-""" Select account.account """
+# """ Select account.account """
 
 
 class TimeParameterVersion(models.Model):

@@ -1,6 +1,8 @@
-import amelding_logic
 import pyxb
-from amelding_testdata import testdata
+
+from . import amelding_logic
+from .amelding_testdata import testdata
+
 
 pyxb.RequireValidWhenGenerating(True)
 

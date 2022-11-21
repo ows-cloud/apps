@@ -37,9 +37,9 @@ for element in sequence:
 """
 
 
-def _debug(input):
-    # _logger.debug(str(input))
-    # print(str(input))
+def _debug(my_input):
+    # _logger.debug(str(my_input))
+    # print(str(my_input))
     pass
 
 
@@ -177,7 +177,7 @@ class AmeldingLogikk:
         je = a.JuridiskEntitet()
         # bi = je.betalingsinformasjon = a.Betalingsinformasjon()
         # virksomheter
-        for id in [1]:  # replace
+        for my_id in [1]:  # replace
             v = self.Virksomhet()
             je.virksomhet.append(v)  # optional
             # bi = self.Betalingsinformasjon(bi, **info)
@@ -485,7 +485,7 @@ class AmeldingLogikk:
         self.je["sumForskuddstrekk"] += -ft.beloep
         return ft
 
-    def Inntekt(self, employee, payslip, line, rule, type):
+    def Inntekt(self, employee, payslip, line, rule, my_type):
         inn = a.Inntekt()
         self._set(
             inn, "skatteOgAvgiftsregel", self._get(rule, "l10n_no_SkatteOgAvgiftsregel")
@@ -702,7 +702,7 @@ class AmeldingLogikk:
         aga = a.Arbeidsgiveravgift()
         # sumArbeidsgiveravgift = 0
         # loennOgGodtgjoerelse
-        for id in [1]:  # replace
+        for my_id in [1]:  # replace
             # agag_loenn, arbeidsgiveravgift = self.Arbeidsgiveravgiftsgrunnlag(loennOgGodtgjoerelse)
             agag_loenn = self.Arbeidsgiveravgiftsgrunnlag(
                 self.aga["avgiftsgrunnlagBeloep"]
@@ -710,7 +710,7 @@ class AmeldingLogikk:
             aga.loennOgGodtgjoerelse.append(agag_loenn)
             # sumArbeidsgiveravgift += arbeidsgiveravgift
         # tilskuddOgPremieTilPensjon
-        for id in [1]:  # replace
+        for my_id in [1]:  # replace
             agag_tilskudd = self.Arbeidsgiveravgiftsgrunnlag(
                 self.aga["avgiftsgrunnlagBeloepPensjon"]
             )
@@ -718,7 +718,7 @@ class AmeldingLogikk:
         # aga.utenlandskeMedSaerskiltProsentsats = self.UtenlandskeMedSaerskiltProsentsats()
         # aga.utenlandskeMedFastAvgiftsbeloep = self.UtenlandskeMedFastAvgiftsbeloep()
         # fradragIGrunnlagetForSone
-        for id in [1]:  # replace
+        for my_id in [1]:  # replace
             fraig = self.FradragIGrunnlaget(self.aga["avgiftsfradragBeloep"])
             aga.fradragIGrunnlagetForSone.append(fraig)
         # aga.fradragIGrunnlagetForUtenlandsk = self.FradragIGrunnlagetForUtenlandsk()
@@ -804,9 +804,9 @@ class AmeldingLogikk:
 
     # FIELDS
 
-    def _set(self, object, name, value):
+    def _set(self, obj, name, value):
         if value:
-            setattr(object, name, value)
+            setattr(obj, name, value)
 
     def _get(self, record, field):
         """record: Odoo object or test dict"""

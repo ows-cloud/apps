@@ -4,7 +4,7 @@
 {
     "name": "Donation Merge",
     "summary": "",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Accounting & Finance",
     "data": [
         "views/views.xml",

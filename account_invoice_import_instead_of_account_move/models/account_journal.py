@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from odoo import api, models
+from odoo import _, api, models
 from odoo.exceptions import UserError
 
 
@@ -30,7 +30,7 @@ class Journal(models.Model):
                 # create or write
                 if company_purchase_journal_with_mail_alias[company_id]:
                     raise UserError(
-                        "You can only have one purchase journal with alias, and journal {} already has an alias.".format(
+                        _("You can only have one purchase journal with alias, and journal {} already has an alias.").format(
                             company_purchase_journal_with_mail_alias[company_id]
                         )
                     )
@@ -60,7 +60,7 @@ class Journal(models.Model):
                 ).name
                 if company_purchase_journal_with_mail_alias:
                     raise UserError(
-                        "Journal {} already has an alias, and you can only have one purchase journal with alias.".format(
+                        _("Journal {} already has an alias, and you can only have one purchase journal with alias.").format(
                             company_purchase_journal_with_mail_alias
                         )
                     )

@@ -4,8 +4,7 @@
 {
     "name": "Company Website",
     "summary": "res_company.website_id",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "auto_install": True,
     "category": "Uncategorized",
     "data": [

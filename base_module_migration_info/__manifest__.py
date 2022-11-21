@@ -4,8 +4,7 @@
 {
     "name": "Migration Info",
     "summary": "Migration status etc.",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "views/base.module.update.xml",

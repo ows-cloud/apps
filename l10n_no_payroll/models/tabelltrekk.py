@@ -1,10 +1,10 @@
+import logging
+
 from odoo import fields, models
 
 from .tabelltrekk2022 import tabelltrekk2022 as tabelltrekk20xx
 
 YEAR = 2022
-
-import logging
 
 _logger = logging.getLogger(__name__)
 
@@ -27,7 +27,9 @@ class Tabelltrekk(models.Model):
             count = 0
             sql = (
                 sql_base
-            ) = "INSERT INTO l10n_no_payroll_tabelltrekk (year, tabellnummer, trekkperiode, tabelltype, trekkgrunnlag, trekk) VALUES "
+            ) = """INSERT INTO l10n_no_payroll_tabelltrekk (
+                year, tabellnummer, trekkperiode, tabelltype, trekkgrunnlag, trekk
+            ) VALUES """
             for line in lines:
                 sql += """
                     (%s, %s, %s, %s, %s, %s),""" % (
@@ -57,12 +59,14 @@ class HrEmployee(models.Model):
     ):
         """
         #year: Integer
-        #trekkperiode: String [('1','maaned'),('2','14 dager'),('3','uke'),('4','4 dager'),('5','3 dager'),('6',2 dager'),('7','1 dag')]
+        #trekkperiode: String [('1','maaned'),('2','14 dager'),('3','uke'),
+        #   ('4','4 dager'),('5','3 dager'),('6',2 dager'),('7','1 dag')]
         #tabelltype: String [('0','Loenn'),('1','Pensjon')]
         #trekkgrunnlag: Integer
         #andel_av_trekk: Float (halv skatt i desember)
         """
-        # def l10n_no_get_tax_deduction(self, context, year=2018, trekkperiode='1', tabelltype='0', trekkgrunnlag=10000, andel_av_trekk=1):
+        # def l10n_no_get_tax_deduction(self, context, year=2018, trekkperiode='1',
+        #   tabelltype='0', trekkgrunnlag=10000, andel_av_trekk=1):
         _logger.debug("l10n_no_get_tax_deduction")
 
         trekkprosent = self.env["res.field.value"].search(

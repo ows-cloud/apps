@@ -4,8 +4,7 @@
 {
     "name": "Company Languages",
     "summary": "",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Administration",
     "depends": ["base"],
     "data": [

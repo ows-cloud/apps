@@ -4,8 +4,7 @@
 {
     "name": "payroll_account_analytic",
     "summary": "Properly create analytic accounting from payslips",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Uncategorized",
     "data": [
         "views/views.xml",

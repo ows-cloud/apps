@@ -4,7 +4,7 @@
 {
     "name": "Replace Mail Template",
     "summary": "Custom mail templates",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, Odoo Community Association (OCA)",
     "auto_install": True,
     "category": "Administration",
     "data": [

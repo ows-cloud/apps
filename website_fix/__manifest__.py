@@ -4,8 +4,7 @@
 {
     "name": "Website Fix",
     "summary": "Removed .sudo()",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [],
     "depends": [

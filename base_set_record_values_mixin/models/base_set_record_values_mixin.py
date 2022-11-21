@@ -78,12 +78,12 @@ class BaseSetRecordValuesMixin(models.AbstractModel):
             return ValueError(error_msg)
 
     def _delele_id_and_replace_tuple_with_first_tuple_item(self, list_of_dict):
-        for dict in list_of_dict:
-            if "id" in dict:
-                del dict["id"]
-            for key, value in dict.items():
+        for mydict in list_of_dict:
+            if "id" in mydict:
+                del mydict["id"]
+            for key, value in mydict.items():
                 if type(value) is tuple:
-                    dict[key] = value[0]
+                    mydict[key] = value[0]
         return list_of_dict
 
     def _values_are_equal(self, list_of_values):

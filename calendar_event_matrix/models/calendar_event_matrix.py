@@ -119,7 +119,7 @@ class CalendarEventMatrix(models.Model):
                 if ce:
                     result.append((4, ce.ensure_one().id))
                 else:
-                    dict = {
+                    my_dict = {
                         "name": "{}".format(matrix_row.name),
                         "matrix_row_id": matrix_row.id,
                         "privacy": "public",
@@ -127,29 +127,29 @@ class CalendarEventMatrix(models.Model):
                         "partner_ids": [],
                     }
                     if allday:
-                        dict["allday"] = True
-                        dict["start_date"] = matrix_date
-                        dict["stop_date"] = matrix_date
+                        my_dict["allday"] = True
+                        my_dict["start_date"] = matrix_date
+                        my_dict["stop_date"] = matrix_date
                     else:
-                        dict["allday"] = False
+                        my_dict["allday"] = False
                         # TODO: get hours from timezone
                         start_day = -1 if matrix_row.default_start.hour >= 22 else 0
-                        dict["start"] = get_datetime(matrix_date) + timedelta(
+                        my_dict["start"] = get_datetime(matrix_date) + timedelta(
                             days=start_day,
                             hours=matrix_row.default_start.hour,
                             minutes=matrix_row.default_start.minute,
                             seconds=matrix_row.default_start.second,
                         )
                         stop_day = -1 if matrix_row.default_stop.hour >= 22 else 0
-                        dict["stop"] = get_datetime(matrix_date) + timedelta(
+                        my_dict["stop"] = get_datetime(matrix_date) + timedelta(
                             days=stop_day,
                             hours=matrix_row.default_stop.hour,
                             minutes=matrix_row.default_stop.minute,
                             seconds=matrix_row.default_stop.second,
                         )
-                        if dict["stop"] < dict["start"]:
-                            dict["stop"] = dict["stop"] + timedelta(days=1)
-                    result.append((0, 0, dict))
+                        if my_dict["stop"] < my_dict["start"]:
+                            my_dict["stop"] = my_dict["stop"] + timedelta(days=1)
+                    result.append((0, 0, my_dict))
 
         return [(5, 0, 0)] + result
 

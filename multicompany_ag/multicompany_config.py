@@ -47,7 +47,6 @@ class MulticompanyConfig(models.AbstractModel):
         )
         if not support_user:
             companies = self.env["res.company"].sudo().search([])
-            companies.ids
             support_user = (
                 self.env["res.users"]
                 .sudo()

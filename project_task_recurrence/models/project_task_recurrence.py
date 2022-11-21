@@ -3,9 +3,9 @@ from dateutil.relativedelta import relativedelta
 from odoo import fields, models
 
 
-def str2list(str):
-    if str:
-        return str.strip("] [").split(",")
+def str2list(string):
+    if string:
+        return string.strip("] [").split(",")
     else:
         return []
 

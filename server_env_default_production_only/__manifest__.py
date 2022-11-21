@@ -4,8 +4,7 @@
 {
     "name": "server_env_default_production_only",
     "summary": "Use database values only in production",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Uncategorized",
     "data": [],
     "depends": ["server_environment"],

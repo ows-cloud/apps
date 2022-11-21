@@ -4,7 +4,7 @@
 {
     "name": "JSON field",
     "summary": "JSON field on all models",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [],
     "depends": [

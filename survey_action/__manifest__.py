@@ -4,8 +4,7 @@
 {
     "name": "Survey Action",
     "summary": "Action after completed survey",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "views/views.xml",

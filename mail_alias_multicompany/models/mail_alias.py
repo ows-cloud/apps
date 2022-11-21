@@ -41,9 +41,9 @@ class Alias(models.Model):
             return vals_dict
         if not company_id:
             raise UserError(
-                _("_set_alias_name_with_alias_company_name_if_required: missing company_id in {}").format(
-                    vals_dict
-                )
+                _(
+                    "_set_alias_name_with_alias_company_name_if_required: missing company_id in {}"
+                ).format(vals_dict)
             )
 
         require_alias_company_name = (
@@ -56,7 +56,7 @@ class Alias(models.Model):
             if not company.alias_company_name:
                 raise UserError(
                     _(
-                    """ERROR in _set_alias_name_with_alias_company_name_if_required.
+                        """ERROR in _set_alias_name_with_alias_company_name_if_required.
                     Please edit the company: set a company alias name."""
                     )
                 )

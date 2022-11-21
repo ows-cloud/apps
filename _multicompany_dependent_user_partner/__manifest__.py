@@ -4,8 +4,7 @@
 {
     "name": "Company-dependent partner for users",
     "summary": "For each company, set a partner",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "views/res.users.xml",

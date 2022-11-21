@@ -5,8 +5,7 @@
     "name": "Norway - SAF-T",
     "summary": "",
     "version": "14.0.1.0.0",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Localization",
     "data": [
         "security/ir.rule.csv",

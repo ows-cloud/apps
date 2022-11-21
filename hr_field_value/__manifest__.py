@@ -4,8 +4,7 @@
 {
     "name": "hr_field_value",
     "summary": "Add custom HR fields",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Uncategorized",
     "data": [
         "views/views.xml",

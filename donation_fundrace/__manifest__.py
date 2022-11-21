@@ -4,8 +4,7 @@
 {
     "name": "Donation Fundrace",
     "summary": "Add field/value to any object",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Events",
     "data": [
         "security/security.xml",

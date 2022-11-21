@@ -4,9 +4,8 @@
 {
     "name": "Attendee name/email/phone",
     "summary": "Require email and/or phone. Get values from contact.",
-    "author": "AppsToGROW",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, Odoo Community Association (OCA)",
+    "category": "Administration",
     "data": [
         "report/report.xml",
         "views/views.xml",

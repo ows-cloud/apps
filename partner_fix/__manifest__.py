@@ -4,8 +4,7 @@
 {
     "name": "Partner Fix",
     "summary": "First name first",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Partner Management",
     "data": [
         "views/res.partner.xml",

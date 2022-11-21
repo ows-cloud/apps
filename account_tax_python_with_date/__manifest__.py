@@ -4,8 +4,7 @@
 {
     "name": "Account Tax with Date",
     "summary": "",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [],
     "depends": [

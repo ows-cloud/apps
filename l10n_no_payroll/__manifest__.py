@@ -4,8 +4,7 @@
 {
     "name": "Norway - Payroll",
     "summary": "",
-    "author": "AppsToGROW, "
-        "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
     "category": "Localization",
     "data": [
         "security/ir.model.access.csv",

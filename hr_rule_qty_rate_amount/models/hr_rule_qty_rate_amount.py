@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -12,7 +12,9 @@ class HrRuleQtyRateAmount(models.Model):
             return self.env.context["params"]["model"]
         except:
             raise UserError(
-                "Please save changes, then refresh the page (F5). If needed, use the menu Payroll / Employee Payslips, or the menu Employees / Employees / Contracts."
+                _("""Please save changes, then refresh the page (F5).
+                If needed, use the menu Payroll / Employee Payslips,
+                or the menu Employees / Employees / Contracts.""")
             )
         # return self.salary_rule_id.qty_rate_amount_from # salary_rule_id is empty
 
