@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+<record id="view_account_journal_form" model="ir.ui.view">
+    <field name="name">account_fix.account_journal_form</field>
+    <field name="model">account.journal</field>
+    <field name="inherit_id" ref="account.view_account_journal_form" />
+    <field name="arch" type="xml">
+        <data>
+            <xpath expr="//field[@name='default_account_id'][3]" position="attributes">
+                <attribute
+                        name="attrs"
+                    >{'required': 0, 'invisible': [('type', '!=', 'sale')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='default_account_id'][4]" position="attributes">
+                <attribute
+                        name="attrs"
+                    >{'required': 0, 'invisible': [('type', '!=', 'purchase')]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='advanced_settings']/group" position="inside">
+                <group string="Sequence Numbers">
+                    <field
+                            name="sequence_override_regex"
+                            groups="account.group_account_manager"
+                        />
+                </group>
+            </xpath>
+        </data>
+    </field>
+</record>
+
+</odoo>

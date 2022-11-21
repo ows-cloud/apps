@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_calendar_event_matrix_internal_user,calendar.event.matrix,model_calendar_event_matrix,group_calendar_event_matrix,1,1,1,1
+access_calendar_event_matrix_row_internal_user,calendar.event.matrix.row,model_calendar_event_matrix_row,group_calendar_event_matrix,1,1,1,1

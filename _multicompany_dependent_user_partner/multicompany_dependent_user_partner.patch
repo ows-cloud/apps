@@ -1,0 +1,463 @@
+diff --git a/addons/bus/models/res_partner.py b/addons/bus/models/res_partner.py
+index 71f2f8fbb..3b7b92431 100644
+--- a/addons/bus/models/res_partner.py
++++ b/addons/bus/models/res_partner.py
+@@ -13,7 +13,7 @@ class ResPartner(models.Model):
+     def _compute_im_status(self):
+         self.env.cr.execute("""
+             SELECT
+-                U.partner_id as id,
++                IP.partner_id as id,
+                 CASE WHEN max(B.last_poll) IS NULL THEN 'offline'
+                     WHEN age(now() AT TIME ZONE 'UTC', max(B.last_poll)) > interval %s THEN 'offline'
+                     WHEN age(now() AT TIME ZONE 'UTC', max(B.last_presence)) > interval %s THEN 'away'
+@@ -21,8 +21,9 @@ class ResPartner(models.Model):
+                 END as status
+             FROM bus_presence B
+             RIGHT JOIN res_users U ON B.user_id = U.id
+-            WHERE U.partner_id IN %s AND U.active = 't'
+-         GROUP BY U.partner_id
++            LEFT JOIN ir_property IP ON U.id = IP.user_id
++            WHERE IP.partner_id IN %s AND U.active = 't'
++         GROUP BY IP.partner_id
+         """, ("%s seconds" % DISCONNECTION_TIMER, "%s seconds" % AWAY_TIMER, tuple(self.ids)))
+         res = dict(((status['id'], status['status']) for status in self.env.cr.dictfetchall()))
+         for partner in self:
+diff --git a/addons/hr_holidays/models/res_users.py b/addons/hr_holidays/models/res_users.py
+index 24f70cdec..a0fd5edae 100644
+--- a/addons/hr_holidays/models/res_users.py
++++ b/addons/hr_holidays/models/res_users.py
+@@ -52,12 +52,14 @@ class User(models.Model):
+     @api.model
+     def _get_on_leave_ids(self, partner=False):
+         now = fields.Datetime.now()
+-        field = 'partner_id' if partner else 'id'
+-        self.env.cr.execute('''SELECT res_users.%s FROM res_users
++        field = 'ir_property.partner_id' if partner else 'res_users.id'
++        self.env.cr.execute('''SELECT %s FROM res_users
+                             JOIN hr_leave ON hr_leave.user_id = res_users.id
++                            LEFT JOIN ir_property ON res_users.id = ir_property.user_id
++                            AND ir_property.company_id = %s
+                             AND state not in ('cancel', 'refuse')
+                             AND res_users.active = 't'
+-                            AND date_from <= %%s AND date_to >= %%s''' % field, (now, now))
++                            AND date_from <= %%s AND date_to >= %%s''' % (field, self.env.company.id), (now, now))
+         return [r[0] for r in self.env.cr.fetchall()]
+
+     def _clean_leave_responsible_users(self):
+diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
+index 4ecd87d3d..165e23be5 100644
+--- a/addons/mail/controllers/main.py
++++ b/addons/mail/controllers/main.py
+@@ -128,10 +128,12 @@ class MailController(http.Controller):
+
+     @http.route('/mail/read_followers', type='json', auth='user')
+     def read_followers(self, res_model, res_id):
++        record = request.env[res_model].browse(res_id)
++        company = record.my_company()
+         request.env['mail.followers'].check_access_rights("read")
+-        request.env[res_model].check_access_rights("read")
+-        request.env[res_model].browse(res_id).check_access_rule("read")
+-        follower_recs = request.env['mail.followers'].search([('res_model', '=', res_model), ('res_id', '=', res_id)])
++        record.check_access_rights("read")
++        record.with_my_company().check_access_rule("read")
++        follower_recs = request.env['mail.followers'].with_company(company).search([('res_model', '=', res_model), ('res_id', '=', res_id)])
+
+         followers = []
+         follower_id = None
+@@ -290,7 +292,7 @@ class MailController(http.Controller):
+         records = request.env[model].browse(res_ids)
+         try:
+             records.check_access_rule('read')
+-            records.check_access_rights('read')
++            records.with_my_company().check_access_rights('read')
+         except:
+             return {}
+         return records._message_get_suggested_recipients()
+diff --git a/addons/mail/models/mail_activity.py b/addons/mail/models/mail_activity.py
+index 26e07e001..0e7a133a7 100644
+--- a/addons/mail/models/mail_activity.py
++++ b/addons/mail/models/mail_activity.py
+@@ -830,7 +830,7 @@ class MailActivityMixin(models.AbstractModel):
+             SELECT 1 AS id, count(*) AS "__count", {fields}
+             FROM {from_clause}
+             JOIN (
+-                SELECT res_id,
++                SELECT mail_activity.res_id,
+                 CASE
+                     WHEN min(date_deadline - (now() AT TIME ZONE COALESCE(res_partner.tz, %s))::date) > 0 THEN 'planned'
+                     WHEN min(date_deadline - (now() AT TIME ZONE COALESCE(res_partner.tz, %s))::date) < 0 THEN 'overdue'
+@@ -839,9 +839,10 @@ class MailActivityMixin(models.AbstractModel):
+                 END AS activity_state
+                 FROM mail_activity
+                 JOIN res_users ON (res_users.id = mail_activity.user_id)
+-                JOIN res_partner ON (res_partner.id = res_users.partner_id)
++                LEFT JOIN ir_property ON res_users.id = ir_property.user_id AND ir_property.company_id = {company_id}
++                LEFT JOIN res_partner ON res_partner.id = ir_property.partner_id
+                 WHERE res_model = '{model}'
+-                GROUP BY res_id
++                GROUP BY mail_activity.res_id
+             ) AS "_last_activity_state" ON ("{table}".id = "_last_activity_state".res_id)
+             WHERE {where_clause}
+             GROUP BY {group_by}
+@@ -852,6 +853,7 @@ class MailActivityMixin(models.AbstractModel):
+             table=self._table,
+             where_clause=where_clause or '1=1',
+             group_by=', '.join(groupby_terms),
++            company_id=self.env.company.id,
+         )
+         self.env.cr.execute(select_query, [tz] * 3 + where_params)
+         fetched_data = self.env.cr.dictfetchall()
+diff --git a/addons/mail/models/mail_followers.py b/addons/mail/models/mail_followers.py
+index e584b87dd..168c32a55 100644
+--- a/addons/mail/models/mail_followers.py
++++ b/addons/mail/models/mail_followers.py
+@@ -139,7 +139,9 @@ SELECT DISTINCT ON(pid, cid) * FROM (
+             partner.active as active, partner.partner_share as pshare, NULL as ctype,
+             users.notification_type AS notif, array_agg(groups.id) AS groups
+         FROM res_partner partner
+-        LEFT JOIN res_users users ON users.partner_id = partner.id AND users.active
++        LEFT JOIN ir_property property ON partner.id = property.partner_id
++        LEFT JOIN res_users users ON users.id = property.user_id
++            AND users.active
+         LEFT JOIN res_groups_users_rel groups_rel ON groups_rel.uid = users.id
+         LEFT JOIN res_groups groups ON groups.id = groups_rel.gid
+         WHERE EXISTS (
+@@ -175,7 +177,8 @@ SELECT partner.id as pid, NULL::int AS cid,
+     partner.active as active, partner.partner_share as pshare, NULL as ctype,
+     users.notification_type AS notif, NULL AS groups
+ FROM res_partner partner
+-LEFT JOIN res_users users ON users.partner_id = partner.id AND users.active
++LEFT JOIN ir_property property ON partner.id = property.partner_id
++LEFT JOIN res_users users ON users.id = property.user_id AND users.active
+ WHERE partner.id IN %s"""
+                 params.append(tuple(pids))
+             if cids:
+diff --git a/addons/mail/models/mail_message.py b/addons/mail/models/mail_message.py
+index 8dc087770..dfd55f7e7 100644
+--- a/addons/mail/models/mail_message.py
++++ b/addons/mail/models/mail_message.py
+@@ -250,6 +250,8 @@ class Message(models.Model):
+             return ids
+
+         pid = self.env.user.partner_id.id
++        if not pid:
++            raise UserError("For '{}' user in '{}' company, please register name and language.".format(self.env.user.login, self.env.company.name))
+         author_ids, partner_ids, channel_ids, allowed_ids = set([]), set([]), set([]), set([])
+         model_ids = {}
+
+diff --git a/addons/mail/models/res_users.py b/addons/mail/models/res_users.py
+index bd4a3f5bf..7f77d5073 100644
+--- a/addons/mail/models/res_users.py
++++ b/addons/mail/models/res_users.py
+@@ -96,6 +96,18 @@ GROUP BY channel_moderator.res_users_id""", [tuple(self.ids)])
+             self.env['mail.channel'].search([('group_ids', 'in', user_group_ids)])._subscribe_users()
+         elif sel_groups:
+             self.env['mail.channel'].search([('group_ids', 'in', sel_groups)])._subscribe_users()
++        # TODO If changes in both vals['groups_id'] and sel_groups, will the user be subscribed based on sel_groups also? If not, then FIX above.
++        if vals.get('partner_id') or (vals.get('name') and vals.get('lang')):
++            # Probably a new partner
++            channels = self.env['mail.channel']
++            if vals.get('groups_id'):
++                user_group_ids = [command[1] for command in vals['groups_id'] if command[0] == 4]
++                user_group_ids += [id for command in vals['groups_id'] if command[0] == 6 for id in command[2]]
++                channels = channels | self.env['mail.channel'].search([('group_ids', 'in', user_group_ids)])
++            if sel_groups:
++                channels = channels | self.env['mail.channel'].search([('group_ids', 'in', sel_groups)])
++            if channels:
++                channels._subscribe_users()
+         return write_res
+
+     def unlink(self):
+diff --git a/odoo/addons/base/__init__.py b/odoo/addons/base/__init__.py
+index bba009035..f02b17eb3 100644
+--- a/odoo/addons/base/__init__.py
++++ b/odoo/addons/base/__init__.py
+@@ -6,8 +6,60 @@ from . import models
+ from . import populate
+ from . import report
+ from . import wizard
++from odoo import api, SUPERUSER_ID
++from openupgradelib import openupgrade
++from psycopg2 import sql
+
+
++def pre_init(cr):
++    """user.partner_id -> company_dependent"""
++
++    if openupgrade.column_exists(cr, 'res_users', 'partner_id'):
++        env = api.Environment(cr, SUPERUSER_ID, {})
++
++        rename_fields = [
++            ('res.users', 'res_users', 'partner_id', 'temp_partner_id'),
++        ]
++        openupgrade.rename_fields(env, rename_fields, no_deep=True)
++
++        add_fields = [
++            ('partner_id', 'res.users', 'res_users', 'integer', 'int4', 'base'),
++            ('user_id', 'ir.property', 'ir_property', 'many2one', 'int4', 'base'),
++            ('partner_id', 'ir.property', 'ir_property', 'many2one', 'int4', 'base'),
++        ]
++        openupgrade.add_fields(env, add_fields)
++
++        cr.execute("SELECT id FROM ir_model_fields "
++                "WHERE name='partner_id' AND model='res.users'")
++        fields_id = cr.fetchone()[0]
++        openupgrade.logged_query(
++            cr,
++            sql.SQL("""
++                INSERT INTO ir_property (
++                    fields_id, company_id, name, type, res_id, user_id, value_reference, partner_id
++                )
++                SELECT
++                    {fields_id}, company_id,
++                    'partner_id', 'many2one',
++                    'res.users,' || id::TEXT, id,
++                    'res.partner,' || temp_partner_id::TEXT, temp_partner_id
++                FROM res_users
++                WHERE temp_partner_id IS NOT NULL
++                AND company_id IS NOT NULL;
++                """.format(fields_id=str(fields_id))
++            )
++        )
++
++        openupgrade.logged_query(
++            cr,
++            sql.SQL("""
++                ALTER TABLE res_users
++                DROP CONSTRAINT IF EXISTS res_users_partner_id_fkey,
++                DROP COLUMN partner_id;
++            """))
++
++        #openupgrade.drop_columns([('res_users', 'temp_partner_id')]) # How to drop the whole field?
++
+ def post_init(cr, registry):
+     """Rewrite ICP's to force groups"""
+     from odoo import api, SUPERUSER_ID
+diff --git a/odoo/addons/base/__manifest__.py b/odoo/addons/base/__manifest__.py
+index 8ca87a209..989337bf0 100644
+--- a/odoo/addons/base/__manifest__.py
++++ b/odoo/addons/base/__manifest__.py
+@@ -85,6 +85,8 @@ The kernel of Odoo, needed for all installation.
+     'test': [],
+     'installable': True,
+     'auto_install': True,
++    'external_dependencies': {'python': ['openupgradelib']},
++    'pre_init_hook': 'pre_init',
+     'post_init_hook': 'post_init',
+     'license': 'LGPL-3',
+ }
+diff --git a/odoo/addons/base/data/base_data.sql b/odoo/addons/base/data/base_data.sql
+index 2e295332d..bd97cc389 100644
+--- a/odoo/addons/base/data/base_data.sql
++++ b/odoo/addons/base/data/base_data.sql
+@@ -20,7 +20,6 @@ CREATE TABLE res_users (
+     -- No FK references below, will be added later by ORM
+     -- (when the destination rows exist)
+     company_id integer, -- references res_company,
+-    partner_id integer, -- references res_partner,
+     create_date timestamp without time zone,
+     primary key(id)
+ );
+@@ -136,7 +135,7 @@ insert into res_partner (id, name, company_id, create_date) VALUES (1, 'My Compa
+ insert into ir_model_data (name, module, model, noupdate, res_id) VALUES ('main_partner', 'base', 'res.partner', true, 1);
+ select setval('res_partner_id_seq', 1);
+
+-insert into res_users (id, login, password, active, partner_id, company_id, create_date) VALUES (1, '__system__', NULL, false, 1, 1, now() at time zone 'UTC');
++insert into res_users (id, login, password, active, company_id, create_date) VALUES (1, '__system__', NULL, false, 1, now() at time zone 'UTC');
+ insert into ir_model_data (name, module, model, noupdate, res_id) VALUES ('user_root', 'base', 'res.users', true, 1);
+ select setval('res_users_id_seq', 1);
+
+diff --git a/odoo/addons/base/models/ir_property.py b/odoo/addons/base/models/ir_property.py
+index 525751302..5a8c41db3 100644
+--- a/odoo/addons/base/models/ir_property.py
++++ b/odoo/addons/base/models/ir_property.py
+@@ -61,6 +61,21 @@ class Property(models.Model):
+                             default='many2one',
+                             index=True)
+
++    user_id = fields.Integer("The User", compute='_compute_user_partner_id', store=True, index=True,
++        help="user_id and partner_id are necessary to join res.users with company_dependent res.partner using standard query.")
++    partner_id = fields.Integer("The Company Partner", compute='_compute_user_partner_id', store=True, index=True,
++        help="user_id and partner_id are necessary to join res.users with company_dependent res.partner using standard query.")
++
++    @api.depends('res_id', 'value_reference')
++    def _compute_user_partner_id(self):
++        for record in self:
++            if record.res_id and record.res_id[:9] == 'res.users' and record.value_reference and record.value_reference[:11] == 'res.partner' and record.name == 'partner_id':
++                record.user_id = int(record.res_id.split(',')[1])
++                record.partner_id = int(record.value_reference.split(',')[1])
++            else:
++                record.user_id = None
++                record.partner_id = None
++
+     def init(self):
+         # Ensure there is at most one active variant for each combination.
+         query = """
+diff --git a/odoo/addons/base/models/res_users.py b/odoo/addons/base/models/res_users.py
+index 34f35ac82..d7ae99231 100644
+--- a/odoo/addons/base/models/res_users.py
++++ b/odoo/addons/base/models/res_users.py
+@@ -283,6 +283,7 @@ class Users(models.Model):
+         return image_process(image, colorize=True)
+
+     partner_id = fields.Many2one('res.partner', required=True, ondelete='restrict', auto_join=True,
++        company_dependent=True,
+         string='Related Partner', help='Partner-related data of the user')
+     login = fields.Char(required=True, help="Used to log into the system")
+     password = fields.Char(
+@@ -547,6 +548,16 @@ class Users(models.Model):
+             if user.partner_id.company_id:
+                 user.partner_id.company_id = user.company_id
+             user.partner_id.active = user.active
++            """
++            multicompany_dependent_user_partner
++            If the patch is installed, but the module is not installed:
++                The user should always have the same partner, regardless of company.
++            """
++            if not self.env['ir.module.module'].search([('name', '=', 'multicompany_dependent_user_partner')]).state == 'installed':
++                field = self.env['res.users']._fields['partner_id']
++                if field.company_dependent:
++                    field_record = self.env['ir.model.fields'].search([('model', '=', 'res.users'), ('name', '=', 'partner_id')]).ensure_one()
++                    self.env['ir.property'].search([('fields_id', '=', field_record.id), ('company_id', '>', 0)]).write({'company_id': False})
+         return users
+
+     def write(self, values):
+@@ -571,11 +582,6 @@ class Users(models.Model):
+                 self = self.sudo().with_context(binary_field_real_user=self.env.user)
+
+         res = super(Users, self).write(values)
+-        if 'company_id' in values:
+-            for user in self:
+-                # if partner is global we keep it that way
+-                if user.partner_id.company_id and user.partner_id.company_id.id != values['company_id']:
+-                    user.partner_id.write({'company_id': user.company_id.id})
+
+         if 'company_id' in values or 'company_ids' in values:
+             # Reset lazy properties `company` & `companies` on all envs
+@@ -1002,6 +1008,69 @@ class Users(models.Model):
+     def _mfa_url(self):
+         """ If an MFA method is enabled, returns the URL for its second step. """
+         return
++
++    # SQL join; res.users _inherits company_dependent res.parter
++    def _inherits_query_left_join(self, query, lhs_alias, lhs_column, rhs_table, rhs_column, link, extra=None, extra_params=()):
++        property_alias = query.left_join(
++            'res_users',
++            'id',
++            'ir_property',
++            'user_id',
++            'property_id',
++            "res_users__property_id.partner_id is not null AND res_users__property_id.company_id = {}".format(self.env.company.id),
++        )
++        parent_alias = query.left_join(
++            'res_users__property_id',
++            'partner_id',
++            'res_partner',
++            'id',
++            'partner_id',
++        )
++        return parent_alias
++
++    # copied from ORM, using _inherits_query_left_join
++    def _inherits_join_add(self, current_model, parent_model_name, query):
++        """
++        Add missing table SELECT and JOIN clause to ``query`` for reaching the parent table (no duplicates)
++        :param current_model: current model object
++        :param parent_model_name: name of the parent model for which the clauses should be added
++        :param query: query object on which the JOIN should be added
++        """
++        inherits_field = current_model._inherits[parent_model_name]
++        parent_model = self.env[parent_model_name]
++        parent_alias = self._inherits_query_left_join(query,
++            current_model._table, inherits_field, parent_model._table, 'id', inherits_field,
++        )
++        return parent_alias
++
++    # copied from ORM, using _inherits_query_left_join
++    @api.model
++    def _inherits_join_calc(self, alias, fname, query):
++        """
++        Adds missing table select and join clause(s) to ``query`` for reaching
++        the field coming from an '_inherits' parent table (no duplicates).
++        :param alias: name of the initial SQL alias
++        :param fname: name of inherited field to reach
++        :param query: query object on which the JOIN should be added
++        :return: qualified name of field, to be used in SELECT clause
++        """
++        # INVARIANT: alias is the SQL alias of model._table in query
++        model, field = self, self._fields[fname]
++        while field.inherited:
++            # retrieve the parent model where field is inherited from
++            parent_model = self.env[field.related_field.model_name]
++            parent_fname = field.related[0]
++            # JOIN parent_model._table AS parent_alias ON alias.parent_fname = parent_alias.id
++            parent_alias = self._inherits_query_left_join(query,
++                alias, parent_fname, parent_model._table, 'id', parent_fname,
++            )
++            model, alias, field = parent_model, parent_alias, field.related_field
++        # handle the case where the field is translated
++        if field.translate is True:
++            return model._generate_translated_field(alias, fname, query)
++        else:
++            return '"%s"."%s"' % (alias, fname)
++
+ #
+ # Implied groups
+ #
+diff --git a/odoo/models.py b/odoo/models.py
+index 34882ef5c..419ddd276 100644
+--- a/odoo/models.py
++++ b/odoo/models.py
+@@ -3860,7 +3860,28 @@ Fields:
+             parent_data_list = []
+             for data in data_list:
+                 if not data['stored'].get(parent_name):
+-                    parent_data_list.append(data)
++                    # Special case if res.users _inherits company_dependent partner_id
++                    # TODO: Split the 3 conditions if this will increase the performance
++                    field = self._fields.get(parent_name)
++                    if field.company_dependent \
++                    and self._name == 'res.users' \
++                    and parent_name == 'partner_id':
++                        # update/create res.partner
++                        if 'res.partner' in data['inherited']:
++                            if 'partner_id' in data['inversed']:
++                                parent = self.env[model_name].browse(data['inversed'][parent_name])
++                                parent.write(data['inherited'][model_name])
++                            else:
++                                partner = self.env['res.partner'].create(data['inherited']['res.partner'])
++                                data['inversed']['partner_id'] = partner.id
++                        # create ir.property
++                        self.env.cr.execute("select nextval('res_users_id_seq');")
++                        id = self.env.cr.fetchone()[0]
++                        partner_id = data['inversed']['partner_id']
++                        data['stored']['id'] = id
++                        self.env['ir.property']._set_multi('partner_id', 'res.users', {id: partner_id})
++                    else:
++                        parent_data_list.append(data)
+                 elif data['inherited'][model_name]:
+                     parent = self.env[model_name].browse(data['stored'][parent_name])
+                     parent.write(data['inherited'][model_name])
+diff --git a/odoo/osv/expression.py b/odoo/osv/expression.py
+index a1589a009..fc582d29c 100644
+--- a/odoo/osv/expression.py
++++ b/odoo/osv/expression.py
+@@ -656,9 +656,14 @@ class expression(object):
+             elif field.inherited:
+                 parent_model = model.env[field.related_field.model_name]
+                 parent_fname = model._inherits[parent_model._name]
+-                parent_alias = self.query.left_join(
+-                    alias, parent_fname, parent_model._table, 'id', parent_fname,
+-                )
++                if model._name == 'res.users' and parent_model._name == 'res.partner':
++                    parent_alias = model._inherits_query_left_join(self.query,
++                        alias, parent_fname, parent_model._table, 'id', parent_fname,
++                    )
++                else:
++                    parent_alias = self.query.left_join(
++                        alias, parent_fname, parent_model._table, 'id', parent_fname,
++                    )
+                 push(leaf, parent_model, parent_alias)
+
+             elif left == 'id' and operator in HIERARCHY_FUNCS:

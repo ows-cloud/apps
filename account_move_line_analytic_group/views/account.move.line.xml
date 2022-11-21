@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="view_account_move_line_filter" model="ir.ui.view">
+        <field name="name">account.move.line.search with analytic_group_id</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_account_move_line_filter" />
+        <field name="arch" type="xml">
+            <search position="inside">
+                <field
+                    name="analytic_group_id"
+                    groups="analytic.group_analytic_accounting"
+                />
+            </search>
+        </field>
+    </record>
+
+    <record id="view_move_line_tree" model="ir.ui.view">
+        <field name="name">account.move.line.tree with analytic_group_id</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_move_line_tree" />
+        <field name="arch" type="xml">
+            <tree position="inside">
+                <field
+                    name="analytic_group_id"
+                    readonly="1"
+                    optional="hide"
+                    groups="analytic.group_analytic_accounting"
+                />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_move_line_form" model="ir.ui.view">
+        <field name="name">account.move.line.form with analytic_group_id</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_move_line_form" />
+        <field name="arch" type="xml">
+            <field name="analytic_account_id" position="after">
+                <field
+                    name="analytic_group_id"
+                    readonly="1"
+                    groups="analytic.group_analytic_accounting"
+                />
+            </field>
+        </field>
+    </record>
+
+</odoo>
