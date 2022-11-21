@@ -45,7 +45,8 @@ class Tax(models.Model):
             ("5", "5 No output VAT - Zero rate"),
             (
                 "6",
-                "6 Not liable to VAT treatment, turnover outside the scope of the VAT legislation",
+                "6 Not liable to VAT treatment, "
+                    "turnover outside the scope of the VAT legislation",
             ),
             ("7", "7 No VAT treatment - no turnover according to the VAT legislation"),
             ("11", "11 Input VAT deductible (domestic) - Reduced rate, middle"),
@@ -80,7 +81,8 @@ class Tax(models.Model):
             ),
             (
                 "89",
-                "89 Services purchased from abroad, without deduction of VAT - Reduced rate, low",
+                "89 Services purchased from abroad, "
+                    "without deduction of VAT - Reduced rate, low",
             ),
             (
                 "91",
@@ -88,7 +90,8 @@ class Tax(models.Model):
             ),
             (
                 "92",
-                "92 Purchase of emissions trading or gold, without deduction of VAT - Regular rate",
+                "92 Purchase of emissions trading or gold, "
+                    "without deduction of VAT - Regular rate",
             ),
         ],
         "Standard Tax Code",
@@ -184,7 +187,12 @@ class AuditFile:
 
     def AuditFile(self):
         # saft_1_10.py#L1120 AuditFile
-        # def export(self, outfile, level, namespaceprefix_='', namespacedef_=' xmlns="urn:StandardAuditFile-Taxation-Financial:NO" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:StandardAuditFile-Taxation-Financial:NO Norwegian_SAF-T_Financial_Schema_v_1.10.xsd" ', name_='AuditFile', pretty_print=True):
+        # def export(self, outfile, level, namespaceprefix_='', namespacedef_='
+        #  xmlns="urn:StandardAuditFile-Taxation-Financial:NO"
+        #  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        #  xsi:schemaLocation="urn:StandardAuditFile-Taxation-Financial:NO
+        #  Norwegian_SAF-T_Financial_Schema_v_1.10.xsd" ',
+        #  name_='AuditFile', pretty_print=True):
         audit_file = saft.AuditFile()
         audit_file.Header = self.Header()
         audit_file.MasterFiles = self.MasterFiles()
@@ -420,7 +428,10 @@ class AuditFile:
         t = saft.TaxIDStructure()
         t.TaxRegistrationNumber = partner.vat[2:] + "MVA"
         t.TaxAuthority = "Skatteetaten"
-        # t.TaxVerificationDate # The date that the tax registration details referred to above were last checked or when the tax registration was completed in the VAT register (Merverdiavgiftsregisteret).
+        # t.TaxVerificationDate
+        # # The date that the tax registration details referred to above were last
+        #  checked or when the tax registration was completed in the
+        #  VAT register (Merverdiavgiftsregisteret).
         return t
 
     def BankAccount(self, partner):
