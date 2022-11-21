@@ -4,7 +4,8 @@
 {
     "name": "Partner Fix",
     "summary": "First name first",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "Partner Management",
     "data": [
         "views/res.partner.xml",
@@ -15,6 +16,4 @@
     "license": "AGPL-3",
     "version": "14.0.1.0.0",
     "website": "http://www.appstogrow.co",
-    "description": """
-    """,
 }

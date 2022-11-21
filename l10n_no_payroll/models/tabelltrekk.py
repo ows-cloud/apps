@@ -55,8 +55,6 @@ class HrEmployee(models.Model):
     def l10n_no_get_tax_deduction(
         self, year, trekkperiode, tabelltype, trekkgrunnlag, andel_av_trekk
     ):
-        # def l10n_no_get_tax_deduction(self, context, year=2018, trekkperiode='1', tabelltype='0', trekkgrunnlag=10000, andel_av_trekk=1):
-        _logger.debug("l10n_no_get_tax_deduction")
         """
         #year: Integer
         #trekkperiode: String [('1','maaned'),('2','14 dager'),('3','uke'),('4','4 dager'),('5','3 dager'),('6',2 dager'),('7','1 dag')]
@@ -64,6 +62,8 @@ class HrEmployee(models.Model):
         #trekkgrunnlag: Integer
         #andel_av_trekk: Float (halv skatt i desember)
         """
+        # def l10n_no_get_tax_deduction(self, context, year=2018, trekkperiode='1', tabelltype='0', trekkgrunnlag=10000, andel_av_trekk=1):
+        _logger.debug("l10n_no_get_tax_deduction")
 
         trekkprosent = self.env["res.field.value"].search(
             [

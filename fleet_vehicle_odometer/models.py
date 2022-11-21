@@ -1,13 +1,13 @@
 import logging
 from datetime import datetime
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
 
-class fleet_vehicle_odometer(models.Model):
+class FleetVehicleOdometer(models.Model):
     _inherit = "fleet.vehicle.odometer"
 
     analytic_account_id = fields.Many2one(
@@ -19,7 +19,7 @@ class fleet_vehicle_odometer(models.Model):
     @api.model
     def create(self, values):
         self._recompute_distance_before_create(values)
-        return super(fleet_vehicle_odometer, self).create(values)
+        return super().create(values)
 
     def _recompute_distance_before_create(self, values, record_id=0):
         below = self.search(
@@ -47,9 +47,9 @@ class fleet_vehicle_odometer(models.Model):
             pass
 
         if below and below.date > values["date"]:
-            raise UserError("Date should not be lower than %s." % str(below.date))
+            raise UserError(_("Date should not be lower than %s.") % str(below.date))
         if above and above.date < values["date"]:
-            raise UserError("Date should not be higher than %s." % str(above.date))
+            raise UserError(_("Date should not be higher than %s.") % str(above.date))
 
         if below:
             values["distance"] = values["value"] - below.value

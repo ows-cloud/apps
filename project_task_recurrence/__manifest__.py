@@ -4,7 +4,8 @@
 {
     "name": "Task Recurrence",
     "summary": "Set recurring fields",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "Project",
     "data": [
         "views/project.task.xml",

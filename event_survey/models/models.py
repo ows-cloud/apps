@@ -143,10 +143,10 @@ class SurveyUserInput(models.Model):
 class SurveySurvey(models.Model):
     _inherit = "survey.survey"
 
-    def _get_event(self):
+    def _compute_event(self):
         for record in self:
             record.event_id = self.env["event.event"].search(
                 [("registration_survey_id", "=", record.id)]
             )
 
-    event_id = fields.Many2one("event.event", "Event", compute="_get_event")
+    event_id = fields.Many2one("event.event", "Event", compute="_compute_event")

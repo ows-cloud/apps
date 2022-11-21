@@ -4,7 +4,8 @@
 {
     "name": "Set Record Values",
     "summary": "Create or update record",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [],
     "depends": ["base"],

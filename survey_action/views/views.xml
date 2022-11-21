@@ -4,23 +4,23 @@
 
         <!-- survey.survey -->
 
-		<record model="ir.ui.view" id="view_survey_form_event_settings">
-    		<field name="name">Survey Action</field>
-    		<field name="model">survey.survey</field>
+        <record model="ir.ui.view" id="view_survey_form_event_settings">
+            <field name="name">Survey Action</field>
+            <field name="model">survey.survey</field>
             <field name="inherit_id" ref="survey.survey_form" />
-    		<field name="priority" eval="20" />
-    		<field name="arch" type="xml">
-				<xpath expr="//notebook" position="inside">
-					<page string="Server Action">
-					  	<group>
-							<group>
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Server Action">
+                          <group>
+                            <group>
                                 <field name="server_action_id" />
-							</group>
-					  	</group>
-					</page>
-				</xpath>
-    		</field>
-		</record>
+                            </group>
+                          </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
 
     </data>
 </odoo>

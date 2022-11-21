@@ -4,7 +4,8 @@
 {
     "name": "Account Reconciliation Account",
     "summary": "",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "account",
     "data": [
         "views/account_bank_statement_views.xml",

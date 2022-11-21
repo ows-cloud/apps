@@ -4,8 +4,8 @@
 
         <!-- res.field -->
 
-		<record model="ir.ui.view" id="view_res_field_tree">
-    	    <field name="name">res.field.tree</field>
+        <record model="ir.ui.view" id="view_res_field_tree">
+            <field name="name">res.field.tree</field>
             <field name="model">res.field</field>
             <field name="priority" eval="20" />
             <field name="arch" type="xml">

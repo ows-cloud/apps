@@ -4,7 +4,8 @@
 {
     "name": "Survey Export Answers",
     "summary": "Question/Answer Matrix in CSV",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "views/views.xml",

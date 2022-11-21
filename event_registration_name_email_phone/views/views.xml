@@ -4,21 +4,21 @@
 
         <!-- event.event -->
 
-		<record model="ir.ui.view" id="view_event_form_require_email_phone">
-    		<field name="name">Require email or phone</field>
-    		<field name="model">event.event</field>
+        <record model="ir.ui.view" id="view_event_form_require_email_phone">
+            <field name="name">Require email or phone</field>
+            <field name="model">event.event</field>
             <field name="inherit_id" ref="event.view_event_form" />
-    		<field name="priority" eval="20" />
-    		<field name="groups_id" eval="[(4, ref('base.group_user'))]" />
-			<field name="arch" type="xml">
-				<data>
+            <field name="priority" eval="20" />
+            <field name="groups_id" eval="[(4, ref('base.group_user'))]" />
+            <field name="arch" type="xml">
+                <data>
                     <field name="auto_confirm" position="after">
                         <field name="require_email" />
                         <field name="require_phone" />
                     </field>
-				</data>
-    		</field>
-		</record>
+                </data>
+            </field>
+        </record>
 
         <!-- qweb -->
 

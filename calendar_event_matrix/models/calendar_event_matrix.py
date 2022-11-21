@@ -93,11 +93,11 @@ class CalendarEventMatrix(models.Model):
 
         if add_date:
             if add_date < date_from:
-                raise UserError("Date cannot be smaller than date_from")
+                raise UserError(_("Date cannot be smaller than date_from"))
             if add_date > date_to:
-                raise UserError("Date cannot be greater than date_to")
+                raise UserError(_("Date cannot be greater than date_to"))
             if add_date in calendar_event_dates:
-                raise UserError("Date already exists")
+                raise UserError(_("Date already exists"))
 
             calendar_event_dates.add(add_date)
 

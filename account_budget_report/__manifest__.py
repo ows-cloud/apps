@@ -4,7 +4,8 @@
 {
     "name": "Account Budget Report",
     "summary": "",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "account",
     "data": [
         "security/ir.model.access.csv",

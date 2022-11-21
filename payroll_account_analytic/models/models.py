@@ -42,7 +42,6 @@ class HrPayslip(models.Model):
     _inherit = "hr.payslip"
 
     def test_payslip_accounting(self, hr_payslip_run_name=None):
-        _logger.debug("hr_payslip_run_name = " + str(hr_payslip_run_name))
         """
         Delete unposted moves related to payslips in the batch
         Skip payslips with posted move
@@ -52,12 +51,13 @@ class HrPayslip(models.Model):
             account_move_line.narration = ""
         Set move_id & date on the payslips
         """
+        _logger.debug("hr_payslip_run_name = " + str(hr_payslip_run_name))
         # check
         for slip in self:
             if not slip.journal_id:
-                raise UserError("Slip %s should have a journal!" % (slip.ref))
+                raise UserError(_("Slip %s should have a journal!" % (slip.ref)))
             if not slip.date and not slip.date_to:
-                raise UserError('Slip %s needs "date" or "date_to"!' % (slip.ref))
+                raise UserError(_('Slip %s needs "date" or "date_to"!' % (slip.ref)))
 
         # delete account.move (if not posted)
         # group payslips per journal/month (skip if posted)

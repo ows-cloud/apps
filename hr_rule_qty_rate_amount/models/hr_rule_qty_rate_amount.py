@@ -97,6 +97,15 @@ class HrRuleQtyRateAmount(models.Model):
             Set the 'months' and what to 'multiply_with' ('result_qty' or 'result_rate').
             If 'uom' is set, the payslip line will include this text.
         If record.amount is 0, use 'default_amount'.
+
+        EXAMPLE CODE
+        default_amount = 3.50
+
+        result_list = []
+        records = contract.qty_rate_amount_ids.filtered(lambda x: x.salary_rule_id.id == rule.id)
+        for record in records:
+            months = record.get_months(payslip=payslip, month_correction_field_name='x_month_salary')
+            result_list.append(record.get_result_dict(months=months, multiply_with='result_qty', uom='km', default_amount=default_amount))
         """
         record = self.ensure_one()
         result_dict = {
@@ -116,14 +125,3 @@ class HrRuleQtyRateAmount(models.Model):
         elif not result_dict["result"]:
             result_dict["result"] = default_amount
         return result_dict
-
-    """
-    EXAMPLE CODE
-    default_amount = 3.50
-
-    result_list = []
-    records = contract.qty_rate_amount_ids.filtered(lambda x: x.salary_rule_id.id == rule.id)
-    for record in records:
-        months = record.get_months(payslip=payslip, month_correction_field_name='x_month_salary')
-        result_list.append(record.get_result_dict(months=months, multiply_with='result_qty', uom='km', default_amount=default_amount))
-    """

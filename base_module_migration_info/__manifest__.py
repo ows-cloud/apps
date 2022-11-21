@@ -4,7 +4,8 @@
 {
     "name": "Migration Info",
     "summary": "Migration status etc.",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "views/base.module.update.xml",
@@ -14,6 +15,4 @@
     "license": "AGPL-3",
     "version": "14.0.1.0.0",
     "website": "http://www.appstogrow.co",
-    "description": """
-    """,
 }

@@ -4,7 +4,8 @@
 {
     "name": "payroll_new_fields",
     "summary": "payslip_line.run_id",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "auto_install": False,
     "category": "Uncategorized",
     "data": [

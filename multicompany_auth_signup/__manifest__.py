@@ -3,7 +3,8 @@
 
 {
     "name": "multicompany_auth_signup",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "auto_install": True,
     "category": "Uncategorized",
     "data": [],

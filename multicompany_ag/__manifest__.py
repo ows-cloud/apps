@@ -3,7 +3,8 @@
 
 {
     "name": "AppsToGROW Security",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "Uncategorized",
     "data": [
         "server_actions.xml",

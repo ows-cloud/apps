@@ -21,7 +21,6 @@ class Alias(models.Model):
 
     def write(self, vals_dict):
         if vals_dict.get("alias_name") or vals_dict.get("company_id"):
-            self.env["mail.alias"]
             for alias in self:
                 vals_dict = self._set_alias_name_with_alias_company_name_if_required(
                     vals_dict,
@@ -42,7 +41,7 @@ class Alias(models.Model):
             return vals_dict
         if not company_id:
             raise UserError(
-                "_set_alias_name_with_alias_company_name_if_required: missing company_id in {}".format(
+                _("_set_alias_name_with_alias_company_name_if_required: missing company_id in {}").format(
                     vals_dict
                 )
             )
@@ -56,7 +55,10 @@ class Alias(models.Model):
             company = self.env["res.company"].browse(company_id)
             if not company.alias_company_name:
                 raise UserError(
-                    "ERROR in _set_alias_name_with_alias_company_name_if_required. Please edit the company: set a company alias name."
+                    _(
+                    """ERROR in _set_alias_name_with_alias_company_name_if_required.
+                    Please edit the company: set a company alias name."""
+                    )
                 )
             length = len(company.alias_company_name) + 1
             if not alias_name[-length:] == "." + company.alias_company_name:

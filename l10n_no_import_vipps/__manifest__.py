@@ -4,7 +4,8 @@
 {
     "name": "l10n_no_import_vipps",
     "summary": "",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "data/xlsx_template.xml",

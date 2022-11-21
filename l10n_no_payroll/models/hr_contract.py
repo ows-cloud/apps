@@ -7,11 +7,11 @@ class HrContract(models.Model):
     leave_ids = fields.One2many("hr.leave", "contract_id", string="Leaves")
     l10n_no_arbeidsforhold = fields.Char(help="A-melding: ArbeidsforholdId")
     l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer = fields.Float(
-        compute="compute_l10n_no_fields"
+        compute="_compute_l10n_no_fields"
     )
-    l10n_no_stillingsprosent = fields.Float(compute="compute_l10n_no_fields")
+    l10n_no_stillingsprosent = fields.Float(compute="_compute_l10n_no_fields")
 
-    def compute_l10n_no_fields(self):
+    def _compute_l10n_no_fields(self):
         for record in self:
             record.l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer = float(
                 record.field_value_ids.filtered(

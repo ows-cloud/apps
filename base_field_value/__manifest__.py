@@ -4,7 +4,8 @@
 {
     "name": "Field Value",
     "summary": "Add field/value to any object",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "security/ir.model.access.csv",
@@ -14,7 +15,4 @@
     "license": "AGPL-3",
     "version": "14.0.1.0.0",
     "website": "http://www.appstogrow.co",
-    "description": """
-        See implementation example in res_field_value.py and views.xml
-    """,
 }

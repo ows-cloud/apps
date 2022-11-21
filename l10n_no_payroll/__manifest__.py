@@ -4,7 +4,8 @@
 {
     "name": "Norway - Payroll",
     "summary": "",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "Localization",
     "data": [
         "security/ir.model.access.csv",
@@ -24,10 +25,4 @@
     "license": "AGPL-3",
     "version": "14.0.1.0.0",
     "website": "http://www.appstogrow.co",
-    "description": """
-IMPLEMENTATION:
-ir.sequence with code = l10n_no_payroll.amelding
-
-Generate the csv files from l10n_no_payroll.xlsm
-""",
 }

@@ -4,7 +4,8 @@
 {
     "name": "Account Regex Fix",
     "summary": "Journal Sequence",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "views/account.account.type.xml",
@@ -21,10 +22,4 @@
     "license": "AGPL-3",
     "version": "14.0.1.0.0",
     "website": "http://www.appstogrow.co",
-    "description": r"""
-        In debug mode, set journal regex, e.g.
-        ^(?P<prefix1>.*?)(?P<year>\d{2})(?P<seq>\d*)(?P<suffix>\D*?)$
-
-        https://github.com/OCA/OCB/pull/1110
-    """,
 }

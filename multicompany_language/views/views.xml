@@ -4,12 +4,12 @@
 
         <!-- res.company -->
 
-		<record model="ir.ui.view" id="view_res_company_form">
+        <record model="ir.ui.view" id="view_res_company_form">
             <field name="name">res.company.form (languages)</field>
-    		<field name="model">res.company</field>
+            <field name="model">res.company</field>
             <field name="inherit_id" ref="base.view_company_form" />
-    		<field name="priority" eval="30" />
-    		<field name="arch" type="xml">
+            <field name="priority" eval="30" />
+            <field name="arch" type="xml">
                 <field name="website" position="after">
                     <p><strong>Languages</strong></p>
                     <field
@@ -19,8 +19,8 @@
                         colspan="2"
                     />
                 </field>
-    		</field>
-		</record>
+            </field>
+        </record>
 
     </data>
 </odoo>

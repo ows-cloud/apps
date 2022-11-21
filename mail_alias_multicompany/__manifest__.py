@@ -4,7 +4,8 @@
 {
     "name": "Mail Alias Multicompany",
     "summary": "alias_name.alias_company_name@alias_domain",
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, "
+        "Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "views/res.company.xml",
