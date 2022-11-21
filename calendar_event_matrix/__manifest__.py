@@ -3,7 +3,7 @@
     'name': 'Calendar Event Matrix',
     'summary': "Schedule attendees",
     "version": "14.0.1.0.0",
-    "author": "Henrik Norlin, "
+    "author": "AppsToGROW,"
               "Odoo Community Association (OCA)",
     "website": "https://github.com/apps2grow/apps",
     "license": "AGPL-3",
