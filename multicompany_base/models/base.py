@@ -2,16 +2,16 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 MODELS_WITH_REPLACE_RECORD_ID = [
-    'mail.template',
+    "mail.template",
 ]
 
 
 class Base(models.AbstractModel):
-    _inherit = 'base'
+    _inherit = "base"
 
     """
     Every model will have 'company_id' field.
-    
+
     Preferrably, 'company_id' should be required.
     Becuase of:
     - clarity
@@ -27,8 +27,8 @@ class Base(models.AbstractModel):
 
     # Also in multicompany_sudo.patch
     company_id = fields.Many2one(
-        'res.company',
-        string='Company',
+        "res.company",
+        string="Company",
         store=True,
         index=True,
         # required=True,
@@ -39,10 +39,15 @@ class Base(models.AbstractModel):
         vals = super(Base, self).copy_data(default)[0]
 
         if "website_id" in vals.keys():
-            vals["company_id"] = self.sudo_bypass_global_rules().env["website"].browse(default["website_id"]).company_id.id
+            vals["company_id"] = (
+                self.sudo_bypass_global_rules()
+                .env["website"]
+                .browse(default["website_id"])
+                .company_id.id
+            )
         elif "company_id" not in vals.keys():
             try:
-                vals['company_id'] = self.env.company.id
+                vals["company_id"] = self.env.company.id
             except:
                 pass
 
@@ -52,13 +57,14 @@ class Base(models.AbstractModel):
     XMLID FOR MULTICOMPANY
     Replace res_id if 'replace_record_id' exists.
     """
+
     @api.model
     def xmlid_lookup(self, xmlid):
         id, model, res_id = super(Base, self).xmlid_lookup(xmlid)
         if model in MODELS_WITH_REPLACE_RECORD_ID:
             try:
                 # 'replace_record_id' might not exist
-                records = self.env[model].search([('replace_record_id', '=', res_id)])
+                records = self.env[model].search([("replace_record_id", "=", res_id)])
                 updated = False
                 # First look for company record
                 for record in records:
@@ -70,10 +76,21 @@ class Base(models.AbstractModel):
                     if len(records) == 1:
                         res_id = records.id
                     else:
-                        raise UserError(_("Multiple {model} records, in {companies}.".format(
-                            model=model,
-                            companies=', '.join([c.name for c in records.mapped('company_id').mapped('name')]),
-                        )))
+                        raise UserError(
+                            _(
+                                "Multiple {model} records, in {companies}.".format(
+                                    model=model,
+                                    companies=", ".join(
+                                        [
+                                            c.name
+                                            for c in records.mapped(
+                                                "company_id"
+                                            ).mapped("name")
+                                        ]
+                                    ),
+                                )
+                            )
+                        )
             except:
                 pass
         return id, model, res_id

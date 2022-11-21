@@ -3,7 +3,7 @@ index 27586358..16673dd3 100644
 --- a/addons/auth_signup/models/res_partner.py
 +++ b/addons/auth_signup/models/res_partner.py
 @@ -51,7 +51,6 @@ class ResPartner(models.Model):
- 
+
          res = dict.fromkeys(self.ids, False)
          for partner in self:
 -            base_url = partner.get_base_url()
@@ -11,19 +11,19 @@ index 27586358..16673dd3 100644
              if self.env.context.get('signup_valid') and not partner.user_ids:
                  partner.sudo().signup_prepare()
 @@ -93,6 +92,7 @@ class ResPartner(models.Model):
- 
+
              signup_url = "/web/%s?%s" % (route, werkzeug.urls.url_encode(query))
              if not self.env.context.get('relative_url'):
 +                base_url = partner.get_base_url()
                  signup_url = werkzeug.urls.url_join(base_url, signup_url)
              res[partner.id] = signup_url
- 
+
 diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
 index 46d01b13..a08b6293 100644
 --- a/addons/mail/controllers/main.py
 +++ b/addons/mail/controllers/main.py
 @@ -274,6 +274,12 @@ class MailController(http.Controller):
- 
+
      @http.route('/mail/init_messaging', type='json', auth='user')
      def mail_init_messaging(self):
 +        try:
@@ -85,7 +85,7 @@ index fecccced..8bd58a25 100644
 --- a/addons/website/models/website.py
 +++ b/addons/website/models/website.py
 @@ -644,7 +644,7 @@ class Website(models.Model):
- 
+
          # Sort on country_group_ids so that we fall back on a generic website:
          # websites with empty country_group_ids will be first.
 -        found_websites = self.search([('domain', 'ilike', _remove_port(domain_name))]).sorted('country_group_ids')
@@ -131,13 +131,13 @@ index 50999888..4a38dd40 100644
 --- a/odoo/addons/base/models/ir_model.py
 +++ b/odoo/addons/base/models/ir_model.py
 @@ -2230,6 +2230,8 @@ class IrModelData(models.Model):
- 
+
      @api.model
      def _process_end_unlink_record(self, record):
 +        if record.env.su:
 +            record = record.with_context(bypass_global_rules=True)
          record.unlink()
- 
+
      @api.model
 diff --git a/odoo/addons/base/models/ir_module.py b/odoo/addons/base/models/ir_module.py
 index 699eaa16..bff8f86d 100644
@@ -164,13 +164,13 @@ index 699eaa16..bff8f86d 100644
 +                mod = mod.sudo(bypass_global_rules=True)
              terp = self.get_module_info(mod_name)
              values = self.get_values_from_terp(terp)
- 
+
 diff --git a/odoo/addons/base/models/ir_rule.py b/odoo/addons/base/models/ir_rule.py
 index 7bbf0305..6111a01d 100644
 --- a/odoo/addons/base/models/ir_rule.py
 +++ b/odoo/addons/base/models/ir_rule.py
 @@ -42,6 +42,7 @@ class IrRule(models.Model):
- 
+
      @api.model
      def _eval_context(self):
 +        self = self.sudo(bypass_global_rules=True)
@@ -180,11 +180,11 @@ index 7bbf0305..6111a01d 100644
 @@ -113,7 +114,7 @@ class IrRule(models.Model):
          if mode not in self._MODES:
              raise ValueError('Invalid mode: %r' % (mode,))
- 
+
 -        if self.env.su:
 +        if self._uid == 1 or (self.env.su and self.env.context.get("bypass_global_rules")):
              return self.browse(())
- 
+
          query = """ SELECT r.id FROM ir_rule r JOIN ir_model m ON (r.model_id=m.id)
 @@ -124,6 +125,14 @@ class IrRule(models.Model):
                           OR r.global)
@@ -200,9 +200,9 @@ index 7bbf0305..6111a01d 100644
 +                    """.format(mode=mode)
          self._cr.execute(query, (model_name, self._uid))
          return self.browse(row[0] for row in self._cr.fetchall())
- 
+
 @@ -140,7 +149,7 @@ class IrRule(models.Model):
- 
+
          # browse user and rules as SUPERUSER_ID to avoid access errors!
          eval_context = self._eval_context()
 -        user_groups = self.env.user.groups_id
@@ -216,7 +216,7 @@ index e3448754..6a42ccb7 100644
 +++ b/odoo/addons/base/models/ir_ui_view.py
 @@ -1829,6 +1829,9 @@ actual arch.
          return self.with_context(active_test=False).search([('key', '=', self.key)]).filtered(lambda r: not r.xml_id == r.key)
- 
+
      def _load_records_write(self, values):
 +        # Global rules with non-standard fields fail (e.g. ir.ui.view.company_id not in base).
 +        if self.env.su:
@@ -230,7 +230,7 @@ index 3b20cb9d..be720744 100644
 +++ b/odoo/addons/base/models/res_company.py
 @@ -300,3 +300,12 @@ class Company(models.Model):
              main_company = self.env['res.company'].sudo().search([], limit=1, order="id")
- 
+
          return main_company
 +
 +    """
@@ -248,7 +248,7 @@ index 07475451..00ed5c05 100644
 @@ -238,6 +238,14 @@ class Partner(models.Model):
          ('check_name', "CHECK( (type='contact' AND name IS NOT NULL) or (type!='contact') )", 'Contacts require a name'),
      ]
- 
+
 +    # This field is used by global rules.
 +    company_ids = fields.Many2many('res.company', string="Companies", compute='_compute_company_ids', store=True)
 +
@@ -261,7 +261,7 @@ index 07475451..00ed5c05 100644
      def _compute_display_name(self):
          diff = dict(show_address=None, show_address_only=None, show_email=None, html_format=None, show_vat=None)
 @@ -258,7 +266,12 @@ class Partner(models.Model):
- 
+
      @api.depends('user_ids.share', 'user_ids.active')
      def _compute_partner_share(self):
 -        super_partner = self.env['res.users'].browse(SUPERUSER_ID).partner_id
@@ -312,43 +312,43 @@ index fc18b27a..f3185807 100644
 +            self.env.context.get("bypass_global_rules") or self.env.context.get("_force_unlink")
 +        ):
              return
- 
+
          # SQL Alternative if computing in-memory is too slow for large dataset
 @@ -3370,7 +3377,7 @@ Fields:
- 
+
      def _filter_access_rules(self, operation):
          """ Return the subset of ``self`` for which ``operation`` is allowed. """
 -        if self.env.su:
 +        if self.env.su and self.env.context.get("bypass_global_rules"):
              return self
- 
+
          if not self._ids:
 @@ -4152,6 +4159,8 @@ Fields:
          return self.create(values)
- 
+
      def _load_records(self, data_list, update=False):
 +        if self.env.su:
 +            self = self.with_context(bypass_global_rules=True)
          """ Create or update records of this model, and assign XMLIDs.
- 
+
              :param data_list: list of dicts with keys `xml_id` (XMLID to
 @@ -4286,7 +4295,7 @@ Fields:
- 
+
             :param query: the current query object
          """
 -        if self.env.su:
 +        if self.env.su and self.env.context.get("bypass_global_rules"):
              return
- 
+
          # apply main rules on the object
 @@ -5027,7 +5036,7 @@ Fields:
          """
          return self._browse(env, self._ids, self._prefetch_ids)
- 
+
 -    def sudo(self, flag=True):
 +    def sudo(self, flag=True, bypass_global_rules=False):
          """ sudo([flag=True])
- 
+
          Returns a new version of this recordset with superuser mode enabled or
 @@ -5057,7 +5066,11 @@ Fields:
          if not isinstance(flag, bool):
@@ -360,12 +360,12 @@ index fc18b27a..f3185807 100644
 +        if self._uid == SUPERUSER_ID or self.env.context.get('bypass_global_rules'):
 +            bypass_global_rules = True
 +        return self.with_env(self.env(su=flag)).with_context(bypass_global_rules=bypass_global_rules)
- 
+
      def with_user(self, user):
          """ with_user(user)
 @@ -5304,6 +5317,10 @@ Fields:
          return self.browse([rec.id for rec in self if func(rec)])
- 
+
      def filtered_domain(self, domain):
 +        if self.env.su:
 +            self = self.with_context(bypass_global_rules=True)
@@ -379,7 +379,7 @@ index 8093f14b..b374a873 100644
 --- a/odoo/modules/loading.py
 +++ b/odoo/modules/loading.py
 @@ -218,7 +218,7 @@ def load_module_graph(cr, graph, status=None, perform_checks=True,
- 
+
              if package.state == 'to upgrade':
                  # upgrading the module information
 -                module.write(module.get_values_from_terp(package.data))
@@ -392,7 +392,7 @@ index e155f213..c97f6723 100644
 --- a/odoo/tools/convert.py
 +++ b/odoo/tools/convert.py
 @@ -453,7 +453,9 @@ form: module.record_id""" % (xml_id,)
- 
+
              if '.' not in a_action:
                  a_action = '%s.%s' % (self.module, a_action)
 -            act = self.env.ref(a_action).sudo()
@@ -400,12 +400,12 @@ index e155f213..c97f6723 100644
 +            # Global rules with non-standard fields fail (e.g. ir.ui.menu.company_id not in base).
 +            act = self.env.ref(a_action).sudo(bypass_global_rules=True)
              values['action'] = "%s,%d" % (act.type, act.id)
- 
+
              if not values.get('name') and act.type.endswith(('act_window', 'wizard', 'url', 'client', 'server')) and act.name:
 @@ -774,6 +776,8 @@ def convert_csv_import(cr, module, fname, csvcontent, idref=None, mode='init',
          warning_msg = "\n".join(msg['message'] for msg in result['messages'])
          raise Exception(_('Module loading %s failed: file %s could not be processed:\n %s') % (module, fname, warning_msg))
- 
+
 +from .misc import frozendict
 +
  def convert_xml_import(cr, module, xmlfile, idref=None, mode='init', noupdate=False, report=None):

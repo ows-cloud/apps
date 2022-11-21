@@ -18,7 +18,10 @@
             <field name="name">TEST USER</field>
             <field name="company_id" ref="test_company" />
             <field name="company_ids" eval="[(4,ref('test_company'))]" />
-            <field name="groups_id" eval="[(4,ref('multicompany_base.group_company_manager'))]" />
+            <field
+                name="groups_id"
+                eval="[(4,ref('multicompany_base.group_company_manager'))]"
+            />
         </record>
 
         <!-- TEST ADMIN USER -->

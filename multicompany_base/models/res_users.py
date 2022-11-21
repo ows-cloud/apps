@@ -1,18 +1,27 @@
 from datetime import datetime
+
 from odoo import api, fields, models
 
 
 class Users(models.Model):
-    _inherit = 'res.users'
+    _inherit = "res.users"
 
     def _default_groups(self):
-        default_user = self.with_context(active_test=False).search([("default_user", "=", True), ("company_id", "=", self.env.company.id)])
+        default_user = self.with_context(active_test=False).search(
+            [("default_user", "=", True), ("company_id", "=", self.env.company.id)]
+        )
         return default_user.groups_id if default_user else []
 
-    default_user = fields.Boolean('Default User Template')
+    default_user = fields.Boolean("Default User Template")
     groups_id = fields.Many2many(default=_default_groups)
 
-    _sql_constraints = [('default_user_uniq', 'unique(default_user, company_id)', 'Default User must be unique per company!')]
+    _sql_constraints = [
+        (
+            "default_user_uniq",
+            "unique(default_user, company_id)",
+            "Default User must be unique per company!",
+        )
+    ]
 
     @api.model
     def create(self, vals):
@@ -26,8 +35,8 @@ class Users(models.Model):
 
     def _remove_admin_access(self, vals):
         admin_access = "sel_groups_{erp}_{system}".format(
-            erp=str(self.env.ref('base.group_erp_manager').id),
-            system=str(self.env.ref('base.group_system').id),
+            erp=str(self.env.ref("base.group_erp_manager").id),
+            system=str(self.env.ref("base.group_system").id),
         )
         vals.pop(admin_access, None)
         return vals
@@ -42,7 +51,7 @@ class Users(models.Model):
                 set_only = True
         if set_only:
             for key in vals.copy():
-                if key not in ('name', 'lang', 'partner_id'):
+                if key not in ("name", "lang", "partner_id"):
                     del vals[key]
         return vals
 
@@ -53,7 +62,7 @@ class Users(models.Model):
         user_id = str(self.env.user.id)
         now = str(datetime.now())
         company_id = str(self.env.company.id)
-        sql = """INSERT INTO res_users_log (id, create_uid, create_date, write_uid, write_date, company_id) 
+        sql = """INSERT INTO res_users_log (id, create_uid, create_date, write_uid, write_date, company_id)
         VALUES (nextval('res_users_log_id_seq'), {}, '{}', {}, '{}', {});""".format(
             user_id, now, user_id, now, company_id
         )

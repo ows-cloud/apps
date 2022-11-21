@@ -1,9 +1,11 @@
-from odoo import api, models, _
-from odoo.exceptions import UserError
 import os
 
+from odoo import api, models
+from odoo.exceptions import UserError
+
+
 class IrAttachment(models.Model):
-    _inherit = 'ir.attachment'
+    _inherit = "ir.attachment"
 
     # source: base/ir/ir_attachment.py
     # - fname = sha[:3] + '/' + sha
@@ -13,14 +15,14 @@ class IrAttachment(models.Model):
     @api.model
     def _get_path(self, bin_data, sha):
         # retro compatibility
-        fname = 'company/' + str(self.env.company.id) + '/' + sha[:3] + '/' + sha
+        fname = "company/" + str(self.env.company.id) + "/" + sha[:3] + "/" + sha
         full_path = self._full_path(fname)
         if os.path.isfile(full_path):
-            return fname, full_path        # keep existing path
+            return fname, full_path  # keep existing path
 
         # scatter files across 256 dirs
         # we use '/' in the db (even on windows)
-        fname = 'company/' + str(self.env.company.id) + '/' + sha[:2] + '/' + sha
+        fname = "company/" + str(self.env.company.id) + "/" + sha[:2] + "/" + sha
         full_path = self._full_path(fname)
         dirname = os.path.dirname(full_path)
         if not os.path.isdir(dirname):

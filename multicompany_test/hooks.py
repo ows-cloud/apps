@@ -1,5 +1,7 @@
+from odoo.api import SUPERUSER_ID, Environment
+
 from odoo.addons.base.models.base_test import update_xmlids
-from odoo.api import Environment, SUPERUSER_ID
+
 
 def post_init_hook(cr, registry):
     """

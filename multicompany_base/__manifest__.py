@@ -4,7 +4,6 @@
 {
     "name": "multicompany_base",
     "summary": "",
-
     "author": "AppsToGROW",
     "category": "Uncategorized",
     "data": [

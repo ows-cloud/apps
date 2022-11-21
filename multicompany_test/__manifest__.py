@@ -4,7 +4,6 @@
 {
     "name": "multicompany_test",
     "summary": "Company & User",
-
     "author": "AppsToGROW",
     "category": "Administration",
     "data": [

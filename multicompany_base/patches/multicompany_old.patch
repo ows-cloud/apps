@@ -3,7 +3,7 @@ index a52be154..66bfb199 100644
 --- a/addons/purchase_stock/models/product.py
 +++ b/addons/purchase_stock/models/product.py
 @@ -11,8 +11,7 @@ class ProductTemplate(models.Model):
- 
+
      @api.model
      def _get_buy_route(self):
 -        buy_route_id = self.env.ref('purchase_stock.route_warehouse0_buy', raise_if_not_found=False).id
