@@ -19,5 +19,5 @@
     ],
     "development_status": "Alpha",
     "license": "AGPL-3",
-    "website": "http://www.appstogrow.co",
+    "website": "https://github.com/OCA/server-tools",
 }

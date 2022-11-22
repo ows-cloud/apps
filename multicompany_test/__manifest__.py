@@ -13,5 +13,5 @@
     "license": "AGPL-3",
     "post_init_hook": "post_init_hook",
     "version": "14.0.1.0.0",
-    "website": "http://www.appstogrow.co",
+    "website": "https://github.com/OCA/server-tools",
 }
