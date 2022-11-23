@@ -7,7 +7,7 @@
     "author": "AppsToGROW, Odoo Community Association (OCA)",
     "summary": "Open inherited view in current window.",
     "category": "Generic Modules",
-    "website": "https://github.com/OCA/server-tools",
+    "website": "https://github.com/appstogrow/apps",
     "depends": ["base"],
     "installable": True,
     "application": False,

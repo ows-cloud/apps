@@ -7,7 +7,7 @@
     "version": "14.0.1.0.0",
     "author": "AppsToGROW,Odoo Community Association (OCA)",
     "license": "AGPL-3",
-    "website": "https://github.com/OCA/server-tools",
+    "website": "https://github.com/appstogrow/apps",
     "category": "Tools",
     "depends": [
         "account_reconciliation_account",

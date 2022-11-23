@@ -17,5 +17,5 @@
     "external_dependencies": {"python": ["numpy", "pandas"]},
     "license": "AGPL-3",
     "version": "14.0.1.0.0",
-    "website": "https://github.com/OCA/server-tools",
+    "website": "https://github.com/appstogrow/apps",
 }

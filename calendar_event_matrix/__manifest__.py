@@ -4,7 +4,7 @@
     "summary": "Schedule attendees",
     "version": "14.0.1.0.0",
     "author": "AppsToGROW," "Odoo Community Association (OCA)",
-    "website": "https://github.com/OCA/server-tools",
+    "website": "https://github.com/appstogrow/apps",
     "license": "AGPL-3",
     "category": "Hidden/Dependency",
     "depends": [

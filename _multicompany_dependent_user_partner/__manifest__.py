@@ -16,5 +16,5 @@
     "pre_init_hook": "pre_init_hook",
     "uninstall_hook": "uninstall_hook",
     "version": "14.0.1.0.0",
-    "website": "https://github.com/OCA/server-tools",
+    "website": "https://github.com/appstogrow/apps",
 }
