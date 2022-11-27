@@ -59,7 +59,8 @@ class Base(models.AbstractModel):
                 )
                 rec_model.set_counterpart_line()
 
-        params = self.env["base.time.parameter"].search([])
+        model_id = self.env.ref("account.model_account_bank_statement_line").id
+        params = self.env["base.time.parameter"].search([("model_id", "=", model_id)])
         for line in self:
             for param in params:
                 if param.code and param.code in line.payment_ref:
