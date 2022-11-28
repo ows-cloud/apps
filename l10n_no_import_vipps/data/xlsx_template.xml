@@ -30,7 +30,8 @@
     '__IMPORT__': {
         'Rapport': {
             'line_ids': {
-                'A9': 'date',
+                'A9':
+                    'date${datetime.strptime(value, "%d.%m.%Y").strftime("%Y-%m-%d")}',
                 'B9': 'payment_ref',
                 'G9': 'amount',
                 'O9': 'import_first_name',

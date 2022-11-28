@@ -14,10 +14,10 @@ class Base(models.AbstractModel):
         for line in self:
             if not line.partner_name:
                 line.partner_name = "{} {}".format(
-                    line.import_first_name,
-                    line.import_last_name,
-                )
-            if not line.partner_id:
+                    line.import_first_name or "",
+                    line.import_last_name or "",
+                ).strip()
+            if line.partner_name and not line.partner_id:
                 partner = Partner.search([("name", "=", line.partner_name)])
                 if not partner:
                     partner = Partner.create(
@@ -49,12 +49,15 @@ class Base(models.AbstractModel):
                     ("match_counterpart_account_id", "=", account.id),
                 ]
             )
+            if len(rec_model) == 1 and rec_model.name != account.name:
+                rec_model.name = account.name
             if not rec_model:
                 rec_model = RecModel.create(
                     {
                         "name": account.name,
                         "rule_type": "writeoff_suggestion",
                         "match_counterpart_account_id": account.id,
+                        "sequence": 100,
                     }
                 )
                 rec_model.set_counterpart_line()
