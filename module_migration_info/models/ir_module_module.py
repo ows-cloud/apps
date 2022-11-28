@@ -246,5 +246,6 @@ class IrModule(models.Model):
                 except Exception:
                     # print("Error Occured: ", e)
                     # print("")
+                    pass
 
         return migration_info
