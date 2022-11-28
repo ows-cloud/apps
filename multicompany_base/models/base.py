@@ -38,7 +38,7 @@ class Base(models.AbstractModel):
     def copy_data(self, default=None):
         vals = super(Base, self).copy_data(default)[0]
 
-        if "website_id" in vals.keys():
+        if "website_id" in vals.keys() and default and "website_id" in default.keys():
             vals["company_id"] = (
                 self.sudo_bypass_global_rules()
                 .env["website"]

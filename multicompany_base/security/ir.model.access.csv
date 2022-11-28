@@ -1,4 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ir_model_access_company_manager,ir.model.access for Company Manager,base.model_ir_model_access,multicompany_base.group_company_manager,1,0,0,0
+access_ir_module_category_company_manager,ir.module.category for Company Manager,base.model_ir_module_category,multicompany_base.group_company_manager,1,0,0,0
 access_ir_module_module_user,ir.module.module for base.group_user,base.model_ir_module_module,base.group_user,1,0,0,0
 access_ir_rule_company_manager,ir.rule for Company Manager,base.model_ir_rule,multicompany_base.group_company_manager,1,0,0,0
 access_ir_ui_view_public,ir.ui.view for base.group_public,base.model_ir_ui_view,base.group_public,1,0,0,0

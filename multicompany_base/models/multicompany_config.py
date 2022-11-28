@@ -39,11 +39,16 @@ class MulticompanyConfig(models.AbstractModel):
 
     def _configure_system(self):
 
-        # The system pricelist should be archived,
-        # so that websites will get the company's pricelist.
-        # 20.11.2022 It is archived in production database.
+        # Create a new pricelist so it is possible to archive the system pricelist.
+        # Archive the system pricelist so that websites will get the company's pricelist.
+        Pricelist = self.env["product.pricelist"]
         product_list = self.env.ref("product.list0", raise_if_not_found=False)
-        if product_list:
+        count_pricelists = Pricelist.with_context(active_test=False).search_count(
+            [("company_id", "=", 1)]
+        )
+        if product_list and count_pricelists == 1:
+            product_list.copy({"name": "Pricelist"})
+        if product_list and product_list.active:
             product_list.active = False
 
         # If active, new websites will get default crm.team which is not accessable.
@@ -75,21 +80,6 @@ class MulticompanyConfig(models.AbstractModel):
 
         # Give access rights to company managers (including the Support User)
         company_manager = self.env.ref("multicompany_base.group_company_manager")
-        erp_manager = self.env.ref("base.group_erp_manager")
-
-        # Field access to create users
-        _set(
-            _ref("auth_signup.field_res_partner__signup_expiration"),
-            {"groups": [(4, company_manager.id, 0), (4, erp_manager.id, 0)]},
-        )
-        _set(
-            _ref("auth_signup.field_res_partner__signup_token"),
-            {"groups": [(4, company_manager.id, 0), (4, erp_manager.id, 0)]},
-        )
-        _set(
-            _ref("auth_signup.field_res_partner__signup_type"),
-            {"groups": [(4, company_manager.id, 0), (4, erp_manager.id, 0)]},
-        )
 
         # Access to change password
         _set(
