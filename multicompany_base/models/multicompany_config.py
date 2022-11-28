@@ -252,6 +252,7 @@ class MulticompanyConfig(models.AbstractModel):
             model="res.users",
             search=[
                 ("groups_id", "=", self._ref("base.group_public").id),
+                ("company_id", "=", company_id),
             ],
             values={
                 "company_id": company_id,
