@@ -1,2 +1,0 @@
-id,name,model_id:id,groups:id,domain_force,perm_read,perm_write,perm_create,perm_unlink
-rule_ir_default_company_manager,ir.default rule for Company Manager,base.model_ir_default,multicompany_base.group_company_manager,"[(1, '=', 1)]",1,1,1,1

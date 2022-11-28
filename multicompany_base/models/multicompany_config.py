@@ -39,17 +39,19 @@ class MulticompanyConfig(models.AbstractModel):
 
     def _configure_system(self):
 
-        # Create a new pricelist so it is possible to archive the system pricelist.
-        # Archive the system pricelist so that websites will get the company's pricelist.
-        Pricelist = self.env["product.pricelist"]
-        product_list = self.env.ref("product.list0", raise_if_not_found=False)
-        count_pricelists = Pricelist.with_context(active_test=False).search_count(
-            [("company_id", "=", 1)]
-        )
-        if product_list and count_pricelists == 1:
-            product_list.copy({"name": "Pricelist"})
-        if product_list and product_list.active:
-            product_list.active = False
+        product_module = self.env["ir.module.module"].search([("name", "=", "product")])
+        if product_module and product_module.state == "installed":
+            # Create a new pricelist so it is possible to archive the system pricelist.
+            # Archive the system pricelist so websites will get the company's pricelist.
+            Pricelist = self.env["product.pricelist"]
+            product_list = self.env.ref("product.list0", raise_if_not_found=False)
+            count_pricelists = Pricelist.with_context(active_test=False).search_count(
+                [("company_id", "=", 1)]
+            )
+            if product_list and count_pricelists == 1:
+                product_list.copy({"name": "Pricelist"})
+            if product_list and product_list.active:
+                product_list.active = False
 
         # If active, new websites will get default crm.team which is not accessable.
         # EDIT: Patch will check if multicompany_base is installed.

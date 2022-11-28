@@ -9,7 +9,6 @@
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
-        "security/ir.rule.csv",
         "views/ir.actions.server.xml",
         "views/ir.model.data.xml",
     ],

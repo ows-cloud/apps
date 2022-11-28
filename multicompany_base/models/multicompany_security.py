@@ -378,13 +378,14 @@ class MulticompanySecurity(models.AbstractModel):
         self._set_global_security_rules_on_all_models_except_ir_rule_and_ir_translation()
         self._update_code_to_comply_with_safe_eval()
         self._update_system_records()
+        param = "multicompany_base.force_security_company_manager"
+        if self.env["ir.config_parameter"].get_param(param) in ("1", repr(True)):
+            self.set_company_manager_security()
         return True
 
-    # """ Deprecated. If needed, add ir.model.access """
-    # def set_company_manager_security(self):
-    #     # So time consuming.
-    #     # Takes 23 seconds, while global rules take 5 seconds to update.
-    #     self._set_read_and_edit_access_to_company_manager()
+    def set_company_manager_security(self):
+        # Time consuming
+        self._set_read_and_edit_access_to_company_manager()
 
     def _set_global_security_rules_on_all_models_except_ir_rule_and_ir_translation(
         self,
@@ -425,6 +426,7 @@ class MulticompanySecurity(models.AbstractModel):
         models_to_exclude = NO_ACCESS_MODEL
         models = self.env["ir.model"].search([("model", "not in", models_to_exclude)])
         for model in models:
+
             if model.model in NO_EDIT_MODEL:
                 security_do_if = "read_if"
             else:
@@ -446,10 +448,19 @@ class MulticompanySecurity(models.AbstractModel):
             if model.model in NO_EDIT_MODEL:
                 # only system records -> no need for company-manager rule
                 continue
-            if not self.env["ir.rule"].search(
+            non_global_rules = self.env["ir.rule"].search(
                 [("global", "=", False), ("model_id", "=", model.id)]
-            ):
+            )
+            if not non_global_rules:
                 # no non-global rules -> no need for company-manager rule
+                continue
+            other_non_global_rules = non_global_rules.filtered(
+                lambda r: r.groups.ids != [group_company_manager_id]
+            )
+            if not other_non_global_rules:
+                # no other non-global rules -> no need for company-manager rule, delete it
+                assert non_global_rules.ensure_one().groups.ids == [group_company_manager_id]
+                non_global_rules.unlink()
                 continue
             values = copy.deepcopy(SECURITY_DO_IF["read_and_edit_if"])
             values["groups"] = [(4, group_company_manager_id), 0]

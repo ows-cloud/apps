@@ -11,6 +11,7 @@ def post_init_hook(cr, registry):
     ICP = env["ir.config_parameter"].sudo()
     default_settings = [
         ("multicompany_base.force_security", "1"),
+        ("multicompany_base.force_security_company_manager", "1"),
         ("multicompany_base.force_config", "1"),
     ]
     for key, value in default_settings:
