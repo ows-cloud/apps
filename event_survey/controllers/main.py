@@ -9,8 +9,7 @@ from odoo.addons.http_routing.models.ir_http import slugify
 from odoo.addons.survey_action.controllers.main import (  # don't replace fill_survey
     SurveyController2 as SurveyController,
 )
-from odoo.addons.website_event_sale.controllers.main import (
-    # inherits (WebsiteEventController)
+from odoo.addons.website_event_sale.controllers.main import (  # inherits (WebsiteEventController)
     WebsiteEventSaleController,
 )
 
@@ -95,10 +94,10 @@ class EventSurveyController(http.Controller):
                 )
             else:
                 ticket = EventTicket.search([("event_id", "=", event.id)])
-                assert (
-                    len(ticket) == 1
-                ), "There must be exactly one event ticket, or a survey question " + \
-                    "with each answer mapped to an event ticket."
+                assert len(ticket) == 1, (
+                    "There must be exactly one event ticket, or a survey question "
+                    + "with each answer mapped to an event ticket."
+                )
 
             # Prepare products, order by survey label sequence
             # (order by doesn't make so much sense when multiple questions have products)
@@ -141,9 +140,9 @@ class EventSurveyController(http.Controller):
 
     @http.route(
         [
-            """/event/<model("event.event"):event>/registration_survey_list""",
-            "/event/<model("event.event"):event>/registration_survey_list/" + \
-                "<string:error_msg>",
+            "/event/<model('event.event'):event>/registration_survey_list",
+            "/event/<model('event.event'):event>/registration_survey_list/"
+            + "<string:error_msg>",
         ],
         type="http",
         auth="public",
@@ -164,7 +163,7 @@ class EventSurveyController(http.Controller):
         return request.render("event_survey.registration_survey_list", data)
 
     @http.route(
-        ["""/event/<model("event.event"):event>/registration_survey_list/confirm"""],
+        ["/event/<model('event.event'):event>/registration_survey_list/confirm"],
         type="http",
         auth="public",
         website=True,
@@ -224,7 +223,7 @@ class EventSurveyController(http.Controller):
         return controller.registration_confirm(event, **post)
 
     @http.route(
-        ['/survey/edit/<model("survey.survey"):survey>/<string:token>'],
+        ["/survey/edit/<model('survey.survey'):survey>/<string:token>"],
         type="http",
         auth="public",
         website=True,
@@ -243,7 +242,7 @@ class EventSurveyController(http.Controller):
                 )
 
     @http.route(
-        ['/survey/delete/<model("survey.survey"):survey>/<string:token>'],
+        ["/survey/delete/<model('survey.survey'):survey>/<string:token>"],
         type="http",
         auth="public",
         website=True,
