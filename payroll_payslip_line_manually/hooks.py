@@ -21,8 +21,6 @@ def pre_init_hook(cr):
                 "qty_rate_amount_from",
                 "line_manually_model",
             ),
-            ("hr.payslip", "hr_payslip", "qty_rate_amount_ids", "line_manually_ids"),
-            ("hr.contract", "hr_contract", "qty_rate_amount_ids", "line_manually_ids"),
         ],
     )
 
@@ -39,7 +37,3 @@ def post_init_hook(cr, registry):
             rule.amount_python_compute = rule.amount_python_compute.replace(
                 "qty_rate_amount_ids", "line_manually_ids"
             )
-    # Uninstall hr_rule_qty_rate_amount
-    env["ir.module.module"].search(
-        [("name", "=", "hr_rule_qty_rate_amount")]
-    ).button_immediate_uninstall()
