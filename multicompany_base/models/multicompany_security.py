@@ -373,7 +373,7 @@ class MulticompanySecurity(models.AbstractModel):
         if not self.env.user.has_group("base.group_system"):
             return False
         # Takes a long time if there are many records without company_id
-        self._set_company_id_where_null()
+        self._set_company_id_to_1_where_null()
         self._update_rule_domains_to_1_where_false_except_partner()
         self._set_global_security_rules_on_all_models_except_ir_rule_and_ir_translation()
         self._update_code_to_comply_with_safe_eval()
@@ -386,6 +386,19 @@ class MulticompanySecurity(models.AbstractModel):
     def set_company_manager_security(self):
         # Time consuming
         self._set_read_and_edit_access_to_company_manager()
+
+    def _set_company_id_to_1_where_null(self):
+        _logger.info('Starting _set_company_id_to_1_where_null')
+        self.env.cr.execute("""
+            SELECT t.table_name FROM information_schema.tables t
+            INNER JOIN information_schema.columns c ON t.table_name = c.table_name
+            WHERE t.table_type='BASE TABLE' AND c.column_name='company_id'
+            ORDER BY table_name;""")
+        tables = self.env.cr.fetchall()
+        for table in tables:
+            sql = "UPDATE " + table[0] + " SET company_id = 1 WHERE company_id IS NULL;"
+            self.env.cr.execute(sql)
+
 
     def _set_global_security_rules_on_all_models_except_ir_rule_and_ir_translation(
         self,
@@ -490,142 +503,6 @@ class MulticompanySecurity(models.AbstractModel):
             company_field = COMPANY_FIELD["default"]
         domain = domain_draft.format(company_id=company_field)
         return domain
-
-    def _set_company_id_where_null(self):
-        self = self.sudo_bypass_global_rules()
-        _logger.info("Starting _set_company_id_where_null")
-
-        last_model_names = ["ir.property", "ir.model.data"]
-        model_names = (
-            self.env["ir.model"]
-            .search([("model", "not in", last_model_names)])
-            .mapped("model")
-        )
-        model_names.extend(last_model_names)
-
-        for model_name in model_names:
-            model = self.env["ir.model"].search([("model", "=", model_name)])
-            if not self.env[model.model]._auto:
-                continue
-            if model.model == "ir.model.fields":
-                sql = "UPDATE {} SET company_id = 1 WHERE company_id IS NULL;".format(
-                    model.model.replace(".", "_")
-                )
-                self.env.cr.execute(sql)
-                continue
-
-            records_with_no_company = (
-                self.env[model.model]
-                .with_context(
-                    active_test=False,
-                )
-                .sudo_bypass_global_rules()
-                .search([("company_id", "=", False)])
-            )
-            if not records_with_no_company:
-                continue
-
-            # WHICH WAY IS THE FASTEST?
-
-            # A) For each record: write company_id
-            # for record in records_with_no_company:
-            #     company = self.env[model.model].related_company(record)
-            #     if company:
-            #         record.sudo().write({'company_id': company.id})
-
-            # B) For each group of similar records: write_company_id
-
-            # relation_field_name = RELATED_RECORD.get(model.model)
-            # if not relation_field_name:
-            #     records_with_no_company.sudo().write(
-            #       {'company_id': self.env.company.id})
-            #     continue
-
-            # relation_field = self.env[model.model]._fields[relation_field_name]
-            # if relation_field.type == 'many2one_reference':
-            #     relation_model_names = set(
-            #       records_with_no_company.mapped(relation_field.model_field))
-            #     for relation_model_name in relation_model_names:
-            #         records_filtered_model = records_with_no_company.filtered(
-            #           lambda r: getattr(
-            #               r, relation_field.model_field) == relation_model_name)
-            #         relation_ids = list(set(
-            #           records_filtered_model.mapped(relation_field_name)))
-            #         relations = self.env[relation_model_name].browse(relation_ids)
-            #         for relation in relations:
-            #             related_company = relation.company_id
-            #             records_filtered = records_filtered_model.filtered(
-            #               lambda r: getattr(r, relation_field_name) == relation.id)
-            #             records_filtered.sudo().write({'company_id': related_company.id})
-            # else:
-            #     relations = records_with_no_company.mapped(relation_field_name)
-            #     for relation in relations:
-            #         related_company = relation.company_id
-            #         records_filtered = records_with_no_company.filtered(
-            #           lambda r: getattr(r, relation_field_name) == relation.id)
-            #         records_filtered.sudo().write({'company_id': related_company.id})
-
-            # C) Another way to loop
-
-            related_field_name = base.FIELD_NAME_TO_GET_COMPANY.get(model.model)
-            if not related_field_name:
-                records_with_no_company.sudo_bypass_global_rules().write(
-                    {"company_id": self.env.company.id}
-                )
-                continue
-
-            related_field = self.env[model.model]._fields[related_field_name]
-            related_models_and_record_ids = defaultdict(
-                lambda: []
-            )  # {'res.partner': [(1001, 1), (1002, 2), (1003, 3)]}
-            for record in records_with_no_company:
-                [
-                    (related_model_name, related_record_id)
-                ] = base._get_model_name_and_res_id(record, related_field, record)
-                if related_model_name and related_record_id:
-                    related_models_and_record_ids[related_model_name].append(
-                        (record.id, related_record_id)
-                    )
-
-            for related_model_name, ids in related_models_and_record_ids.items():
-
-                related_record_ids = [tup[1] for tup in ids if tup[1]]
-                # Related records may not exist. Search for existing related records.
-                related_records = (
-                    self.env[related_model_name]
-                    .sudo_bypass_global_rules()
-                    .search([("id", "in", related_record_ids)])
-                )
-                related_companies = related_records.mapped("company_id")
-                for related_company in related_companies:
-                    related_records_with_this_company = related_records.filtered(
-                        lambda r: r.company_id == related_company
-                    )
-                    update_record_ids = [
-                        tup[0]
-                        for tup in ids
-                        if tup[1] in related_records_with_this_company.ids
-                    ]
-                    # Option 1
-                    # records_with_no_company.filtered(
-                    #   lambda r: id in update_record_ids
-                    # ).sudo().write({'company_id': related_company.id})
-                    # Option 2
-                    self.env[model.model].sudo_bypass_global_rules().browse(
-                        update_record_ids
-                    ).write({"company_id": related_company.id})
-
-                record_ids_with_no_related_record = [
-                    tup[0] for tup in ids if not tup[1]
-                ]
-                # Option 1
-                # records_with_no_company.filtered(
-                #   lambda r: id in record_ids_with_no_related_record
-                # ).sudo().write({'company_id': self.env.company.id})
-                # Option 2
-                self.env[model.model].sudo_bypass_global_rules().browse(
-                    record_ids_with_no_related_record
-                ).write({"company_id": self.env.company.id})
 
     def _update_rule_domains_to_1_where_false_except_partner(self):
         _logger.info("Starting _update_rule_domains_to_1_where_false_except_partner")
