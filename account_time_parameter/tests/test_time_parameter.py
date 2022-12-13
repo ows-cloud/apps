@@ -41,6 +41,14 @@ class TestTimeParameter(TransactionCase):
                 "version_ids": [(0, 0, version_adra), (0, 0, version_church)],
             }
         )
+        self.reference_parameter_id = self.env["base.time.parameter"].create(
+            {
+                "name": "Donations ID",
+                "type": "reference_id",
+                "model_id": self.env.ref("account.model_account_move").id,
+                "version_ids": [(0, 0, version_adra), (0, 0, version_church)],
+            }
+        )
 
     def test_00_get(self):
         value = self.reference_parameter._get(date(2022, 12, 3))
@@ -48,3 +56,9 @@ class TestTimeParameter(TransactionCase):
 
         value = self.reference_parameter._get(date(2022, 12, 12))
         self.assertEqual(value, self.account_church, "Account for church donations")
+
+        value = self.reference_parameter_id._get(date(2022, 12, 3))
+        self.assertEqual(value, self.account_adra.id, "Account for ADRA donations")
+
+        value = self.reference_parameter_id._get(date(2022, 12, 12))
+        self.assertEqual(value, self.account_church.id, "Account for church donations")
