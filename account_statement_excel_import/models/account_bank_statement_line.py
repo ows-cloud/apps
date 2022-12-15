@@ -73,7 +73,7 @@ class Base(models.AbstractModel):
                 else:
                     continue
 
-                value = param._get_value(line.date)
+                value = param._get(line.date)
                 if not value:
                     continue
                 elif isinstance(value, type(self.env["account.account"])):
