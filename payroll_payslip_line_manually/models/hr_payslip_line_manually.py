@@ -115,7 +115,7 @@ class HrAnalyticQtyRateAmount(models.Model):
         if round(months, 2) != 1.00:
             if uom:
                 uom = " á {:.2f} {}".format(result_dict[multiply_with], uom)
-            result_dict["result_name"] += " ({:.2f} months{})".format(months, uom)
+            result_dict["result_name"] += " ({:.2f} months{})".format(months, uom or "")
             result_dict[multiply_with] *= months
         if not result_dict["result"]:
             result_dict["result"] = default_amount
