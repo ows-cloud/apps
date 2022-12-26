@@ -12,12 +12,16 @@ _logger = logging.getLogger(__name__)
 class Alias(models.Model):
     _inherit = "mail.alias"
 
-    alias_defaults = fields.Text(compute="_compute_alias_defaults")
-    alias_defaults_hook = fields.Char(
-        string="Hook to compute defaults",
-        help="List of keywords to call functions, e.g. ['time_parameter']"
+    alias_defaults = fields.Text(
+        compute="_compute_alias_defaults",
+        inverse="_inverse_alias_defaults",
     )
-    alias_defaults_input = fields.Char(string="Default Input")
+    alias_defaults_hook = fields.Char(
+        string="Default Values Hooks",
+        help="""List of keywords to call methods.
+            ['time_parameter'] will call _alias_defaults_time_parameter()"""
+    )
+    alias_defaults_input = fields.Text(string="Default Values Input")
     
     api.onchange("alias_defaults_hook", "alias_defaults_input")  # TODO why not working
     def _compute_alias_defaults(self):
@@ -32,3 +36,7 @@ class Alias(models.Model):
                     {},
                 )
             record.alias_defaults = alias_defaults_input
+
+    def _inverse_alias_defaults(self):
+        for record in self:
+            record.alias_defaults_input = record.alias_defaults
