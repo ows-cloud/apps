@@ -2,13 +2,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "Profit/Loss Pivot Report",
+    "name": "Accounting Statistics",
     "summary": "",
     "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "account",
     "data": [
-        "views/account_account_views.xml",
-        "views/account_move_line_views.xml",
+        "report/account_move_line_report_views.xml",
+        "security/ir.model.access.csv",
     ],
     "depends": [
         "account",
