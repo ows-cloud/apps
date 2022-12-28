@@ -2,12 +2,12 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "Account Move Line TEST",
+    "name": "Profit/Loss Pivot Report",
     "summary": "",
     "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "account",
     "data": [
-        "report/account_invoice_report_test_view.xml",
+        "report/account_move_line_pl_report_views.xml",
         "security/ir.model.access.csv",
     ],
     "depends": [

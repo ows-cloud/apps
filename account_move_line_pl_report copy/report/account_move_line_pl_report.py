@@ -4,7 +4,8 @@ from odoo import api, fields, models
 class AccountReport(models.Model):
     _name = "account.move.line.pl.report"
     _inherit = "account.move.line"
-    _description = "Account Report"
+    _table = "account_move_line"
+    _description = "Profit/Loss Report"
     _auto = False
     _rec_name = 'date'
     _order = 'date desc'
@@ -48,9 +49,9 @@ class AccountReport(models.Model):
         'res.partner': ['country_id'],
     }
 
-    @property
-    def _table_query(self):
-        return '%s %s %s' % (self._select(), self._from(), self._where())
+    # @property
+    # def _table_query(self):
+    #     return '%s %s %s' % (self._select(), self._from(), self._where())
 
     @api.model
     def _select(self):

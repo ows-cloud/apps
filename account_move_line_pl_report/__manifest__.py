@@ -7,8 +7,8 @@
     "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "account",
     "data": [
-        "report/account_move_line_pl_report_views.xml",
-        "security/ir.model.access.csv",
+        "views/account_account_views.xml",
+        "views/account_move_line_views.xml",
     ],
     "depends": [
         "account",

@@ -140,7 +140,7 @@
         </field>
     </record>
     <record id="action_account_move_line_pl_report" model="ir.actions.act_window">
-        <field name="name">Journal Items Report</field>
+        <field name="name">Profit/Loss Report</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">account.move.line.pl.report</field>
         <field name="view_mode">pivot,graph,tree,form</field>
