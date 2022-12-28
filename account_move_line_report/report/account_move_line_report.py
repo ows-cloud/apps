@@ -3,7 +3,7 @@ from odoo import api, fields, models
 
 class AccountReport(models.Model):
     _name = "account.move.line.report"
-    _inherit = ["account.invoice.report", "account.move.line"]
+    _inherit = "account.move.line"
     _description = "Accounting Statistics"
     _auto = False
     _rec_name = 'date'
@@ -47,26 +47,28 @@ class AccountReport(models.Model):
         column2="account_account_tag_id",
     )
 
+    @property
+    def _table_query(self):
+        return '%s %s %s' % (self._select(), self._from(), self._where())
+
     @api.model
     def _select(self):
-        return super()._select() + """,
-        line.amount_currency,
-        line.balance,
-        -line.balance as balance_pl,
-        line.credit,
-        line.currency_id,
-        line.date,
-        line.date_maturity,
-        line.debit,
-        user_type.include_initial_balance,
-        line.matching_number,
-        line.name,
-        line.parent_state,
-        line.reconciled,
-        line.reconcile_model_id,
-        line.ref,
-        line.statement_id,
-        account.user_type_id"""
+        return """
+            SELECT
+                -line.balance as balance_pl,
+                user_type.include_initial_balance,
+                account.user_type_id,
+                line.*
+        """
+
+    @api.model
+    def _from(self):
+        return '''
+            FROM account_move_line line
+                LEFT JOIN account_account account ON account.id = line.account_id
+                LEFT JOIN account_account_type user_type ON user_type.id = account.user_type_id
+                INNER JOIN account_move move ON move.id = line.move_id
+        '''
 
     @api.model
     def _where(self):
