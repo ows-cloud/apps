@@ -62,7 +62,9 @@ class Base(models.AbstractModel):
                 )
                 rec_model.set_counterpart_line()
 
-        model_id = self.env.ref("account.model_account_bank_statement_line").id
+        # Incoming emails may use time parameters to create account.move with lines.
+        # The same time parameters may be used for statement lines.
+        model_id = self.env.ref("account.model_account_move").id
         params = self.env["base.time.parameter"].search([("model_id", "=", model_id)])
         for line in self:
             for param in params:
