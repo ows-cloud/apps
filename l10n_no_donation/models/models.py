@@ -14,9 +14,16 @@ from . import gavefrivilligorganisasjon_2_0 as gave
 class Company(models.Model):
     _inherit = "res.company"
 
-    l10n_no_partner_donation_id = fields.Many2one(
+    l10n_no_donation_partner_id = fields.Many2one(
         "res.partner", "Donation Contact Person"
     )
+
+# TODO The donation total should be computed based on the donation models.
+# Then this class extension may be deleted.
+class Partner(models.Model):
+    _inherit = "res.partner"
+
+    donation_total = fields.Integer("Donation Total")
 
 
 # TODO The wizard should download the donation XML file directly.
@@ -113,7 +120,7 @@ class DonationFile:
 
     def Leveranse(self):
         l = gave.Leveranse()
-        l.kildesystem = "Odoo 12.0"
+        l.kildesystem = "Odoo 14.0"
         l.oppgavegiver = self.Oppgavegiver()
         l.inntektsaar = self.year
         # TODO: unique reference
@@ -129,7 +136,7 @@ class DonationFile:
         ):
             l.add_oppgave(self.Oppgave(partner))
             count += 1
-            total += int(partner.function)
+            total += int(partner.donation_total)
         l.oppgaveoppsummering = gave.Oppgaveoppsummering()
         l.oppgaveoppsummering.antallOppgaver = count
         l.oppgaveoppsummering.sumBeloep = total
@@ -145,7 +152,7 @@ class DonationFile:
     def Kontaktinformasjon(self):
         k = gave.Kontaktinformasjon()
         # TODO: error handling if partner is missing
-        partner = self.company.l10n_no_partner_donation_id
+        partner = self.company.l10n_no_donation_partner_id
         k.navn = partner.name
         k.telefonnummer = partner.phone
         k.varselEpostadresse = partner.email
@@ -156,7 +163,7 @@ class DonationFile:
         o = gave.OppgaveGave()
         o.oppgaveeier = self.Oppgaveeier(partner)
         # TODO: compute the total donation
-        o.beloep = int(partner.function)
+        o.beloep = int(partner.donation_total)
         return o
 
     def Oppgaveeier(self, partner):
