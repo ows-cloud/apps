@@ -19,4 +19,5 @@
         "report/report_views.xml",
     ],
     "installable": True,
+    "maintainers": ["appstogrow"],
 }

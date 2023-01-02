@@ -11,6 +11,7 @@
     ],
     "depends": ["multicompany_base"],
     "license": "AGPL-3",
+    "maintainers": ["appstogrow"],
     "post_init_hook": "post_init_hook",
     "version": "14.0.1.0.0",
     "website": "https://github.com/appstogrow/apps",

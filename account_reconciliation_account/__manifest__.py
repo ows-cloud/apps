@@ -14,6 +14,7 @@
         "account_reconciliation_widget",
     ],
     "license": "AGPL-3",
+    "maintainers": ["appstogrow"],
     "version": "14.0.2.0.0",
     "website": "https://github.com/appstogrow/apps",
 }

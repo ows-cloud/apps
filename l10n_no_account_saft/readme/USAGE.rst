@@ -1,3 +1,3 @@
-Make sure that the company contact info is correct.
+On the company, set the SAF-T Contact Person.
 
 Menu to export: Invoicing - Reporting - Norwegian SAF-T XML

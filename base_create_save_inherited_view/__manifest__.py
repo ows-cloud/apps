@@ -13,5 +13,6 @@
     "application": False,
     "images": [],
     "license": "AGPL-3",
+    "maintainers": ["appstogrow"],
     "data": ["views/ir_ui_view_views.xml"],
 }
