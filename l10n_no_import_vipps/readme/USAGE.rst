@@ -2,7 +2,7 @@ FIRST prepare the Excel document.
 The transactions should be together, no "non-transaction" row between.
 Delete unnecessary rows.
 
-Suggestion: Create two extra transaction lines (see vipps_demo.xlsx):
+Optional: Create two extra transaction lines (see vipps_demo.xlsx):
 
 - One line for the transaction fees
 - One line for the total bank transfer (transactions minus the transaction fees)
