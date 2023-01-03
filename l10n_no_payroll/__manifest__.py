@@ -8,6 +8,7 @@
     "category": "Localization",
     "data": [
         "security/ir.model.access.csv",
+        "views/res_company_view.xml",
         "views/views.xml",
         "data/res.field.csv",
         "data/res.field.selection_value.csv",
