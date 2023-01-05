@@ -1,20 +1,22 @@
 <odoo>
     <record id="view_company_form" model="ir.ui.view">
         <field name="model">res.company</field>
-        <field name="inherit_id" ref="hr_custom_info.view_company_form" />
+        <field name="inherit_id" ref="base.view_company_form" />
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='custom_info']" position="inside">
-                <group>
-                    <field name="l10n_no_aga_konto" />
-                    <field name="l10n_no_aga_motkonto" />
-                    <field name="l10n_no_fp_konto" />
-                    <field name="l10n_no_fp_motkonto" />
-                    <field name="l10n_no_aga_fp_konto" />
-                    <field name="l10n_no_aga_fp_motkonto" />
-                    <field name="l10n_no_loennsart_fp_i_aar" />
-                    <field name="l10n_no_loennsart_fp_i_fjor" />
-                </group>
-            </xpath>
+            <notebook position="inside">
+                <page>
+                    <group>
+                        <field name="l10n_no_aga_konto" />
+                        <field name="l10n_no_aga_motkonto" />
+                        <field name="l10n_no_fp_konto" />
+                        <field name="l10n_no_fp_motkonto" />
+                        <field name="l10n_no_aga_fp_konto" />
+                        <field name="l10n_no_aga_fp_motkonto" />
+                        <field name="l10n_no_loennsart_fp_i_aar" />
+                        <field name="l10n_no_loennsart_fp_i_fjor" />
+                    </group>
+                </page>
+            </notebook>
         </field>
     </record>
 </odoo>

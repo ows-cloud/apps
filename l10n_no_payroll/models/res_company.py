@@ -5,6 +5,35 @@ class Company(models.Model):
     _inherit = "res.company"
 
     json = fields.Serialized()
+    l10n_no_Arbeidsgiveravgiftsone = fields.Selection(
+        selection=[],
+        string="Sone",
+        sparse="json",
+    )
+    l10n_no_BeregningskodeForArbeidsgiveravgift = fields.Selection(
+        selection=[],
+        string="Naeringskode",
+        sparse="json",
+    )
+    l10n_no_fp_prosent = fields.Float("Feriepenger prosent", sparse="json")
+    l10n_no_fp_prosent_senior = fields.Float(
+        "Feriepenger prosent over 60 år", sparse="json"
+    )
+    l10n_no_Grunnlagsprosent = fields.Selection(
+        selection=[],
+        string="Prosentsats for a.g.a.",
+        sparse="json",
+    )
+    l10n_no_pensjonsinnretning = fields.Char(
+        "Pensjonsinnretning org.nr.", sparse="json"
+    )
+    l10n_no_Spraak = fields.Selection(
+        selection=[],
+        string="Spraak",
+        sparse="json",
+    )
+    l10n_no_virksomhet = fields.Char("Virksomhetsnummer", sparse="json")
+
     l10n_no_aga_konto = fields.Many2one(
         "account.account",
         string="Arbeidsgiveravgift konto",
