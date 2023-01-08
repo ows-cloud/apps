@@ -4,7 +4,7 @@
 
 
 testdata = {
-    "l10n_no_payroll.amelding": {
+    "l10n.no.amelding": {
         "leveringstidspunkt": "2008-09-29 03:49:45",
         "kalendermaaned": "2018-01",
         "company_id": ("res.company", 0),

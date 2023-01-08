@@ -6,31 +6,61 @@ class Company(models.Model):
 
     json = fields.Serialized()
     l10n_no_Arbeidsgiveravgiftsone = fields.Selection(
-        selection=[],
         string="Sone",
         sparse="json",
+        selection=[
+            ("1", "1"),
+            ("1a", "1a"),
+            ("2", "2"),
+            ("3", "3"),
+            ("4", "4"),
+            ("4a", "4a"),
+            ("5", "5"),
+
+        ],
     )
     l10n_no_BeregningskodeForArbeidsgiveravgift = fields.Selection(
-        selection=[],
         string="Naeringskode",
         sparse="json",
+        selection=[
+            ("generelleNaeringer", "generelleNaeringer"),
+            ("helseforetakOgDelerAvStatsforvaltningen", "helseforetakOgDelerAvStatsforvaltningen"),
+            ("jordOgSkogbrukFiskeri", "jordOgSkogbrukFiskeri"),
+            ("kunForskuddstrekk", "kunForskuddstrekk"),
+            ("svalbard", "svalbard"),
+            ("staalprodukterOgSkipsverft", "staalprodukterOgSkipsverft"),
+            ("veitransport", "veitransport"),
+            ("sektorunnattAktivitet", "sektorunnattAktivitet"),
+            ("godstransportPaaVei", "godstransportPaaVei"),
+        ],
     )
     l10n_no_fp_prosent = fields.Float("Feriepenger prosent", sparse="json")
     l10n_no_fp_prosent_senior = fields.Float(
         "Feriepenger prosent over 60 år", sparse="json"
     )
     l10n_no_Grunnlagsprosent = fields.Selection(
-        selection=[],
         string="Prosentsats for a.g.a.",
         sparse="json",
+        selection=[
+            ("14.1", "14.1"),
+            ("10.6", "10.6"),
+            ("7.9", "7.9"),
+            ("6.4", "6.4"),
+            ("5.1", "5.1"),
+            ("0", "0"),
+        ],
     )
     l10n_no_pensjonsinnretning = fields.Char(
         "Pensjonsinnretning org.nr.", sparse="json"
     )
     l10n_no_Spraak = fields.Selection(
-        selection=[],
         string="Spraak",
         sparse="json",
+        selection=[
+            ("bokmaal", "bokmaal"),
+            ("engelsk", "engelsk"),
+            ("nynorsk", "nynorsk"),
+        ],
     )
     l10n_no_virksomhet = fields.Char("Virksomhetsnummer", sparse="json")
 

@@ -4,8 +4,8 @@
         <field name="inherit_id" ref="base.view_company_form" />
         <field name="arch" type="xml">
             <notebook position="inside">
-                <page>
-                    <group>
+                <page name="norway" string="Norway">
+                    <group name="payroll" string="Payroll">
                         <field name="l10n_no_aga_konto" />
                         <field name="l10n_no_aga_motkonto" />
                         <field name="l10n_no_fp_konto" />

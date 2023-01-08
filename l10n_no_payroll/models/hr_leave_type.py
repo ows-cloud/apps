@@ -6,7 +6,13 @@ class LeaveType(models.Model):
 
     json = fields.Serialized()
     l10n_no_PermisjonsOgPermitteringsBeskrivelse = fields.Selection(
-        selection=[],
         string="PermisjonsOgPermitteringsBeskrivelse",
         sparse="json",
+        selection=[
+            ("permittering", "permittering"),
+            ("permisjonMedForeldrepenger", "permisjonMedForeldrepenger"),
+            ("permisjonVedMilitaertjeneste", "permisjonVedMilitaertjeneste"),
+            ("utdanningspermisjon", "utdanningspermisjon"),
+            ("velferdspermisjon", "velferdspermisjon"),
+        ],
     )

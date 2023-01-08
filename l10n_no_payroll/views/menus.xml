@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- feriepenger (hr.payslip.line) -->
+
+    <record model="ir.actions.server" id="action_l10n_no_feriepenger">
+        <field name="name">Vis feriepenger</field>
+        <field name="model_id" ref="payroll.model_hr_payslip_line" />
+        <field name="state">code</field>
+        <field name="code">env['hr.payslip.line'].l10n_no_feriepenger()</field>
+    </record>
+
+    <!-- l10n_no_payroll.tabelltrekk -->
+
+    <record model="ir.actions.server" id="action_l10n_no_import_tax_deduction">
+        <field name="name">Importer trekktabeller</field>
+        <field name="model_id" ref="model_l10n_no_tabelltrekk" />
+        <field name="state">code</field>
+        <field name="code">model.l10n_no_import_tax_deduction()</field>
+    </record>
+
+    <!-- menu -->
+
+    <menuitem
+        id="menu_payroll_norway"
+        name="Norge"
+        sequence="20"
+        parent="payroll.payroll_menu_root"
+    />
+    <menuitem
+        id="menu_payroll_norway_lag_amelding"
+        name="Lag A-melding"
+        sequence="20"
+        parent="menu_payroll_norway"
+        groups="payroll.group_payroll_manager"
+        action="action_l10n_no_amelding_wizard_form"
+    />
+    <menuitem
+        id="menu_payroll_norway_amelding"
+        name="A-melding"
+        sequence="21"
+        parent="menu_payroll_norway"
+        action="action_l10n_no_amelding_tree"
+    />
+    <menuitem
+        id="menu_payroll_norway_feriepenger"
+        name="Vis feriepenger"
+        sequence="22"
+        parent="menu_payroll_norway"
+        action="action_l10n_no_feriepenger"
+    />
+    <menuitem
+        id="menu_l10n_no_import_tax_deduction"
+        name="Importer trekktabeler"
+        sequence="100"
+        parent="menu_payroll_norway"
+        groups="base.group_system"
+        action="action_l10n_no_import_tax_deduction"
+    />
+</odoo>

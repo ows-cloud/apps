@@ -1,4 +1,4 @@
-# Copyright 2019 AppsToGROW - Henrik Norlin
+# Copyright 2019-2023 AppsToGROW - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
@@ -8,11 +8,18 @@
     "category": "Localization",
     "data": [
         "security/ir.model.access.csv",
-        "views/res_company_view.xml",
-        "views/views.xml",
-        # "data/res.field.csv",
-        # "data/res.field.selection_value.csv",
-        # "execute_functions.xml",
+        "views/hr_contract_views.xml",
+        "views/hr_job_views.xml",
+        "views/hr_leave_type_views.xml",
+        "views/hr_leave_views.xml",
+        "views/hr_payslip_views.xml",
+        "views/hr_payslip_run_views.xml",
+        "views/hr_salary_rule_views.xml",
+        "views/l10n_no_amelding_views.xml",
+        "views/l10n_no_amelding_wizard_views.xml",
+        "views/res_company_views.xml",
+        "views/menus.xml",
+        "execute_functions.xml",
     ],
     "demo": [
         "demo/hr.salary.rule.xml",

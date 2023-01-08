@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 
 
 class Tabelltrekk(models.Model):
-    _name = "l10n_no_payroll.tabelltrekk"
+    _name = "l10n.no.tabelltrekk"
     _description = "Tabelltrekk fra skattetabeller"
 
     year = fields.Integer("Year")
@@ -27,7 +27,7 @@ class Tabelltrekk(models.Model):
             count = 0
             sql = (
                 sql_base
-            ) = """INSERT INTO l10n_no_payroll_tabelltrekk (
+            ) = """INSERT INTO l10n_no_tabelltrekk (
                 year, tabellnummer, trekkperiode, tabelltype, trekkgrunnlag, trekk
             ) VALUES """
             for line in lines:

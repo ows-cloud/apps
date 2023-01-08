@@ -11,15 +11,17 @@ class Job(models.Model):
     _inherit = "hr.job"
 
     json = fields.Serialized()
-    l10n_no_profession_code = fields.Selection(
-        selection=[],
+    l10n_no_job_code = fields.Selection(
         string="Yrkeskode",
         sparse="json",
+        selection=[
+
+        ],
     )
 
-    def l10n_no_import_profession(self):
+    def l10n_no_import_job_codes(self):
         SelectValue = self.env["res.field.selection_value"]
-        field_id = self.env.ref("l10n_no_payroll.res_field_l10n_no_profession_code").id
+        field_id = self.env.ref("l10n_no_payroll.res_field_l10n_no_job_code").id
         records = SelectValue.search_count([("field_id", "=", field_id)])
         if not records:
             for line in hr_job_codes.splitlines():
