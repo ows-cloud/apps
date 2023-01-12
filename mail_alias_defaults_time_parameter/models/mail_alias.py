@@ -1,4 +1,4 @@
-# Copyright 2021 AppsToGROW
+# Copyright 2021-2023 AppsToGROW
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import _, api, fields, models
@@ -21,9 +21,11 @@ class MailAlias(models.Model):
             elif param.name and param.name in alias_defaults_input:
                 replace = param.name
             if replace:
+                new_value = param._get()
+                if param.type == "reference":
+                    new_value = new_value.id
                 alias_defaults_input = alias_defaults_input.replace(
-                    replace,
-                    str(param._get()),
+                    replace, str(new_value)
                 )
 
         return alias_defaults_input
