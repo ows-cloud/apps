@@ -1,5 +1,5 @@
-Reconcile on `counterpart_account_id` without any reconciliation model.
-This would be **less flexible**, forcing `counterpart_account_id` if it exists.
+Reconcile on `account_id` without any reconciliation model.
+This would be **less flexible**, forcing `account_id` if it exists.
 And currently, looping through the statement lines,
 Javascript requires a reconciliation model per account.
 https://github.com/OCA/account-reconcile/blob/14.0/account_reconciliation_widget/static/src/js/reconciliation/reconciliation_model.js#L680
@@ -16,8 +16,8 @@ Implementation draft
         lines_vals_list = super()._get_write_off_move_lines_dict(
             st_line, residual_balance
         )
-        if not lines_vals_list and st_line.counterpart_account_id and \
-          self.match_counterpart_account_id:
+        if not lines_vals_list and st_line.account_id and \
+          self.match_account_id:
             balance = -st_line.amount
             lines_vals_list = [
                 {
@@ -25,7 +25,7 @@ Implementation draft
                     'balance': balance,
                     'debit': balance > 0 and balance or 0,
                     'credit': balance < 0 and -balance or 0,
-                    'account_id': st_line.counterpart_account_id.id,
+                    'account_id': st_line.account_id.id,
                     'currency_id': False,
                     'analytic_account_id': False,
                     'analytic_tag_ids': [(6, 0, [])],

@@ -16,5 +16,5 @@ with values from `import_first_name` and `import_last_name`.
   and replace with the parameter value.
 * If the parameter value is an account:
 
-  - Set `counterpart_account_id` on the statement line.
+  - Set `account_id` on the statement line.
   - If no reconciliation model exists for the account, create it.
