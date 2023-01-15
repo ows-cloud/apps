@@ -22,7 +22,7 @@ class MailAlias(models.Model):
                 replace = param.name
             if replace:
                 new_value = param._get()
-                if param.type == "reference":
+                if param.type == "record":
                     new_value = new_value.id
                 alias_defaults_input = alias_defaults_input.replace(
                     replace, str(new_value)
