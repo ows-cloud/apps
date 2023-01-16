@@ -10,11 +10,11 @@
         />
         <field
             name="domain"
-            eval="[('model_id', '=', ref('account.model_account_bank_statement_line'))]"
+            eval="[('model_id', '=', ref('account.model_account_move'))]"
         />
         <field
             name="context"
-            eval="{'default_model_id': ref('account.model_account_bank_statement_line')}"
+            eval="{'default_model_id': ref('account.model_account_move')}"
         />
     </record>
 </odoo>
