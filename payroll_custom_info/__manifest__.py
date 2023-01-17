@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "HR Custom Info",
+    "name": "Payroll Custom Info",
     "summary": "Add custom HR info",
     "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Uncategorized",

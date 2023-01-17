@@ -28,6 +28,7 @@
         "base_sparse_field",
         "hr_contract_leave",
         "payroll_account_analytic",
+        "payroll_custom_info",
     ],
     "external_dependencies": {"python": ["pyxb"]},
     "license": "AGPL-3",
