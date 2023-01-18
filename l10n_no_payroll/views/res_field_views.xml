@@ -1,0 +1,15 @@
+<odoo>
+    <record
+        model="ir.actions.server"
+        id="res_field_action_migrate"
+    >
+        <field name="name">Migrate (almost) all fields</field>
+        <field name="model_id" ref="model_res_field" />
+        <field name="binding_model_id" ref="model_res_field" />
+        <field name="state">code</field>
+        <field name="code">
+model.update_record_fields()
+model.create_custom_info()
+        </field>
+    </record>
+</odoo>

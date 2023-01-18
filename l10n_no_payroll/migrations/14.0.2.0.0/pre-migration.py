@@ -1,19 +1,17 @@
-"""
-This code was written previously to get from regular field to res.field.
-In the migration we want to do the opposite.
-"""
+# from openupgradelib import openupgrade
 
 
-def _compute_l10n_no_fields(self):
-    for record in self:
-        record.l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer = float(
-            record.field_value_ids.filtered(
-                lambda x: x.field_code
-                == "l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer"
-            ).value
-        )
-        record.l10n_no_stillingsprosent = float(
-            record.field_value_ids.filtered(
-                lambda x: x.field_code == "l10n_no_stillingsprosent"
-            ).value
-        )
+# @openupgrade.migrate()
+# def migrate(env, version):
+#     cr = env.cr
+#     try:
+#         openupgrade.rename_models(
+#             cr,
+#             [
+#                 ("l10n_no_payroll.amelding", "l10n.no.amelding"),
+#                 ("l10n_no_payroll.amelding.wizard", "l10n.no.amelding.wizard"),
+#                 ("l10n_no_payroll.tabelltrekk", "l10n.no.tabelltrekk"),
+#             ]
+#         )
+#     except Exception:
+#         pass
