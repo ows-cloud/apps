@@ -37,6 +37,7 @@
     "external_dependencies": {"python": ["pyxb"]},
     "license": "AGPL-3",
     "maintainers": ["appstogrow"],
+    "post_init_hook": "post_init_hook",
     "version": "14.0.2.0.0",
     "website": "https://github.com/appstogrow/apps",
 }
