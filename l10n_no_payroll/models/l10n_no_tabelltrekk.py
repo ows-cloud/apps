@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 
 class Tabelltrekk(models.Model):
     _name = "l10n.no.tabelltrekk"
-    _description = "Tabelltrekk fra skattetabeller"
+    _description = "Tax tables with tax deduction amounts"
 
     year = fields.Integer("Year")
     tabellnummer = fields.Char("Tabellnummer", size=4)
@@ -20,7 +20,7 @@ class Tabelltrekk(models.Model):
     trekkgrunnlag = fields.Integer("Trekkgrunnlag")
     trekk = fields.Integer("Trekk")
 
-    def l10n_no_import_tax_deduction(self):
+    def post_init_hook_import_tax_deduction_tables(self):
         year_exists = self.search([("year", "=", YEAR)], limit=1)
         if not year_exists:
             lines = tabelltrekk20xx.splitlines()

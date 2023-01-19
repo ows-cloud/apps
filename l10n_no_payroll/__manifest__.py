@@ -22,7 +22,6 @@
         "data/res.field.csv",  # remove after manual migration
         "data/res.field.selection_value.csv",  # remove after manual migration
         "views/res_field_views.xml",  # remove after manual migration
-        "execute_functions.xml",
     ],
     "demo": [
         "demo/hr.salary.rule.xml",

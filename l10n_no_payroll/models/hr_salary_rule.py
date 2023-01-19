@@ -17,9 +17,6 @@ class SalaryRule(models.Model):
     l10n_no_BeregnFP = fields.Boolean(
         string="Beregn feriepenger",
         sparse="json",
-        selection=[
-
-        ],
     )
     l10n_no_BeregnTrekk = fields.Selection(
         string="Beregn skattetrekk",
