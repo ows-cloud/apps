@@ -19,8 +19,8 @@
         "views/l10n_no_amelding_wizard_views.xml",
         "views/res_company_views.xml",
         "views/menus.xml",
-        "data/res.field.csv",  # remove after manual migration
-        "data/res.field.selection_value.csv",  # remove after manual migration
+        "data_old/res.field.csv",  # remove after manual migration
+        "data_old/res.field.selection_value.csv",  # remove after manual migration
         "views/res_field_views.xml",  # remove after manual migration
     ],
     "demo": [
@@ -30,6 +30,7 @@
         "base_sparse_field",
         "hr_contract_leave",
         "hr_field_value",  # remove after manual migration
+        "l10n_no_oca",
         "payroll_account_analytic",
         "payroll_custom_info",
     ],
