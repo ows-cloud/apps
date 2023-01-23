@@ -9,6 +9,7 @@
     "data": [
         "security/ir.model.access.csv",
         "views/hr_contract_views.xml",
+        "views/hr_employee_views.xml",
         "views/hr_job_views.xml",
         "views/hr_leave_type_views.xml",
         "views/hr_leave_views.xml",
@@ -24,7 +25,10 @@
         "views/res_field_views.xml",  # remove after manual migration
     ],
     "demo": [
-        "demo/hr.salary.rule.xml",
+        # "demo/hr_contribution_register_data.xml",
+        "demo/hr_salary_rule_category_data.xml",
+        "demo/hr_salary_rule_data.xml",
+        "demo/hr_payroll_structure_data.xml",
     ],
     "depends": [
         "base_sparse_field",

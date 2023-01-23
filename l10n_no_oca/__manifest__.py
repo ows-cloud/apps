@@ -1,14 +1,18 @@
 # Copyright 2023 AppsToGROW - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+# The General Ledger Standard Accounts code lists are Copyright Regnskap Norge AS, 2018.
+# Henrik called on Jan. 23, 2023. They said that software developers may freely use it.
+# Source: https://github.com/skatteetaten/saf-t
+
 {
-    "name": "l10n_no",
+    "name": "Norway - Accounting",
     "summary": "",
     "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Accounting",
     "data": [
         "data/account_chart_template_data.xml",
-        "data/account.account.template.csv",
+        "data/account.account.template.csv",  # Copyright Regnskap Norge AS
         "data/account.tax.template.csv",
         "data/account_chart_template_data_update.xml",
     ],

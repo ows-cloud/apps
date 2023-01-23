@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record model="ir.ui.view" id="view_l10n_no_amelding_tree">
+    <record id="l10n_no_amelding_view_tree" model="ir.ui.view">
         <field name="name">A-melding</field>
         <field name="model">l10n.no.amelding</field>
         <field name="priority" eval="20" />
@@ -15,7 +15,7 @@
             </tree>
         </field>
     </record>
-    <record model="ir.ui.view" id="view_l10n_no_amelding_form">
+    <record id="l10n_no_amelding_view_form" model="ir.ui.view">
         <field name="name">A-melding</field>
         <field name="model">l10n.no.amelding</field>
         <field name="priority" eval="20" />
@@ -46,7 +46,7 @@
             </form>
         </field>
     </record>
-    <record model="ir.actions.act_window" id="action_l10n_no_amelding_tree">
+    <record id="l10n_no_amelding_action_tree" model="ir.actions.act_window">
         <field name="name">A-melding</field>
         <field name="res_model">l10n.no.amelding</field>
         <field name="view_mode">tree,form</field>

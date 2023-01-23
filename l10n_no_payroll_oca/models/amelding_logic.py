@@ -5,7 +5,6 @@ from dateutil.relativedelta import relativedelta
 from lxml import etree
 
 from . import amelding_v2_2 as a
-from .amelding_testdata import testdata
 
 _logger = logging.getLogger(__name__)
 
@@ -372,11 +371,7 @@ class AmeldingLogikk:
 
     def Arbeidsforhold(self, contract):
         af = a.Arbeidsforhold()
-        if not contract.l10n_no_arbeidsforhold:
-            contract.l10n_no_arbeidsforhold = contract.env["ir.sequence"].next_by_code(
-                "l10n_no_payroll.arbeidsforhold"
-            )
-        af.arbeidsforholdId = contract.l10n_no_arbeidsforhold  # string #optional
+        af.arbeidsforholdId = str(contract.id)  # string #optional
         af.typeArbeidsforhold = self._get(
             contract, "l10n_no_Arbeidsforholdtype"
         )  # string #required
@@ -396,8 +391,13 @@ class AmeldingLogikk:
             )  # float #optional
             # af.avloenningstype = self._get(contract, 'avloenningstype') #replace #string #optional #utgaar
             job = self._get(contract, "job_id")
+            test_record = self._get(job, "l10n_no_job_code")
+            test_code = test_record.code
             self._set(
-                af, "yrke", self._get(job, "l10n_no_profession_code")
+                # af, "yrke", self._get(job, "l10n_no_job_code").code
+                af,
+                "yrke",
+                test_code,
             )  # string #optional
             self._set(
                 af,
@@ -776,14 +776,8 @@ class AmeldingLogikk:
 
     def _get_records(self, model, domain, record):
         _debug("%s %s %s" % (str(model), str(domain), str(record)))
-        if type(record) not in (dict, tuple):
-            # odoo regular
-            records = record.env[model].with_context(active_test=False).search(domain)
-            return records
-        else:
-            # test data (get all records)
-            records = testdata[model]
-            return records
+        records = record.env[model].with_context(active_test=False).search(domain)
+        return records
 
     # def _filtered(self, records, field, list):  # HOW TO USER LAMBDA WITH VARIABLES? getattr(record, field) == variable ?
     #    if type(record) not in (dict, tuple):
@@ -809,66 +803,7 @@ class AmeldingLogikk:
             setattr(obj, name, value)
 
     def _get(self, record, field):
-        """record: Odoo object or test dict"""
-        value = None
-
         if record is None:
-            pass
-        elif type(record) is dict:
-            # test data
-            if field in record:
-                value = record[field]
-                return value
-        elif type(record) is tuple:
-            # test data get dict
-            if record[0] in testdata and field in testdata[record[0]][record[1]]:
-                record = testdata[record[0]][record[1]]
-                value = record[field]
-                return value
-        elif hasattr(record, field):
-            # odoo regular
-            value = getattr(record, field)
-            return value
+            return
         else:
-            # odoo res.field.value
-
-            # # field_extid = 'l10n_no_payroll.res_field_' + field
-            # rec = record.env['res.field.value'].search(
-            #     # [('model','=',record._name),('res_id','=',record.id),('field_id','=',record.env.ref(field_extid).id)])
-            #     [('model', '=', record._name), ('res_id', '=', record.id),
-            #      ('field_code', '=', field)])
-            # if rec:
-            #     if rec.field_data_type in ('selection', 'Selection'):
-            #         return rec.selection_value_id.code  # TODO:improve_performance
-            #     else:
-            #         return rec.value
-            # else:
-            #     return None
-
-            # for r in self.field_values:
-            #    if r.field_id.id == 219:
-            #        code = r.field_code
-            # DOES THIS IMPROVE THE PERFORMANCE?
-            rec = [
-                r
-                for r in self.field_values
-                if r.model == record._name
-                and r.res_id == record.id
-                and r.field_code == field
-            ]
-            if rec:
-                assert len(rec) == 1, (
-                    "Expected singleton in _get(" & str(field) & ", " & str(value) & ")"
-                )
-                if rec[0].field_data_type == "selection":
-                    selection_record = [
-                        r
-                        for r in self.field_selection_values
-                        if r.id == rec[0].selection_value_id.id
-                    ]
-                    if selection_record:
-                        return selection_record[0].code
-                else:
-                    return rec[0].value
-            else:
-                return None
+            return getattr(record, field)

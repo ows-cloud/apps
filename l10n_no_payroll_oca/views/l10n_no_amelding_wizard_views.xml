@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record model="ir.ui.view" id="view_l10n_no_amelding_wizard_form">
+    <record id="l10n_no_amelding_wizard_view_form" model="ir.ui.view">
         <field name="name">Lag A-melding</field>
         <field name="model">l10n.no.amelding.wizard</field>
         <field name="priority" eval="20" />
@@ -25,10 +25,7 @@
             </form>
         </field>
     </record>
-    <record
-        id="action_l10n_no_amelding_wizard_form"
-        model="ir.actions.act_window"
-    >
+    <record id="l10n_no_amelding_wizard_action_form" model="ir.actions.act_window">
         <field name="name">Lag A-melding</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">l10n.no.amelding.wizard</field>

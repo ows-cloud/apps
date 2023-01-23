@@ -1,6 +1,6 @@
-from odoo import models
 from collections import defaultdict
 
+from odoo import models
 
 x_codes = [
     "x_month_salary",
@@ -16,9 +16,11 @@ x_codes = [
 class Field(models.Model):
     _inherit = "res.field"
 
-    def update_record_fields(self):
-        for val in self.env["res.field.value"].sudo_bypass_global_rules().search(
-            [("field_code", "not like", "x_%")]
+    def set_standard_info_in_fields(self):
+        for val in (
+            self.env["res.field.value"]
+            .sudo_bypass_global_rules()
+            .search([("field_code", "not like", "x_%")])
         ):
             if val.field_data_type == "reference":
                 value = val.reference_value
@@ -36,7 +38,16 @@ class Field(models.Model):
         # res.field loop
         for (company_id, model), list_of_fields in dict_of_fields.items():
             properties = [
-                (0, 0, {"name": fld.name, "code": fld.code, "widget": fld.data_type, "company_id": fld.company_id.id})
+                (
+                    0,
+                    0,
+                    {
+                        "name": fld.name,
+                        "code": fld.code,
+                        "widget": fld.data_type,
+                        "company_id": fld.company_id.id,
+                    },
+                )
                 for fld in list_of_fields
             ]
             name = "{} for {}".format(model, fld.company_id.name)
@@ -46,14 +57,20 @@ class Field(models.Model):
                     {
                         "name": name,
                         "model": model,
-                        "model_id": self.env["ir.model"].search([("model", "=", model)]).id,
+                        "model_id": self.env["ir.model"]
+                        .search([("model", "=", model)])
+                        .id,
                         "company_id": company_id,
                         "property_ids": properties,
                     }
                 )
             # res.field.value loop
-            for val in self.env["res.field.value"].sudo_bypass_global_rules().search(
-                [("field_code", "in", x_codes), ("company_id", "=", company_id)]
+            for val in (
+                self.env["res.field.value"]
+                .sudo_bypass_global_rules()
+                .search(
+                    [("field_code", "in", x_codes), ("company_id", "=", company_id)]
+                )
             ):
                 record = val.env[val.model].browse(val.res_id)
                 if not record.custom_info_template_id:
@@ -64,7 +81,13 @@ class Field(models.Model):
                     [
                         ("model", "=", val.model),
                         ("res_id", "=", val.res_id),
-                        ("property_id", "=", template.property_ids.filtered(lambda p: p.code == val.field_code).id),
+                        (
+                            "property_id",
+                            "=",
+                            template.property_ids.filtered(
+                                lambda p: p.code == val.field_code
+                            ).id,
+                        ),
                     ]
                 )
                 custom_info_value.ensure_one()

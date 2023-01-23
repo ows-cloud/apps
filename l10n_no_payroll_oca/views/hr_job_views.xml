@@ -1,5 +1,5 @@
 <odoo>
-    <record id="hr_job_form" model="ir.ui.view">
+    <record id="hr_job_view_form" model="ir.ui.view">
         <field name="name">hr.job.form Norway</field>
         <field name="model">hr.job</field>
         <field name="inherit_id" ref="hr.view_hr_job_form" />
