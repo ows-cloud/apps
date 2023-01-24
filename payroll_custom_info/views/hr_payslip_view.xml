@@ -3,8 +3,8 @@
         <field name="model">hr.payslip</field>
         <field name="inherit_id" ref="payroll.hr_payslip_view_form" />
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='input_line_ids']" position="after">
-                <group name="custom_info">
+            <xpath expr="//separator[@name='worked']" position="before">
+                <group name="custom_info" string="Custom Information">
                     <group>
                         <field
                             name="custom_info_template_id"
