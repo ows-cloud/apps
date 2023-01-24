@@ -26,10 +26,10 @@ class TestNoPayrollBase(TransactionCase):
                 "l10n_no_aga_fp_konto": self.env.ref("l10n_no_oca.account_5405").id,
                 "l10n_no_aga_fp_motkonto": self.env.ref("l10n_no_oca.account_2785").id,
                 "l10n_no_loennsart_fp_i_aar": self.env.ref(
-                    "l10n_no_payroll_oca.rule_fp_i_aar"
+                    "l10n_no_payroll.rule_fp_i_aar"
                 ).id,
                 "l10n_no_loennsart_fp_i_fjor": self.env.ref(
-                    "l10n_no_payroll_oca.rule_fp_i_fjor"
+                    "l10n_no_payroll.rule_fp_i_fjor"
                 ).id,
             }
         )
@@ -63,7 +63,7 @@ class TestNoPayrollBase(TransactionCase):
                     "name": "Test contract for {}".format(self.employee.name),
                     "employee_id": self.employee.id,
                     "job_id": self.job.id,
-                    "struct_id": self.env.ref("l10n_no_payroll_oca.structure_no").id,
+                    "struct_id": self.env.ref("l10n_no_payroll.structure_no").id,
                     "date_start": datetime(2023, 1, 1).date(),
                     "date_end": datetime(2023, 12, 31).date(),
                     "wage": 0,

@@ -31,7 +31,7 @@ class TestNoPayroll(TestNoPayrollBase):
                     "contract_id": self.contract.id,
                     "date_from": datetime(2023, 1, 1).date(),
                     "date_to": datetime(2023, 1, 31).date(),
-                    "struct_id": self.env.ref("l10n_no_payroll_oca.structure_no").id,
+                    "struct_id": self.env.ref("l10n_no_payroll.structure_no").id,
                 },
             ]
         )
