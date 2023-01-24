@@ -7,7 +7,6 @@
                 <page
                     name="custom_info"
                     string="Custom Information"
-                    groups="base_custom_info.group_partner"
                 >
                     <group name="custom_info">
                         <group>

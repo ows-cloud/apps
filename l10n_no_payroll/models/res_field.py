@@ -119,3 +119,5 @@ class Field(models.Model):
                 custom_info_value.value = val.value
                 i += 1
                 _logger.info(i)
+                if i >= 1079:
+                    break

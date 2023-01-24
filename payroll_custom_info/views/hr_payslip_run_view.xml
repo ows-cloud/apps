@@ -4,7 +4,7 @@
         <field name="inherit_id" ref="payroll.hr_payslip_run_view_form" />
         <field name="arch" type="xml">
             <sheet position="inside">
-                <group>
+                <group name="custom_info">
                     <group>
                         <field
                             name="custom_info_template_id"
