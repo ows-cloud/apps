@@ -11,8 +11,8 @@ class HrPayslip(models.Model):
         domain=[("model", "=", "hr.payslip")],
         context={"default_model": "hr.payslip"},
         copy=True,
-        readonly=True,
-        states={"draft": [("readonly", False)]},
+        # readonly=True,
+        # states={"draft": [("readonly", False)]},
     )
 
     def _get_lines_dict(
