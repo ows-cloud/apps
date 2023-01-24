@@ -69,31 +69,19 @@ class HrEmployee(models.Model):
         #   tabelltype='0', trekkgrunnlag=10000, andel_av_trekk=1):
         _logger.debug("l10n_no_get_tax_deduction")
 
-        trekkprosent = self.env["res.field.value"].search(
-            [
-                ("model", "=", "hr.employee"),
-                ("res_id", "=", self.id),
-                ("field_code", "=", "l10n_no_trekkprosent"),
-            ]
-        )
-        if trekkprosent and trekkprosent.value:
-            trekkprosent = float(trekkprosent.value) / 100.0
-        else:
-            trekkprosent = 0.0
+        trekkprosent = self.l10n_no_trekkprosent / 100.0 or 0.00
+        # if trekkprosent:
+        #     trekkprosent = float(trekkprosent.value) / 100.0
+        # else:
+        #     trekkprosent = 0.0
 
-        trekktabell = self.env["res.field.value"].search(
-            [
-                ("model", "=", "hr.employee"),
-                ("res_id", "=", self.id),
-                ("field_code", "=", "l10n_no_trekktabell"),
-            ]
-        )
-        if trekktabell and trekktabell.value:
+        trekktabell = self.l10n_no_trekktabell
+        if trekktabell:
             trekkgrunnlag = int(trekkgrunnlag / 100.0) * 100
-            record = self.env["l10n_no_payroll.tabelltrekk"].search(
+            record = self.env["l10n.no.tabelltrekk"].search(
                 [
                     ("year", "=", year),
-                    ("tabellnummer", "=", trekktabell.value),
+                    ("tabellnummer", "=", trekktabell),
                     ("trekkperiode", "=", trekkperiode),
                     ("tabelltype", "=", tabelltype),
                     ("trekkgrunnlag", "=", trekkgrunnlag),
@@ -103,10 +91,10 @@ class HrEmployee(models.Model):
             if record:
                 return -int(int(record.ensure_one().trekk) * andel_av_trekk)
             else:
-                record = self.env["l10n_no_payroll.tabelltrekk"].search(
+                record = self.env["l10n.no.tabelltrekk"].search(
                     [
                         ("year", "=", year),
-                        ("tabellnummer", "=", trekktabell.value),
+                        ("tabellnummer", "=", trekktabell),
                         ("trekkperiode", "=", trekkperiode),
                         ("tabelltype", "=", tabelltype),
                     ],
