@@ -14,6 +14,14 @@
                         <field name="l10n_no_aga_fp_motkonto" />
                         <field name="l10n_no_loennsart_fp_i_aar" />
                         <field name="l10n_no_loennsart_fp_i_fjor" />
+                        <field name="l10n_no_virksomhet" />
+                        <field name="l10n_no_pensjonsinnretning" />
+                        <field name="l10n_no_fp_prosent_senior" />
+                        <field name="l10n_no_fp_prosent" />
+                        <field name="l10n_no_Grunnlagsprosent" />
+                        <field name="l10n_no_BeregningskodeForArbeidsgiveravgift" />
+                        <field name="l10n_no_Spraak" />
+                        <field name="l10n_no_Arbeidsgiveravgiftsone" />
                     </group>
                 </page>
             </notebook>
