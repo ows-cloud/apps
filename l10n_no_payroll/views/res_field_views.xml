@@ -9,4 +9,16 @@ model.set_standard_info_in_fields()
 model.create_custom_info()
         </field>
     </record>
+    <record id="res_field_view_form" model="ir.ui.view">
+        <field name="model">res.field</field>
+        <field name="inherit_id" ref="base_field_value.view_res_field_form" />
+        <field name="arch" type="xml">
+            <form position="inside">
+                    <group name="migrate" string="Migrate">
+                        <button name="set_standard_info_in_fields" type="object" string="Set standard info in fields"  />
+                        <button name="create_custom_info" type="object" string="Create custom info" />
+                    </group>
+            </form>
+        </field>
+    </record>
 </odoo>

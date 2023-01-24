@@ -1,6 +1,10 @@
+import logging
 from collections import defaultdict
 
-from odoo import models
+from odoo import api, models
+from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 x_codes = [
     "x_month_salary",
@@ -28,15 +32,29 @@ class Field(models.Model):
                 value = val.selection_value_id.code
             else:
                 value = val.value
-            record = val.env[val.model].browse(val.res_id)
-            setattr(record, val.field_code, value)
+            record = val.env[val.model].sudo_bypass_global_rules().browse(val.res_id)
+            if record.exists():
+                new_field_name = val.field_code
+                if new_field_name == "l10n_no_profession_code":
+                    new_field_name = "l10n_no_job_code"
+                try:
+                    setattr(record.with_record_company(), new_field_name, value)
+                except:
+                    raise UserError("{} | {} | {} | {} | id {}".format(record.company_id.name, record.display_name, new_field_name, value, val.id))
 
     def create_custom_info(self):
+        i = 0
         dict_of_fields = defaultdict(lambda: [])
-        for fld in self.sudo_bypass_global_rules().search([("code", "in", x_codes)]):
+        for fld in self.sudo_bypass_global_rules().search([("code", "in", x_codes)], order="model"):
             dict_of_fields[(fld.company_id.id, fld.model)].append(fld)
         # res.field loop
         for (company_id, model), list_of_fields in dict_of_fields.items():
+            # All fields in list_of_fields should have the same company.
+            context = {key: value for key, value in self.env.context.items()}
+            context['allowed_company_ids'] = [company_id]
+            env = api.Environment(self.env.cr, self.env.uid, context, su=True)
+            base = self.env["base"].with_env(env)
+
             properties = [
                 (
                     0,
@@ -50,10 +68,10 @@ class Field(models.Model):
                 )
                 for fld in list_of_fields
             ]
-            name = "{} for {}".format(model, fld.company_id.name)
-            template = fld.env["custom.info.template"].search([("name", "=", name)])
+            name = "{} for {}".format(model, base.env.company.name)
+            template = base.env["custom.info.template"].search([("name", "=", name)])
             if not template:
-                template = fld.env["custom.info.template"].create(
+                template = base.env["custom.info.template"].create(
                     {
                         "name": name,
                         "model": model,
@@ -69,16 +87,21 @@ class Field(models.Model):
                 self.env["res.field.value"]
                 .sudo_bypass_global_rules()
                 .search(
-                    [("field_code", "in", x_codes), ("company_id", "=", company_id)]
+                    [("field_code", "in", x_codes), ("company_id", "=", company_id), ("model", "=", model)]
                 )
             ):
                 record = val.env[val.model].browse(val.res_id)
+                if not record.exists():
+                    continue
+                # record = record.sudo_bypass_global_rules()
                 if not record.custom_info_template_id:
                     record.custom_info_template_id = template.id
                     # Create custom.info.value records
+                    record = record.with_company(record.company_id)
                     record._onchange_custom_info_template_id()
-                custom_info_value = val.env["custom.info.value"].search(
+                custom_info_value = record.env["custom.info.value"].search(
                     [
+                        ("company_id", "=", val.company_id.id),
                         ("model", "=", val.model),
                         ("res_id", "=", val.res_id),
                         (
@@ -90,5 +113,9 @@ class Field(models.Model):
                         ),
                     ]
                 )
+                # if sum([1 for record in custom_info_value]) != 1:
+                #     will = "debug"
                 custom_info_value.ensure_one()
                 custom_info_value.value = val.value
+                i += 1
+                _logger.info(i)
