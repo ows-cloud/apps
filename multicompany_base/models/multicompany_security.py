@@ -94,7 +94,8 @@ NO_EDIT_MODEL = [
     # APPS
     "account.payment.method",
     "account.tax.group",
-    "l10n_no_payroll.tabelltrekk",
+    "l10n.no.tabelltrekk",
+    "l10n.no.job.code",
     "mail.activity.type",
     "payment.icon",
     "report.layout",

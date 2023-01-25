@@ -459,11 +459,7 @@ class AmeldingLogikk:
         p.startdato = leave.date_from.strftime("%Y-%m-%d")
         p.sluttdato = leave.date_to.strftime("%Y-%m-%d")
         p.permisjonsprosent = leave.percent
-        if not leave.l10n_no_permisjon:
-            leave.l10n_no_permisjon = leave.env["ir.sequence"].next_by_code(
-                "l10n_no_payroll.permisjon"
-            )
-        p.permisjonId = leave.l10n_no_permisjon
+        p.permisjonId = str(leave.id)
         p.beskrivelse = self._get(
             leave.holiday_status_id, "l10n_no_PermisjonsOgPermitteringsBeskrivelse"
         )
