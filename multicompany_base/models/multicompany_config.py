@@ -221,23 +221,15 @@ class MulticompanyConfig(models.AbstractModel):
                 "perm_unlink": 1,
             },
         )
-        payroll_user_rule = self._set_record_values(
-            "ir.rule",
-            [
-                ("name", "=", "Contract Department Manager"),
-                ("model_id", "=", _id(_ref("payroll.model_hr_payslip"))),
-                ("groups", "in", _id(_ref("payroll.group_payroll_user"))),
-            ],
+        _set(
+            _ref("payroll.hr_payroll_rule_officer"),
             {
-                "name": "Contract Department Manager",
-                "model_id": _id(_ref("payroll.model_hr_payslip")),
-                "groups": [(4, _id(_ref('payroll.group_payroll_user')))],
-                "domain_force": "['|', ('contract_id.department_id', '=', False), ('contract_id.department_id.manager_id.user_id', '=', user.id)]",
-                "perm_read": 1,
-                "perm_write": 1,
-                "perm_create": 1,
-                "perm_unlink": 1,
-            },
+                "domain_force": """[
+                '|',
+                ('employee_id.department_id.manager_id.user_id', '=', user.id),
+                ('contract_id.department_id.manager_id.user_id', '=', user.id),
+                ]"""
+            }
         )
         _set(
             _ref("payroll.group_payroll_user"),

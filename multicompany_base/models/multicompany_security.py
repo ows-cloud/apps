@@ -50,6 +50,7 @@ COMPANY_READ_SYSTEM_MODEL = [
     "mis.report.kpi.expression",
     "mis.report.style",
     "mis.report.subreport",
+    "py3o.template",
     "res.field",  # Will be replaced by base_custom_info
     "res.field.selection_value",  # Will be replaced by base_custom_info
     "stock.location",
