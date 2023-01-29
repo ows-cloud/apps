@@ -72,6 +72,12 @@ class MulticompanyConfig(models.AbstractModel):
             if record:
                 models.Model.write(record, values)
 
+        def _set_record_values(*args, **kwargs):
+            try:
+                return self._set_record_values(*args, **kwargs)
+            except Exception:
+                pass
+
         # Hide some security rules
         # Read the system user/partner
         # (necessary when sudo() does not bypass global rules)
@@ -160,94 +166,96 @@ class MulticompanyConfig(models.AbstractModel):
         ################################################################################
         # Contract Officer
         # TODO: Make this configuration in XML, try to load each XML record, ignore errors, new section (or demo?) in __manifest__.py
-        contract_category = _ref("base.module_category_human_resources_contracts")
-        contract_user_group = self._set_record_values(
-            "res.groups",
-            [("name", "=", "Officer"), ("category_id", "=", contract_category.id)],
-            {
-                "name": "Officer",
-                "category_id": _id(contract_category),
-                "implied_ids": [(4, _id(_ref('hr.group_hr_user')))],
-            },
-            "__ag__.group_hr_contract_user",
-        )
-        contract_user_access = self._set_record_values(
-            "ir.model.access",
-            [
-                ("model_id", "=", _id(_ref("hr_contract.model_hr_contract"))),
-                ("group_id", "=", _id(_ref("__ag__.group_hr_contract_user"))),
-            ],
-            {
-                "name": "hr.contract user",
-                "model_id": _id(_ref("hr_contract.model_hr_contract")),
-                "group_id": _id(_ref("__ag__.group_hr_contract_user")),
-                "perm_read": 1,
-                "perm_write": 1,
-                "perm_create": 1,
-                "perm_unlink": 1,
-            },
-        )
-        contract_user_rule = self._set_record_values(
-            "ir.rule",
-            [
-                ("model_id", "=", _id(_ref("hr_contract.model_hr_contract"))),
-                ("groups", "in", _id(_ref("__ag__.group_hr_contract_user"))),
-            ],
-            {
-                "name": "Department managers can access their employee contracts",
-                "model_id": _id(_ref("hr_contract.model_hr_contract")),
-                "groups": [(4, _id(_ref('__ag__.group_hr_contract_user')))],
-                "domain_force": "['|', ('department_id', '=', False), ('department_id.manager_id.user_id', '=', user.id)]",
-                "perm_read": 1,
-                "perm_write": 1,
-                "perm_create": 1,
-                "perm_unlink": 1,
-            },
-        )
-        contract_manager_rule = self._set_record_values(
-            "ir.rule",
-            [
-                ("model_id", "=", _id(_ref("hr_contract.model_hr_contract"))),
-                ("groups", "in", _id(_ref("hr_contract.group_hr_contract_manager"))),
-            ],
-            {
-                "name": "Contract managers can access all contracts",
-                "model_id": _id(_ref("hr_contract.model_hr_contract")),
-                "groups": [(4, _id(_ref('hr_contract.group_hr_contract_manager')))],
-                "domain_force": "[(1, '=', 1)]",
-                "perm_read": 1,
-                "perm_write": 1,
-                "perm_create": 1,
-                "perm_unlink": 1,
-            },
-        )
-        _set(
-            _ref("payroll.hr_payroll_rule_officer"),
-            {
-                "domain_force": """[
-                '|',
-                ('employee_id.department_id.manager_id.user_id', '=', user.id),
-                ('contract_id.department_id.manager_id.user_id', '=', user.id),
-                ]"""
-            }
-        )
-        _set(
-            _ref("payroll.group_payroll_user"),
-            {
-                "implied_ids": [
-                    (3, _id(_ref("hr_contract.group_hr_contract_manager"))),
-                    (4, _id(_ref("__ag__.group_hr_contract_user"))),
-                ]
-            }
-        )
-        _set(
-            _ref("hr_contract.group_hr_contract_manager"),
-            {
-                "implied_ids": [
-                    (4, _id(_ref("__ag__.group_hr_contract_user"))),
-                ]
-            }
-        )
+        module = self.env['ir.module.module'].search([('name', '=', 'hr_contract')])
+        if module.exists() and module.state == 'installed':
+            contract_category = _ref("base.module_category_human_resources_contracts")
+            contract_user_group = self._set_record_values(
+                "res.groups",
+                [("name", "=", "Officer"), ("category_id", "=", contract_category.id)],
+                {
+                    "name": "Officer",
+                    "category_id": _id(contract_category),
+                    "implied_ids": [(4, _id(_ref('hr.group_hr_user')))],
+                },
+                "__ag__.group_hr_contract_user",
+            )
+            contract_user_access = self._set_record_values(
+                "ir.model.access",
+                [
+                    ("model_id", "=", _id(_ref("hr_contract.model_hr_contract"))),
+                    ("group_id", "=", _id(_ref("__ag__.group_hr_contract_user"))),
+                ],
+                {
+                    "name": "hr.contract user",
+                    "model_id": _id(_ref("hr_contract.model_hr_contract")),
+                    "group_id": _id(_ref("__ag__.group_hr_contract_user")),
+                    "perm_read": 1,
+                    "perm_write": 1,
+                    "perm_create": 1,
+                    "perm_unlink": 1,
+                },
+            )
+            contract_user_rule = self._set_record_values(
+                "ir.rule",
+                [
+                    ("model_id", "=", _id(_ref("hr_contract.model_hr_contract"))),
+                    ("groups", "in", _id(_ref("__ag__.group_hr_contract_user"))),
+                ],
+                {
+                    "name": "Department managers can access their employee contracts",
+                    "model_id": _id(_ref("hr_contract.model_hr_contract")),
+                    "groups": [(4, _id(_ref('__ag__.group_hr_contract_user')))],
+                    "domain_force": "['|', ('department_id', '=', False), ('department_id.manager_id.user_id', '=', user.id)]",
+                    "perm_read": 1,
+                    "perm_write": 1,
+                    "perm_create": 1,
+                    "perm_unlink": 1,
+                },
+            )
+            contract_manager_rule = self._set_record_values(
+                "ir.rule",
+                [
+                    ("model_id", "=", _id(_ref("hr_contract.model_hr_contract"))),
+                    ("groups", "in", _id(_ref("hr_contract.group_hr_contract_manager"))),
+                ],
+                {
+                    "name": "Contract managers can access all contracts",
+                    "model_id": _id(_ref("hr_contract.model_hr_contract")),
+                    "groups": [(4, _id(_ref('hr_contract.group_hr_contract_manager')))],
+                    "domain_force": "[(1, '=', 1)]",
+                    "perm_read": 1,
+                    "perm_write": 1,
+                    "perm_create": 1,
+                    "perm_unlink": 1,
+                },
+            )
+            _set(
+                _ref("payroll.hr_payroll_rule_officer"),
+                {
+                    "domain_force": """[
+                    '|',
+                    ('employee_id.department_id.manager_id.user_id', '=', user.id),
+                    ('contract_id.department_id.manager_id.user_id', '=', user.id),
+                    ]"""
+                }
+            )
+            _set(
+                _ref("payroll.group_payroll_user"),
+                {
+                    "implied_ids": [
+                        (3, _id(_ref("hr_contract.group_hr_contract_manager"))),
+                        (4, _id(_ref("__ag__.group_hr_contract_user"))),
+                    ]
+                }
+            )
+            _set(
+                _ref("hr_contract.group_hr_contract_manager"),
+                {
+                    "implied_ids": [
+                        (4, _id(_ref("__ag__.group_hr_contract_user"))),
+                    ]
+                }
+            )
         ################################################################################
 
     def _configure_companies(self, companies):
