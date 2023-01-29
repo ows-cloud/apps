@@ -4,14 +4,14 @@
 {
     "name": "Survey Action",
     "summary": "Action after completed survey",
-    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
+    "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
-        "views/views.xml",
+        "views/survey_question_views.xml",
+        "views/survey_survey_views.xml",
     ],
     "depends": [
         "survey",
-        "base_technical_user",
     ],
     "development_status": "Alpha",
     "license": "AGPL-3",
