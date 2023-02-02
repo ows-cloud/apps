@@ -205,16 +205,20 @@ class AmeldingLogikk:
             bi.sumForskuddstrekk = int(
                 self.je["sumForskuddstrekk"]
             )  # integer #optional
+            self.amelding_record.sumForskuddstrekk = bi.sumForskuddstrekk
         if self.je["sumArbeidsgiveravgift"]:
             bi.sumArbeidsgiveravgift = int(
                 self.je["sumArbeidsgiveravgift"]
             )  # integer #optional
+            self.amelding_record.sumArbeidsgiveravgift = bi.sumArbeidsgiveravgift
         if self.je["sumFinansskattLoenn"]:
             bi.sumFinansskattLoenn = int(
                 self.je["sumFinansskattLoenn"]
             )  # integer #optional
+            self.amelding_record.sumFinansskattLoenn = bi.sumFinansskattLoenn
         if self.je["sumUtleggstrekk"]:
             bi.sumUtleggstrekk = int(self.je["sumUtleggstrekk"])  # integer #optional
+            self.amelding_record.sumUtleggstrekk = bi.sumUtleggstrekk
         return bi
 
     # def BetalingsinformasjonForForenkletOrdning(self):
@@ -424,7 +428,9 @@ class AmeldingLogikk:
             # permisjon
             for leave in self._get(contract, "leave_ids").sorted("date_from"):
                 newer_period = leave.date_from.date() > self.date_to
-                older_period = leave.date_to.date() < self.date_from
+                older_period = leave.date_to.date() < self.date_from - relativedelta(
+                    months=1
+                )
                 changed = leave.write_date.date() > self.date_from
                 if newer_period or (older_period and not changed):
                     continue

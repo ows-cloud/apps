@@ -33,9 +33,13 @@ class Amelding(models.Model):
         index=True,
         default=lambda self: self.env.company,
     )
-    meldingsId = fields.Integer(readonly=True)
+    meldingsId = fields.Integer(readonly=True, related="id", string="Meldingsid")
     erstatterMeldingsId = fields.Integer(readonly=True)
     kalendermaaned = fields.Char()
+    sumForskuddstrekk = fields.Integer("Sum forskuddstrekk", readonly=True)
+    sumArbeidsgiveravgift = fields.Integer("Sum arbeidsgiveravgift", readonly=True)
+    sumFinansskattLoenn = fields.Integer("Sum finansskatt lønn", readonly=True)
+    sumUtleggstrekk = fields.Integer("Sum utleggstrekk", readonly=True)
     leveringstidspunkt = fields.Datetime(readonly=True)
     state = fields.Selection([("new", "New"), ("done", "Done")], default="new")
     amelding = fields.Text(readonly=True)

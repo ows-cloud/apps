@@ -43,9 +43,6 @@ class AmeldingWizard(models.TransientModel):
             d = {}
             if record:
                 d["erstatterMeldingsId"] = record.meldingsId
-            d["meldingsId"] = self.env["ir.sequence"].next_by_code(
-                "l10n.no.amelding"
-            )
             d["kalendermaaned"] = self.kalendermaaned
             d["leveringstidspunkt"] = datetime.now()
 

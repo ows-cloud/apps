@@ -36,6 +36,10 @@
                         <field name="kalendermaaned" />
                         <field name="meldingsId" />
                         <field name="erstatterMeldingsId" />
+                        <field name="sumForskuddstrekk" />
+                        <field name="sumArbeidsgiveravgift" />
+                        <field name="sumFinansskattLoenn" />
+                        <field name="sumUtleggstrekk" />
                         <field name="leveringstidspunkt" />
                         <field name="company_id" />
                         <field name="amelding_filename" invisible="1" />
