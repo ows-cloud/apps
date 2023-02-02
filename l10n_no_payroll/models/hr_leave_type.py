@@ -9,10 +9,12 @@ class LeaveType(models.Model):
         string="PermisjonsOgPermitteringsBeskrivelse",
         sparse="json",
         selection=[
-            ("permittering", "permittering"),
-            ("permisjonMedForeldrepenger", "permisjonMedForeldrepenger"),
-            ("permisjonVedMilitaertjeneste", "permisjonVedMilitaertjeneste"),
-            ("utdanningspermisjon", "utdanningspermisjon"),
-            ("velferdspermisjon", "velferdspermisjon"),
+            ("permittering", "Permittering"),
+            ("permisjonMedForeldrepenger", "Permisjon med foreldrepenger"),
+            ("permisjonVedMilitaertjeneste", "Permisjon ved militærtjeneste"),
+            ("utdanningspermisjonLovfestet", "Utdanningspermisjon, lovfestet"),
+            ("utdanningspermisjonIkkeLovfestet", "Utdanningspermisjon, ikke lovfestet"),
+            ("andreLovfestedePermisjoner", "Andre lovfestede permisjoner"),
+            ("andreIkkeLovfestedePermisjoner", "Andre ikke lovfestede permisjoner"),
         ],
     )
