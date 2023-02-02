@@ -279,7 +279,11 @@ class AmeldingLogikk:
                 older_period = contract.date_end < self.date_from
             else:
                 older_period = False
-            changed = contract.write_date.date() > self.date_from
+            changed = (
+                contract.write_date.date() > self.date_from - relativedelta(months=1)
+                and
+                not contract.write_uid.has_group('base.group_system')
+            )
             if newer_period or (older_period and not changed):
                 continue
             af = self.Arbeidsforhold(contract)
@@ -431,7 +435,11 @@ class AmeldingLogikk:
                 older_period = leave.date_to.date() < self.date_from - relativedelta(
                     months=1
                 )
-                changed = leave.write_date.date() > self.date_from
+                changed = (
+                    leave.write_date.date() > self.date_from - relativedelta(months=1)
+                    and
+                    not leave.write_uid.has_group('base.group_system')
+                )
                 if newer_period or (older_period and not changed):
                     continue
                 p = self.Permisjon(leave)
