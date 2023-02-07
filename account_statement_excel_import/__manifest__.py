@@ -16,7 +16,6 @@
         "excel_import_hook",
     ],
     "data": [
-        "views/base_time_parameter_views.xml",
         "views/import_xlsx_wizard_views.xml",
     ],
     "installable": True,
