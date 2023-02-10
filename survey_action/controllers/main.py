@@ -19,7 +19,7 @@ class Survey2(Survey):
                     action.with_context(
                         active_id=answer_sudo.id,
                         active_model="survey.user_input",
-                        website_id=request.website.id,
+                        # website_id=request.website.id, # depends on website module
                     )
                     .run()
                 )

@@ -6,15 +6,20 @@
         <field name="inherit_id" ref="survey.survey_form" />
         <field name="priority" eval="20" />
         <field name="arch" type="xml">
-            <xpath expr="//notebook" position="inside">
-                <page string="Server Action" name="server_action">
-                    <group>
+            <data>
+                <xpath expr="//notebook" position="inside">
+                    <page string="Server Action" name="server_action">
                         <group>
-                            <field name="server_action_id" />
+                            <group>
+                                <field name="server_action_id" />
+                            </group>
                         </group>
-                    </group>
-                </page>
-            </xpath>
+                    </page>
+                </xpath>
+                <xpath expr="//tree/field[@name='title']" position="before">
+                    <field name="code" optional="hide" />
+                </xpath>
+            </data>
         </field>
     </record>
 </odoo>

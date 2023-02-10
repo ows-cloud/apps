@@ -17,4 +17,15 @@
             </xpath>
         </field>
     </record>
+    <record id="survey_question_view_tree_code" model="ir.ui.view">
+        <field name="name">survey.question.tree with code</field>
+        <field name="model">survey.question</field>
+        <field name="inherit_id" ref="survey.survey_question_tree" />
+        <field name="priority" eval="20" />
+        <field name="arch" type="xml">
+            <field name="title" position="before">
+                <field name="code" optional="hide" />
+            </field>
+        </field>
+    </record>
 </odoo>
