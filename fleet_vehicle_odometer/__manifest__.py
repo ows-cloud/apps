@@ -8,7 +8,7 @@
     "auto_install": True,
     "category": "Administration",
     "data": [
-        "views.xml",
+        "views/views.xml",
     ],
     "depends": [
         "analytic",
