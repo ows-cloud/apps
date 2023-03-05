@@ -15,6 +15,12 @@ class FleetVehicleOdometer(models.Model):
     )
     comment = fields.Char("Comment")
     distance = fields.Integer("Distance")
+    value_int = fields.Integer("Odometer")
+
+    @api.onchange("value_int")
+    def _onchange_set_value(self):
+        for record in self:
+            record.value = float(record.value_int)
 
     def unlink(self):
         self._recompute_distance_before_unlink()
