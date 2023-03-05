@@ -49,18 +49,30 @@ class FleetVehicleOdometer(models.Model):
                 next.distance = None
 
     def _recompute_distance_before_create(self, values):
-        prev = self._get_record("prev")
-        next = self._get_record("next")
-        self.check_date(values, prev, next)
-        self.set_distance(values, prev, next)
+        prev = self._get_record("prev", values)
+        next = self._get_record("next", values)
+        self._check_date(prev, next, values)
+        self._set_distance(prev, next, values)
 
-    def _check_date(self, values, prev, next):
-        if prev and prev.date > values["date"]:
-            raise UserError(_("Date should not be lower than %s.") % str(prev.date))
-        if next and next.date < values["date"]:
-            raise UserError(_("Date should not be higher than %s.") % str(next.date))
+    def _check_date(self, prev, next, values):
+        value = values.get("value") or self.value
+        date = values["date"]
+        if type(date) is str:
+            date = datetime.strptime(date, "%Y-%m-%d").date()
+        if prev and prev.date > date:
+            raise UserError(
+                _("Date should not be lower than {} for odometer value {}.").format(
+                    str(prev.date), str(value)
+                )
+            )
+        if next and next.date < date:
+            raise UserError(
+                _("Date should not be higher than {} for odometer value {}.").format(
+                    str(next.date), str(value)
+                )
+            )
 
-    def set_distance(self, values, prev, next):
+    def _set_distance(self, prev, next, values):
         if prev:
             values["distance"] = values["value"] - prev.value
         else:
@@ -93,12 +105,13 @@ class FleetVehicleOdometer(models.Model):
 
         sign = {"prev": "<", "next": ">"}
         order = {"prev": "value desc", "next": "value"}
+        id = self.ids[0] if self.ids and type(self.ids[0]) is int else 0
 
         return self.search(
             [
                 ("vehicle_id", "=", _get("vehicle_id")),
                 ("value", sign[which], _get("value")),
-                ("id", "!=", self.id),
+                ("id", "!=", id),
             ],
             order=order[which],
             limit=1,
