@@ -54,7 +54,7 @@ class Base(models.AbstractModel):
             if not rec_model:
                 rec_model = RecModel.create(
                     {
-                        "name": account.name,
+                        "name": account.display_name,
                         "rule_type": "writeoff_suggestion",
                         "match_account_id": account.id,
                         "sequence": 100,
