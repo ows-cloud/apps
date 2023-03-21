@@ -316,18 +316,6 @@ class AmeldingLogikk:
                 elif rule_type == "forskuddstrekk":
                     ft = self.Forskuddstrekk(line, rule)
                     im.forskuddstrekk.append(ft)
-                else:
-                    # aga av pensjon og refusjon sykepenger er ikke tilknyttet noen regeltype. All aga av inntekt er av typen "inntekt og godtgjoerelser".
-                    navn = {
-                        "loennOgGodtgjoerelse": "avgiftsgrunnlagBeloep",
-                        "tilskuddOgPremieTilPensjon": "avgiftsgrunnlagBeloepPensjon",
-                        "fradragIGrunnlagetForSone": "avgiftsfradragBeloep",
-                    }
-                    beregnAga = self._get(rule, "l10n_no_BeregnAga")
-                    if beregnAga:
-                        self.aga[navn[beregnAga]] += self._get(line, "total")
-                    else:
-                        _debug("ERROR: payslip line rule_type = " + str(rule_type))
 
         # im.sjoefolksrelatertInformasjon = self.SjoefolksrelatertInformasjon()
         # # oppholdPaaSvalbardJanMayenOgBilandene
