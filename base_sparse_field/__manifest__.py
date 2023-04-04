@@ -10,5 +10,6 @@
         "views/views.xml",
     ],
     "license": "LGPL-3",
+    "maintainers": ["appstogrow"],
     "website": "https://github.com/appstogrow/apps",
 }

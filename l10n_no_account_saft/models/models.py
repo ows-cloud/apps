@@ -206,7 +206,7 @@ class AuditFile:
         h.AuditFileDateCreated = datetime.now()
         h.SoftwareCompanyName = "Norske Apps2GROW AS"
         h.SoftwareID = "Odoo"
-        h.SoftwareVersion = "12.0"
+        h.SoftwareVersion = "14.0"
         h.Company = self.Company()
         h.DefaultCurrencyCode = "NOK"
         h.SelectionCriteria = saft.SelectionCriteriaStructure()
@@ -257,8 +257,8 @@ class AuditFile:
 
         # customers
 
-        receivable_accounts = self.company.env["account.account"].filtered(
-            lambda r: r.user_type_id.type == "receivable"
+        receivable_accounts = self.company.env["account.account"].search(
+            [("internal_type", "=", "receivable")]
         )
         opening_balance_records = line_obj.read_group(
             domain=[
@@ -284,8 +284,9 @@ class AuditFile:
         }
 
         mf.Customers = saft.CustomersType()
-        for customer in self.company.env["res.partner"].search(
-            [("customer", "=", True), ("parent_id", "=", False)]
+
+        for customer in self.company.env["res.partner"].browse(
+            [d["partner_id"][0] for d in closing_balance_records]
         ):
             mf.Customers.add_Customer(
                 self.Customer(
@@ -297,8 +298,8 @@ class AuditFile:
 
         # suppliers
 
-        payable_accounts = self.company.env["account.account"].filtered(
-            lambda r: r.user_type_id.type == "payable"
+        payable_accounts = self.company.env["account.account"].search(
+            [("internal_type", "=", "payable")]
         )
         opening_balance_records = line_obj.read_group(
             domain=[
@@ -324,10 +325,9 @@ class AuditFile:
         }
 
         mf.Suppliers = saft.SuppliersType()
-        for supplier in (
-            self.company.env["res.partner"]
-            .browse()
-            .search([("supplier", "=", True), ("parent_id", "=", False)])
+
+        for supplier in self.company.env["res.partner"].browse(
+            [d["partner_id"][0] for d in closing_balance_records]
         ):
             mf.Suppliers.add_Supplier(
                 self.Supplier(

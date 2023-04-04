@@ -8,13 +8,14 @@
     "auto_install": True,
     "category": "Administration",
     "data": [
-        "views.xml",
+        "views/fleet_vehicle_odometer.xml",
     ],
     "depends": [
         "analytic",
         "fleet",
     ],
     "license": "AGPL-3",
+    "maintainers": ["appstogrow"],
     "version": "14.0.1.0.0",
     "website": "https://github.com/appstogrow/apps",
 }

@@ -6,12 +6,15 @@
     "summary": "",
     "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Accounting",
-    "data": [],
+    "data": [
+        "views/base_time_parameter_views.xml",
+    ],
     "depends": [
         "account",
         "base_time_parameter",
     ],
     "license": "AGPL-3",
-    "version": "14.0.1.0.0",
+    "maintainers": ["appstogrow"],
+    "version": "14.0.2.0.0",
     "website": "https://github.com/appstogrow/apps",
 }

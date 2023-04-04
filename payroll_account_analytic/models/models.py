@@ -90,40 +90,10 @@ class HrPayslip(models.Model):
                 )
 
         # TODO: Move to l10n_no_payroll
-        loennsart_fp_i_aar = (
-            self.env["res.field.value"]
-            .search(
-                [
-                    ("model", "=", "res.company"),
-                    (
-                        "field_id",
-                        "=",
-                        self.env.ref(
-                            "l10n_no_payroll.res_field_l10n_no_loennsart_fp_i_aar"
-                        ).id,
-                    ),
-                ]
-            )
-            .ensure_one()
-            .reference_value
-        )
-        loennsart_fp_i_fjor = (
-            self.env["res.field.value"]
-            .search(
-                [
-                    ("model", "=", "res.company"),
-                    (
-                        "field_id",
-                        "=",
-                        self.env.ref(
-                            "l10n_no_payroll.res_field_l10n_no_loennsart_fp_i_fjor"
-                        ).id,
-                    ),
-                ]
-            )
-            .ensure_one()
-            .reference_value
-        )
+        company = self.env.company
+        aga = float(company.l10n_no_Grunnlagsprosent) / 100.0
+        fp = company.l10n_no_fp_prosent / 100.0
+        fp_senior = company.l10n_no_fp_prosent_senior / 100.0
 
         # create one account.move per journal/month
         # update payslip.move_id & payslip.date
@@ -219,82 +189,40 @@ class HrPayslip(models.Model):
 
                     if self.env.company.partner_id.country_id.code == "NO":
                         # TODO: move to a method in l10n_no_payroll; call the method from here (depends on def _add)
-                        c_field = {}
-                        c_records = self.env.company.field_value_hr_ids
-                        for c_record in c_records:
-                            if c_record.selection_value_id:
-                                c_field[
-                                    c_record.field_code
-                                ] = c_record.selection_value_id.code
-                            elif c_record.reference_value:
-                                c_field[c_record.field_code] = c_record.reference_value
-                            elif c_record.value:
-                                c_field[c_record.field_code] = c_record.value
 
-                        aga = float(c_field["l10n_no_Grunnlagsprosent"]) / 100.0
-                        fp = float(c_field["l10n_no_fp_prosent"]) / 100.0
-                        fp_senior = float(c_field["l10n_no_fp_prosent_senior"]) / 100.0
-
-                        beregn_aga = line.salary_rule_id.field_value_ids.filtered(
-                            lambda x: x.field_code == "l10n_no_BeregnAga"
-                        )
-                        if beregn_aga:
-                            beregn_aga = beregn_aga.selection_value_id
-
-                        beregn_fp = line.salary_rule_id.field_value_ids.filtered(
-                            lambda x: x.field_code == "l10n_no_BeregnFP"
-                        )
-                        if beregn_fp:
-                            beregn_fp = bool(
-                                beregn_fp.value
-                            ) and beregn_fp.value not in (
-                                "False",
-                                "false",
-                                "FALSE",
-                                "0",
-                            )
+                        beregn_aga = line.salary_rule_id.l10n_no_BeregnAga
+                        beregn_fp = line.salary_rule_id.l10n_no_BeregnFP
 
                         if beregn_aga:
-                            _add(amount * aga, c_field["l10n_no_aga_konto"])
-                            _add(-amount * aga, c_field["l10n_no_aga_motkonto"])
+                            _add(amount * aga, company.l10n_no_aga_konto)
+                            _add(-amount * aga, company.l10n_no_aga_motkonto)
                         if beregn_fp:
                             year = line.slip_id.date_to.year
                             birthyear = line.employee_id.birthday.year
                             if year - birthyear >= 59:
                                 fp = fp_senior
-                            _add(amount * fp, c_field["l10n_no_fp_konto"])
-                            _add(-amount * fp, c_field["l10n_no_fp_motkonto"])
-                            _add(amount * aga * fp, c_field["l10n_no_aga_fp_konto"])
-                            _add(-amount * aga * fp, c_field["l10n_no_aga_fp_motkonto"])
+                            _add(amount * fp, company.l10n_no_fp_konto)
+                            _add(-amount * fp, company.l10n_no_fp_motkonto)
+                            _add(amount * aga * fp, company.l10n_no_aga_fp_konto)
+                            _add(-amount * aga * fp, company.l10n_no_aga_fp_motkonto)
 
                         if line.salary_rule_id in (
-                            loennsart_fp_i_aar,
-                            loennsart_fp_i_fjor,
+                            company.l10n_no_loennsart_fp_i_aar,
+                            company.l10n_no_loennsart_fp_i_fjor,
                         ):
-                            _add(-amount * aga, c_field["l10n_no_aga_fp_konto"])
-                            _add(amount * aga, c_field["l10n_no_aga_fp_motkonto"])
+                            _add(-amount * aga, company.l10n_no_aga_fp_konto)
+                            _add(amount * aga, company.l10n_no_aga_fp_motkonto)
 
             if not float_is_zero(total, precision_digits=precision):
                 acc_journal = self.env["account.journal"].browse(group["journal_id"])
-                acc_id = None
-                if total > 0:
-                    acc_id = acc_journal.default_account_id.id
-                    if not acc_id:
-                        raise UserError(
-                            _(
-                                'The Expense Journal "%s" has not properly configured the Default Account!'
-                            )
-                            % (acc_journal.name)
+                acc_id = acc_journal.default_account_id.id
+                if not acc_id:
+                    raise UserError(
+                        _(
+                            'The Expense Journal "%s" has not properly configured the Default Account!'
                         )
-                elif total < 0:
-                    acc_id = acc_journal.default_account_id.id
-                    if not acc_id:
-                        raise UserError(
-                            _(
-                                'The Expense Journal "%s" has not properly configured the Default Account!'
-                            )
-                            % (acc_journal.name)
-                        )
+                        % (acc_journal.name)
+                    )
                 account_move_lines.append(
                     {
                         "name": name,
@@ -327,132 +255,6 @@ class HrPayslip(models.Model):
         for slip in self:
             slip.write({"state": "done"})
         return account_moves
-
-    # DEPRECATED, use confirm_payslip_accounting()
-
-    # TODO: Create pull request in Odoo, later take away this code
-    # + contract_analytic_account_id = None
-    # + if slip.contract_id and slip.contract_id.analytic_account_id:
-    # +     contract_analytic_account_id = slip.contract_id.analytic_account_id.id
-    # - (2x) 'analytic_account_id': line.salary_rule_id.analytic_account_id.id,
-    # + (2x) 'analytic_account_id': line.salary_rule_id.analytic_account_id.id or contract_analytic_account_id,
-    # + return self.write({'state': 'done'})
+    
     def action_payslip_done(self):
-        precision = self.env["decimal.precision"].precision_get("Payroll")
-
-        for slip in self:
-            line_ids = []
-            debit_sum = 0.0
-            credit_sum = 0.0
-            date = slip.date or slip.date_to
-
-            name = _("Payslip of %s") % (slip.employee_id.name)
-            contract_analytic_account_id = None
-            if slip.contract_id and slip.contract_id.analytic_account_id:
-                contract_analytic_account_id = slip.contract_id.analytic_account_id.id
-            move_dict = {
-                "narration": name,
-                "ref": slip.number,
-                "journal_id": slip.journal_id.id,
-                "date": date,
-            }
-            for line in slip.line_ids:
-                amount = slip.credit_note and -line.total or line.total
-                if float_is_zero(amount, precision_digits=precision):
-                    continue
-                debit_account_id = line.salary_rule_id.account_debit.id
-                credit_account_id = line.salary_rule_id.account_credit.id
-
-                if debit_account_id:
-                    debit_line = (
-                        0,
-                        0,
-                        {
-                            "name": line.name,
-                            "partner_id": line._get_partner_id(credit_account=False),
-                            "account_id": debit_account_id,
-                            "journal_id": slip.journal_id.id,
-                            "date": date,
-                            "debit": amount > 0.0 and amount or 0.0,
-                            "credit": amount < 0.0 and -amount or 0.0,
-                            "analytic_account_id": line.salary_rule_id.analytic_account_id.id
-                            or contract_analytic_account_id,
-                            "tax_line_id": line.salary_rule_id.account_tax_id.id,
-                        },
-                    )
-                    line_ids.append(debit_line)
-                    debit_sum += debit_line[2]["debit"] - debit_line[2]["credit"]
-
-                if credit_account_id:
-                    credit_line = (
-                        0,
-                        0,
-                        {
-                            "name": line.name,
-                            "partner_id": line._get_partner_id(credit_account=True),
-                            "account_id": credit_account_id,
-                            "journal_id": slip.journal_id.id,
-                            "date": date,
-                            "debit": amount < 0.0 and -amount or 0.0,
-                            "credit": amount > 0.0 and amount or 0.0,
-                            "analytic_account_id": line.salary_rule_id.analytic_account_id.id
-                            or contract_analytic_account_id,
-                            "tax_line_id": line.salary_rule_id.account_tax_id.id,
-                        },
-                    )
-                    line_ids.append(credit_line)
-                    credit_sum += credit_line[2]["credit"] - credit_line[2]["debit"]
-
-            if float_compare(credit_sum, debit_sum, precision_digits=precision) == -1:
-                acc_id = slip.journal_id.default_account_id.id
-                if not acc_id:
-                    raise UserError(
-                        _(
-                            'The Expense Journal "%s" has not properly configured the Default Account!'
-                        )
-                        % (slip.journal_id.name)
-                    )
-                adjust_credit = (
-                    0,
-                    0,
-                    {
-                        "name": _("Adjustment Entry"),
-                        "partner_id": False,
-                        "account_id": acc_id,
-                        "journal_id": slip.journal_id.id,
-                        "date": date,
-                        "debit": 0.0,
-                        "credit": debit_sum - credit_sum,
-                    },
-                )
-                line_ids.append(adjust_credit)
-
-            elif float_compare(debit_sum, credit_sum, precision_digits=precision) == -1:
-                acc_id = slip.journal_id.default_account_id.id
-                if not acc_id:
-                    raise UserError(
-                        _(
-                            'The Expense Journal "%s" has not properly configured the Default Account!'
-                        )
-                        % (slip.journal_id.name)
-                    )
-                adjust_debit = (
-                    0,
-                    0,
-                    {
-                        "name": _("Adjustment Entry"),
-                        "partner_id": False,
-                        "account_id": acc_id,
-                        "journal_id": slip.journal_id.id,
-                        "date": date,
-                        "debit": credit_sum - debit_sum,
-                        "credit": 0.0,
-                    },
-                )
-                line_ids.append(adjust_debit)
-            move_dict["line_ids"] = line_ids
-            move = self.env["account.move"].create(move_dict)
-            slip.write({"move_id": move.id, "date": date})
-            move.post()
-
-        return self.write({"state": "done"})
+        return self.confirm_payslip_accounting()

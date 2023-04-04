@@ -5,33 +5,6 @@ class HrContract(models.Model):
     _inherit = "hr.contract"
 
     leave_ids = fields.One2many("hr.leave", "contract_id", string="Leaves")
-    l10n_no_arbeidsforhold = fields.Char(help="A-melding: ArbeidsforholdId")
-    l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer = fields.Float(
-        compute="_compute_l10n_no_fields"
-    )
-    l10n_no_stillingsprosent = fields.Float(compute="_compute_l10n_no_fields")
-
-    def _compute_l10n_no_fields(self):
-        for record in self:
-            record.l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer = float(
-                record.field_value_ids.filtered(
-                    lambda x: x.field_code
-                    == "l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer"
-                ).value
-            )
-            record.l10n_no_stillingsprosent = float(
-                record.field_value_ids.filtered(
-                    lambda x: x.field_code == "l10n_no_stillingsprosent"
-                ).value
-            )
-
-    def copy(self, default=None):
-        default = dict(default or {})
-        if self.l10n_no_arbeidsforhold:
-            default["l10n_no_arbeidsforhold"] = self.env["ir.sequence"].next_by_code(
-                "l10n_no_payroll.arbeidsforhold"
-            )
-        return super(HrContract, self).copy(default)
 
     def l10n_no_action_new_leave(self):
         self.ensure_one()
@@ -42,3 +15,58 @@ class HrContract(models.Model):
             "context": "{'default_employee_id': %d,'default_contract_id': %d}"
             % (self.employee_id.id, self.id),
         }
+
+    json = fields.Serialized()
+    l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer = fields.Float(
+        "Antall timer per uke som en full stilling tilsvarer", sparse="json"
+    )
+    l10n_no_Arbeidsforholdtype = fields.Selection(
+        string="Type arbeidsforhold",
+        sparse="json",
+        selection=[
+            ("frilanserOppdragstakerHonorarPersonerMm", "frilanserOppdragstakerHonorarPersonerMm"),
+            ("maritimtArbeidsforhold", "maritimtArbeidsforhold"),
+            ("ordinaertArbeidsforhold", "ordinaertArbeidsforhold"),
+            ("pensjonOgAndreTyperYtelserUtenAnsettelsesforhold", "pensjonOgAndreTyperYtelserUtenAnsettelsesforhold"),
+        ],
+    )
+    l10n_no_Arbeidstidsordning = fields.Selection(
+        string="Arbeidstidsordning",
+        sparse="json",
+        selection=[
+            ("offshore336", "offshore336"),
+            ("doegnkontinuerligSkiftOgTurnus355", "doegnkontinuerligSkiftOgTurnus355"),
+            ("helkontinuerligSkiftOgAndreOrdninger336", "helkontinuerligSkiftOgAndreOrdninger336"),
+            ("ikkeSkift", "ikkeSkift"),
+            ("skift365", "skift365"),
+        ],
+    )
+    l10n_no_FormForAnsettelse = fields.Selection(
+        string="Form for ansettelse",
+        sparse="json",
+        selection=[
+            ("fast", "Fast ansettelse"),
+            ("midlertidig", "Midlertidig ansettelse"),
+        ],
+    )
+    l10n_no_loennsansiennitet = fields.Date("Dato for lønnsansiennitet", sparse="json")
+    l10n_no_loennstrinn = fields.Char("Loennstrinn", sparse="json")
+    l10n_no_sisteDatoForStillingsprosentendring = fields.Date(
+        "Dato for siste stillingsprosentendring", sparse="json"
+    )
+    l10n_no_sisteLoennsendringsdato = fields.Date(
+        "Dato for siste lønnsendring", sparse="json"
+    )
+    l10n_no_stillingsprosent = fields.Float("Stillingsprosent", sparse="json")
+    l10n_no_AarsakTilSluttdato = fields.Selection(
+        string="Årsak til sluttdato",
+        sparse="json",
+        selection=[
+            ("arbeidsforholdetSkulleAldriVaertRapportert", "Arbeidsforholdet skulle aldri vært rapportert"),
+            ("arbeidsgiverHarSagtOppArbeidstaker", "Arbeidsgiver har sagt opp arbeidstaker"),
+            ("arbeidstakerHarSagtOppSelv", "Arbeidstaker har sagt opp selv"),
+            ("byttetLoenssystemEllerRegnskapsfoerer", "Byttet lønnssystem eller regnskapsfører"),
+            ("endringIOrganisasjonsstrukturEllerByttetJobbInternt", "Endring i organisasjonsstruktur eller byttet jobb internt"),
+            ("kontraktEngasjementEllerVikariatErUtloept", "Kontrakt, engasjement eller vikariat er utløpt"),
+        ],
+    )

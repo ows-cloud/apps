@@ -38,7 +38,7 @@ class Base(models.AbstractModel):
     def _excel_post_import_time_parameter(self):
         # Replace label keyword with time-related value.
         # If time-related account:
-        # - Set counterpart_account_id.
+        # - Set account_id.
         # - Create a reconciliation model for the account if it doesn't exist.
 
         def create_rec_model_if_not_exists(account):
@@ -46,7 +46,7 @@ class Base(models.AbstractModel):
             rec_model = RecModel.search(
                 [
                     ("rule_type", "=", "writeoff_suggestion"),
-                    ("match_counterpart_account_id", "=", account.id),
+                    ("match_account_id", "=", account.id),
                 ]
             )
             if len(rec_model) == 1 and rec_model.name != account.name:
@@ -54,15 +54,17 @@ class Base(models.AbstractModel):
             if not rec_model:
                 rec_model = RecModel.create(
                     {
-                        "name": account.name,
+                        "name": account.display_name,
                         "rule_type": "writeoff_suggestion",
-                        "match_counterpart_account_id": account.id,
+                        "match_account_id": account.id,
                         "sequence": 100,
                     }
                 )
                 rec_model.set_counterpart_line()
 
-        model_id = self.env.ref("account.model_account_bank_statement_line").id
+        # Incoming emails may use time parameters to create account.move with lines.
+        # The same time parameters may be used for statement lines.
+        model_id = self.env.ref("account.model_account_move").id
         params = self.env["base.time.parameter"].search([("model_id", "=", model_id)])
         for line in self:
             for param in params:
@@ -77,9 +79,9 @@ class Base(models.AbstractModel):
                 if not value:
                     continue
                 elif isinstance(value, type(self.env["account.account"])):
-                    line.counterpart_account_id = value
-                    value = line.counterpart_account_id.name
+                    line.account_id = value
+                    value = line.account_id.name
                     # Create a reconciliation model
-                    create_rec_model_if_not_exists(line.counterpart_account_id)
+                    create_rec_model_if_not_exists(line.account_id)
 
                 line.payment_ref = line.payment_ref.replace(key, value)

@@ -1,4 +1,4 @@
-# Copyright 2019 AppsToGROW - Henrik Norlin
+# Copyright 2019-2023 AppsToGROW - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
@@ -8,20 +8,40 @@
     "category": "Localization",
     "data": [
         "security/ir.model.access.csv",
-        "views/views.xml",
-        "data/res.field.csv",
-        "data/res.field.selection_value.csv",
-        "execute_functions.xml",
+        "views/hr_contract_views.xml",
+        "views/hr_employee_views.xml",
+        "views/hr_job_views.xml",
+        "views/hr_leave_type_views.xml",
+        "views/hr_leave_views.xml",
+        "views/hr_payslip_views.xml",
+        "views/hr_payslip_run_views.xml",
+        "views/hr_salary_rule_views.xml",
+        "views/l10n_no_amelding_views.xml",
+        "views/l10n_no_amelding_wizard_views.xml",
+        "views/res_company_views.xml",
+        "views/menus.xml",
+        "data_old/res.field.csv",  # remove after manual migration
+        "data_old/res.field.selection_value.csv",  # remove after manual migration
+        "views/res_field_views.xml",  # remove after manual migration
     ],
     "demo": [
-        "demo/hr.salary.rule.xml",
+        # "demo/hr_contribution_register_data.xml",
+        "demo/hr_salary_rule_category_data.xml",
+        "demo/hr_salary_rule_data.xml",
+        "demo/hr_payroll_structure_data.xml",
     ],
     "depends": [
-        "hr_field_value",
+        "base_sparse_field",
+        "hr_contract_leave",
+        "hr_field_value",  # remove after manual migration
+        "l10n_no_oca",
         "payroll_account_analytic",
+        "payroll_custom_info",
     ],
     "external_dependencies": {"python": ["pyxb"]},
     "license": "AGPL-3",
-    "version": "14.0.1.0.0",
+    "maintainers": ["appstogrow"],
+    "post_init_hook": "post_init_hook",
+    "version": "14.0.2.0.0",
     "website": "https://github.com/appstogrow/apps",
 }

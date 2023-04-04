@@ -10,9 +10,23 @@
             <field name="inherit_id" ref="base.view_company_form" />
             <field name="priority" eval="20" />
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='sequence']" position="after">
-                    <field name="l10n_no_partner_donation_id" />
-                </xpath>
+                <field name="sequence" position="after">
+                    <field name="l10n_no_donation_partner_id" />
+                </field>
+            </field>
+        </record>
+
+        <!-- res.partner -->
+
+        <record model="ir.ui.view" id="view_res_partner_form">
+            <field name="name">res.partner donation</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+                <field name="category_id" position="after">
+                    <field name="donation_total" />
+                </field>
             </field>
         </record>
 
@@ -79,21 +93,21 @@
                 </form>
             </field>
         </record>
-
-        <act_window
+        <record
             id="action_l10n_no_donation_xml_wizard_form"
-            name="Norsk gaverapport XML"
-            src_model=""
-            res_model="l10n_no_donation.xml.wizard"
-            view_mode="form"
-            target="inline"
-        />
+            model="ir.actions.act_window"
+        >
+            <field name="name">Norwegian Donation Report XML</field>
+            <field name="res_model">l10n_no_donation.xml.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
 
         <!-- menu -->
 
         <menuitem
             id="menu_l10n_no_donation"
-            name="Norsk gaverapport XML"
+            name="Norwegian Donation Report XML"
             sequence="20"
             parent="donation.donation_report_title_menu"
             action="action_l10n_no_donation_xml_wizard_form"

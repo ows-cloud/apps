@@ -16,5 +16,6 @@
         "account",
     ],
     "license": "AGPL-3",
+    "maintainers": ["appstogrow"],
     "website": "https://github.com/appstogrow/apps",
 }

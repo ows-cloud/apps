@@ -348,6 +348,8 @@ class AccountBudgetReport(models.Model):
                 LEFT JOIN account_account t1 ON t0.account_id = t1.id
                 LEFT JOIN account_account_type t2 ON t1.user_type_id = t2.id
                 LEFT JOIN account_analytic_account t3 ON t0.analytic_account_id = t3.id
+                LEFT JOIN account_move t4 ON t0.move_id = t4.id
+               WHERE t4.state in ('draft', 'posted')
              UNION
              SELECT t0.id,
                 t4.name AS accounting_or_budget,
