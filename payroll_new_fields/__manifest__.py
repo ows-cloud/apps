@@ -9,7 +9,6 @@
     "category": "Uncategorized",
     "data": [
         "hr.payslip.line.xml",
-        "send_email.xml",
     ],
     "depends": ["payroll"],
     "license": "AGPL-3",
