@@ -63,7 +63,7 @@ COMPANY_READ_SYSTEM_MODEL = [
 
 NO_EDIT_MODEL = [
     # BASE, IR, RES
-    "base.automation",
+    "base.automation",  # create:    self._update_cron()    self._update_registry()
     "base.language.export",
     "base.language.import",
     "base.language.install",
@@ -84,7 +84,7 @@ NO_EDIT_MODEL = [
     "ir.module.module.dependency",
     "ir.module.module.exclusion",
     "ir.rule",
-    "ir.server.object.lines",
+    "ir.server.object.lines",  # base.automation
     "mail.message.subtype",
     "res.country",
     "res.country.state",
