@@ -7,12 +7,12 @@
         <record model="ir.ui.view" id="view_event_form_ticket_survey_label">
             <field name="name">Ticket Survey Label</field>
             <field name="model">event.event</field>
-            <field name="inherit_id" ref="event_sale.view_event_form_inherit_ticket" />
+            <field name="inherit_id" ref="event.view_event_form" />
             <field name="priority" eval="20" />
             <field name="groups_id" eval="[(4, ref('group_event_survey'))]" />
             <field name="arch" type="xml">
                 <data>
-                    <page name="event_mail_schedule" position="before">
+                    <page name="event_communication" position="before">
                         <page name="registration_survey" string="Registration Survey">
                             <p><br />Set <b
                                 >web?debug</b> in the URL and hover the fields to see details.
@@ -33,27 +33,27 @@
                                     />
                                     <field
                                         name="registration_name_question_id"
-                                        domain="[('survey_id','=',registration_survey_id), ('type','=','textbox'), ('constr_mandatory','=',True)]"
+                                        domain="[('survey_id','=',registration_survey_id), ('question_type','=','char_box'), ('constr_mandatory','=',True)]"
                                         options="{'no_create_edit':True}"
                                     />
                                     <field
                                         name="registration_email_question_id"
-                                        domain="[('survey_id','=',registration_survey_id), ('type','=','textbox'), ('constr_mandatory','=',True), ('validation_email','=',True)]"
+                                        domain="[('survey_id','=',registration_survey_id), ('question_type','=','char_box'), ('constr_mandatory','=',True), ('validation_email','=',True)]"
                                         options="{'no_create_edit':True}"
                                     />
                                     <field
                                         name="registration_phone_question_id"
-                                        domain="[('survey_id','=',registration_survey_id), ('type','=','textbox')]"
+                                        domain="[('survey_id','=',registration_survey_id), ('question_type','=','char_box')]"
                                         options="{'no_create_edit':True}"
                                     />
                                     <field
                                         name="registration_ticket_question_id"
-                                        domain="[('survey_id','=',registration_survey_id), ('type','=','simple_choice'), ('constr_mandatory','=',True)]"
+                                        domain="[('survey_id','=',registration_survey_id), ('question_type','=','simple_choice'), ('constr_mandatory','=',True)]"
                                         options="{'no_create_edit':True}"
                                     />
                                     <field
                                         name="registration_products_question_id"
-                                        domain="[('survey_id','=',registration_survey_id), ('type','in',('simple_choice','multiple_choice','matrix'))]"
+                                        domain="[('survey_id','=',registration_survey_id), ('question_type','in',('simple_choice','multiple_choice','matrix'))]"
                                         invisible="1"
                                         options="{'no_create_edit':True}"
                                     />
@@ -90,17 +90,6 @@
                         </page>
                     </page>
 
-                    <xpath
-                        expr="//field[@name='event_ticket_ids']/tree"
-                        position="inside"
-                    >
-                        <field name="survey_question_id" invisible="1" />
-                        <field
-                            name="survey_label_id"
-                            domain="[('question_id','=',survey_question_id)]"
-                            options="{'no_create_edit':True}"
-                        />
-                    </xpath>
                 </data>
             </field>
         </record>
@@ -117,6 +106,28 @@
                 <group name="event" position="inside">
                     <field name="survey_user_input_print_url" widget="url" />
                 </group>
+            </field>
+        </record>
+
+        <!-- event.event.ticket -->
+
+        <record model="ir.ui.view" id="view_event_registration_form_survey">
+            <field name="name">Event Ticket List</field>
+            <field name="model">event.event.ticket</field>
+            <field name="inherit_id" ref="event.event_event_ticket_view_tree_from_event" />
+            <field name="priority" eval="20" />
+            <field name="groups_id" eval="[(4, ref('group_event_survey'))]" />
+            <field name="arch" type="xml">
+                    <tree
+                        position="inside"
+                    >
+                        <field name="survey_question_id" invisible="1" />
+                        <field
+                            name="survey_label_id"
+                            domain="[('question_id','=',survey_question_id)]"
+                            options="{'no_create_edit':True}"
+                        />
+                    </tree>
             </field>
         </record>
 
