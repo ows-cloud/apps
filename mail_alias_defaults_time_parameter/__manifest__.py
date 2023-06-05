@@ -7,6 +7,7 @@
     "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
+        "views/base_time_parameter_views.xml",
     ],
     "depends": [
         "base_time_parameter",
