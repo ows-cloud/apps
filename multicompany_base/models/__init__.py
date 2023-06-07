@@ -2,6 +2,7 @@ from . import (
     base,
     base_partner_merge_automatic_wizard,
     ir_attachment,
+    ir_cron,
     ir_model_data,
     ir_rule,
     ir_ui_view,

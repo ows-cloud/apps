@@ -2,6 +2,8 @@ import logging
 
 from odoo import models
 
+from ..tools import _prepare
+
 _logger = logging.getLogger(__name__)
 SYSTEM_COMPANY_ID = 1
 
@@ -260,7 +262,7 @@ class MulticompanyConfig(models.AbstractModel):
 
     def _configure_companies(self, companies):
         for company in companies:
-            self = self._prepare(company)
+            self = _prepare(self, company)
             self._configure_company()
 
     def _configure_company(self):
@@ -275,17 +277,6 @@ class MulticompanyConfig(models.AbstractModel):
         self._create_website_and_crm_team(public_user)
         self._create_product_category()
         # --------------------------------------------------
-
-    def _prepare(self, company):
-        self = self.with_user(
-            self.env.ref("__multicompany_base__.support_user")
-        ).with_context(
-            active_test=False,
-            allowed_company_ids=[company.id],
-        )
-        self.env.company = company
-        self.env.companies = company
-        return self
 
     def _create_a_company_mail_channel_for_all_employees(self):
         imd_record = self._env("ir.model.data").search(
