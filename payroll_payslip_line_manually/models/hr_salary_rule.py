@@ -59,6 +59,7 @@ class HrSalaryRule(models.Model):
 
     def _reset_localdict_values(self, localdict):
         localdict["rule"] = self
+        localdict.pop("result_analytic", None)
         localdict.pop("result_list", None)
         return super(HrSalaryRule, self)._reset_localdict_values(localdict)
 
@@ -77,7 +78,9 @@ class HrSalaryRule(models.Model):
                 result_list.append(values)
             return result_list
         else:
-            return self._get_rule_dict(localdict)
+            values = self._get_rule_dict(localdict)
+            values["analytic_account_id"] = localdict.get("result_analytic")
+            return values
 
     def replace_lines(self, line_format):
         for record in self:
