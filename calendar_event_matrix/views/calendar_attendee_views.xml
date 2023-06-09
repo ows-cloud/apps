@@ -69,6 +69,7 @@
         <field name="mode">primary</field>
         <field name="arch" type="xml">
             <search>
+                <field name="event_id" />
                 <group expand="1" string="Group By">
                     <filter string="Calendar Event" name="calendar_event" context="{'group_by': 'event_id'}"/>
                 </group>
@@ -87,6 +88,7 @@
         name="Attendees"
         parent="calendar.mail_menu_calendar"
         action="action_calendar_attendee"
+        groups="group_calendar_event_matrix"
     />
 
 </odoo>

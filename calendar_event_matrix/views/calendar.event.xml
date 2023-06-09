@@ -17,5 +17,19 @@
               </tree>
         </field>
     </record>
-    -->
+
+    <record id="action_calendar_event_portal" model="ir.actions.act_window">
+        <field name="name">Portal Calendar</field>
+        <field name="res_model">calendar.event</field>
+        <field name="view_mode">tree,kanban,form</field>
+    </record>
+
+    <menuitem
+        id="menu_calendar_event_portal"
+        name="Portal Calendar"
+        parent="calendar.mail_menu_calendar"
+        action="action_calendar_event_portal"
+        groups="group_calendar_event_matrix"
+    /> -->
+
 </odoo>
