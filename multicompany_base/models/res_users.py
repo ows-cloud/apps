@@ -15,6 +15,7 @@ class Users(models.Model):
     default_user = fields.Boolean("Default User Template")
     groups_id = fields.Many2many(default=_default_groups)
 
+    # TODO: Allow multiple non-default users per company!
     _sql_constraints = [
         (
             "default_user_uniq",
@@ -26,6 +27,8 @@ class Users(models.Model):
     @api.model
     def create(self, vals):
         vals = self._remove_admin_access(vals)
+        if "default_user" in vals and vals["default_user"] == False:
+            vals.pop("default_user")
         return super(Users, self).create(vals)
 
     def write(self, vals):
@@ -34,9 +37,10 @@ class Users(models.Model):
         return super(Users, self).write(vals)
 
     def _remove_admin_access(self, vals):
+        self_sudo = self.sudo_bypass_global_rules()
         admin_access = "sel_groups_{erp}_{system}".format(
-            erp=str(self.env.ref("base.group_erp_manager").id),
-            system=str(self.env.ref("base.group_system").id),
+            erp=str(self_sudo.env.ref("base.group_erp_manager").id),
+            system=str(self_sudo.env.ref("base.group_system").id),
         )
         vals.pop(admin_access, None)
         return vals
