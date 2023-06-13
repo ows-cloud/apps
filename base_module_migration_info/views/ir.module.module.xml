@@ -1,19 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data>
-        
-		<record model="ir.ui.view" id="module_tree">
-    	    <field name="name">ir.module.module.tree mig info</field>
+
+        <record model="ir.ui.view" id="module_tree">
+            <field name="name">ir.module.module.tree mig info</field>
             <field name="model">ir.module.module</field>
-            <field name="inherit_id" ref="base.module_tree"/>
-            <field name="priority" eval="20"/>
+            <field name="inherit_id" ref="base.module_tree" />
+            <field name="priority" eval="20" />
             <field name="arch" type="xml">
                 <tree position="inside">
-                    <field name="mig_url" optional="hide" widget="url"/>
-                    <field name="mig_state" optional="hide"/>
-                    <field name="mig_opened" optional="hide"/>
-                    <field name="mig_merged" optional="hide"/>
-                    <field name="mig_last_commented" optional="hide"/>
+                    <field name="mig_url" optional="hide" widget="url" />
+                    <field name="mig_state" optional="hide" />
+                    <field name="mig_opened" optional="hide" />
+                    <field name="mig_merged" optional="hide" />
+                    <field name="mig_last_commented" optional="hide" />
                 </tree>
             </field>
         </record>

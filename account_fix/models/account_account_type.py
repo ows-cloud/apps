@@ -1,8 +1,8 @@
-from odoo import api, fields, models, _
+from odoo import fields, models
 
 
 class AccountType(models.Model):
-    _inherit = 'account.account.type'
-    _order = 'note'
+    _inherit = "account.account.type"
+    _order = "note"
 
-    company_id = fields.Many2one('res.company', string="Company")
+    company_id = fields.Many2one("res.company", string="Company")

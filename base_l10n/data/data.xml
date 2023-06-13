@@ -7,7 +7,7 @@
             <field name="currency_id" ref="base.USD" />
             <field eval="670" name="phone_code" />
         </record>
-        
+
         <record id="base.lang_nb_NO" model="res.lang">
             <field name="date_format">%d.%m.%Y</field>
         </record>

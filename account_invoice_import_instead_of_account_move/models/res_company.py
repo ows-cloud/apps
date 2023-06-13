@@ -1,5 +1,4 @@
-from odoo import api, fields, models, _
-import re
+from odoo import fields, models
 
 
 class Company(models.Model):

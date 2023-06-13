@@ -2,18 +2,17 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': 'hr_rule_qty_rate_amount',
-    'summary': 'Easily create and use salary rules',
-
-    'author': 'AppsToGROW',
-    'category': 'Uncategorized',
-    'data': [
-        'security/ir.model.access.csv',
-        'views/views.xml',
+    "name": "hr_rule_qty_rate_amount",
+    "summary": "Easily create and use salary rules",
+    "author": "AppsToGROW, Odoo Community Association (OCA)",
+    "category": "Uncategorized",
+    "data": [
+        "security/ir.model.access.csv",
+        "views/views.xml",
     ],
-    'depends': ['payroll', 'analytic'],
-    'license': 'AGPL-3',
-    'version': '14.0.1.0.0',
-    'website': 'http://www.appstogrow.co',
-    'description': '''See the core changes in payroll: https://github.com/apps2grow/odoo/commit/97fdeef09223338c5e3cf5c93149b7ca17219b62''',
+    "depends": ["payroll", "analytic"],
+    "license": "AGPL-3",
+    "maintainers": ["appstogrow"],
+    "version": "14.0.1.0.0",
+    "website": "https://github.com/appstogrow/apps",
 }

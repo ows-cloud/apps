@@ -4,8 +4,7 @@
 {
     "name": "multicompany_account",
     "summary": "Company Tax B2B/B2C",
-
-    "author": "AppsToGROW",
+    "author": "AppsToGROW, Odoo Community Association (OCA)",
     "auto_install": True,
     "category": "Uncategorized",
     "data": [
@@ -16,6 +15,7 @@
         "multicompany_base",
     ],
     "license": "AGPL-3",
+    "maintainers": ["appstogrow"],
     "version": "14.0.1.0.0",
-    "website": "http://www.appstogrow.co",
+    "website": "https://github.com/appstogrow/apps",
 }

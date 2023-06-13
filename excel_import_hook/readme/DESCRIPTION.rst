@@ -1,2 +1,2 @@
-This module provides a generic hook that other modules may inherit for any model.
-By inheriting and calling super(), a developer may extend what the hook will do for the model.
+This module provides a generic post-import-hook to use with any model.
+An xlsx.template may call the generic hook and instruct it to call other hooks.

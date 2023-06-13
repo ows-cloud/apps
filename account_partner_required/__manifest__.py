@@ -10,9 +10,10 @@
     "version": "14.0.1.0.0",
     "category": "Accounting",
     "license": "AGPL-3",
+    "maintainers": ["appstogrow"],
     "summary": "Adds an option 'partner policy' on account types",
     "author": "ACSONE SA/NV,Akretion,Odoo Community Association (OCA)",
-    "website": "https://github.com/OCA/account-financial-tools",
+    "website": "https://github.com/appstogrow/apps",
     "depends": [
         "account_menu",
     ],

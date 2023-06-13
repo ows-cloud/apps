@@ -1,0 +1,923 @@
+diff --git a/addons/account/models/account_journal.py b/addons/account/models/account_journal.py
+index a0c994d0..8d512929 100644
+--- a/addons/account/models/account_journal.py
++++ b/addons/account/models/account_journal.py
+@@ -361,7 +361,7 @@ class AccountJournal(models.Model):
+             company's name or id (in case the company's name is not ascii either).
+         """
+         def get_company_suffix():
+-            if self.company_id != self.env.ref('base.main_company'):
++            if self.company_id.id != 1:
+                 try:
+                     remove_accents(self.company_id.name).encode('ascii')
+                     return '-' + str(self.company_id.name)
+diff --git a/addons/account/models/account_move.py b/addons/account/models/account_move.py
+index c46a4550..10d9c776 100644
+--- a/addons/account/models/account_move.py
++++ b/addons/account/models/account_move.py
+@@ -56,9 +56,8 @@ class AccountMove(models.Model):
+     def _sequence_yearly_regex(self):
+         return self.journal_id.sequence_override_regex or super()._sequence_yearly_regex
+
+-    @property
+-    def _sequence_fixed_regex(self):
+-        return self.journal_id.sequence_override_regex or super()._sequence_fixed_regex
++    # REMOVED: def _sequence_fixed_regex(self):
++    # More info in https://github.com/OCA/OCB/pull/1110
+
+     @api.model
+     def _search_default_journal(self, journal_types):
+@@ -1200,8 +1199,8 @@ class AccountMove(models.Model):
+                 try:
+                     if not move.posted_before:
+                         move._constrains_date_sequence()
+-                    # Has already a name or is not posted, we don't add to a batch
+-                    continue
++                    # REMOVED: continue
++                    # More info in https://github.com/OCA/OCB/pull/1110
+                 except ValidationError:
+                     # Has never been posted and the name doesn't match the date: recompute it
+                     pass
+@@ -2575,11 +2574,11 @@ class AccountMove(models.Model):
+
+         # Search for partners in copy.
+         cc_mail_addresses = email_split(msg_dict.get('cc', ''))
+-        followers = [partner for partner in self._mail_find_partner_from_emails(cc_mail_addresses, extra_domain) if partner]
++        followers = [partner for partner in self._mail_find_partner_from_emails(cc_mail_addresses, extra_domain=extra_domain) if partner]
+
+         # Search for partner that sent the mail.
+         from_mail_addresses = email_split(msg_dict.get('from', ''))
+-        senders = partners = [partner for partner in self._mail_find_partner_from_emails(from_mail_addresses, extra_domain) if partner]
++        senders = partners = [partner for partner in self._mail_find_partner_from_emails(from_mail_addresses, extra_domain=extra_domain) if partner]
+
+         # Search for partners using the user.
+         if not senders:
+diff --git a/addons/auth_signup/models/res_users.py b/addons/auth_signup/models/res_users.py
+index d93e7c70..458aef84 100644
+--- a/addons/auth_signup/models/res_users.py
++++ b/addons/auth_signup/models/res_users.py
+@@ -194,7 +194,8 @@ class ResUsers(models.Model):
+             'partner_to': False,
+             'scheduled_date': False,
+         }
+-        template.write(template_values)
++        # template.write(template_values)
++        # ACCESS ERROR: Users cannot edit system record.
+
+         for user in self:
+             if not user.email:
+diff --git a/addons/base_setup/models/res_config_settings.py b/addons/base_setup/models/res_config_settings.py
+index 9ea1339f..1932b047 100644
+--- a/addons/base_setup/models/res_config_settings.py
++++ b/addons/base_setup/models/res_config_settings.py
+@@ -61,6 +61,7 @@ class ResConfigSettings(models.TransientModel):
+             },
+         }
+
++    # open_default_user() in multicompany_base will replace this open_default_user().
+     def open_default_user(self):
+         action = self.env["ir.actions.actions"]._for_xml_id("base.action_res_users")
+         if self.env.ref('base.default_user', raise_if_not_found=False):
+diff --git a/addons/mail/controllers/main.py b/addons/mail/controllers/main.py
+index 46d01b13..62e9b54d 100644
+--- a/addons/mail/controllers/main.py
++++ b/addons/mail/controllers/main.py
+@@ -146,10 +146,12 @@ class MailController(http.Controller):
+
+     @http.route('/mail/read_followers', type='json', auth='user')
+     def read_followers(self, res_model, res_id):
++        record = request.env[res_model].browse(res_id)
++        company = record.record_company()
+         request.env['mail.followers'].check_access_rights("read")
+-        request.env[res_model].check_access_rights("read")
+-        request.env[res_model].browse(res_id).check_access_rule("read")
+-        follower_recs = request.env['mail.followers'].search([('res_model', '=', res_model), ('res_id', '=', res_id)])
++        record.check_access_rights("read")
++        record.with_record_company().check_access_rule("read")
++        follower_recs = request.env['mail.followers'].with_company(company).search([('res_model', '=', res_model), ('res_id', '=', res_id)])
+
+         followers = []
+         follower_id = None
+@@ -182,7 +184,7 @@ class MailController(http.Controller):
+         follower = request.env['mail.followers'].sudo().browse(follower_id)
+         follower.ensure_one()
+         request.env[follower.res_model].check_access_rights("read")
+-        request.env[follower.res_model].browse(follower.res_id).check_access_rule("read")
++        request.env[follower.res_model].browse(follower.res_id).with_record_company().check_access_rule("read")
+
+         # find current model subtypes, add them to a dictionary
+         subtypes = request.env['mail.message.subtype'].search([
+@@ -305,7 +307,7 @@ class MailController(http.Controller):
+
+     @http.route('/mail/get_suggested_recipients', type='json', auth='user')
+     def message_get_suggested_recipients(self, model, res_ids):
+-        records = request.env[model].browse(res_ids)
++        records = request.env[model].browse(res_ids).with_record_company()
+         try:
+             records.check_access_rule('read')
+             records.check_access_rights('read')
+diff --git a/addons/mail/models/mail_thread.py b/addons/mail/models/mail_thread.py
+index 12cf1080..02b9e714 100644
+--- a/addons/mail/models/mail_thread.py
++++ b/addons/mail/models/mail_thread.py
+@@ -1052,6 +1052,9 @@ class MailThread(models.AbstractModel):
+             # disabled subscriptions during message_new/update to avoid having the system user running the
+             # email gateway become a follower of all inbound messages
+             ModelCtx = Model.with_user(related_user).sudo()
++            if alias:
++                # TODO: check if alias has company_id field
++                ModelCtx = ModelCtx.with_company(alias.company_id)
+             if thread_id and hasattr(ModelCtx, 'message_update'):
+                 thread = ModelCtx.browse(thread_id)
+                 thread.message_update(message_dict)
+diff --git a/addons/mail/models/update.py b/addons/mail/models/update.py
+index edf5b4f2..9be029ec 100644
+--- a/addons/mail/models/update.py
++++ b/addons/mail/models/update.py
+@@ -98,6 +98,10 @@ class PublisherWarrantyContract(AbstractModel):
+             # old behavior based on res.log; now on mail.message, that is not necessarily installed
+             user = self.env['res.users'].sudo().browse(SUPERUSER_ID)
+             poster = self.sudo().env.ref('mail.channel_all_employees')
++            try:
++                poster = self.env['mail.channel'].search([('company_id', '=', self.env.company.id), ('all_employees', '=', True)])
++            except:
++                pass
+             if not (poster and poster.exists()):
+                 if not user.exists():
+                     return True
+diff --git a/addons/payment/__manifest__.py b/addons/payment/__manifest__.py
+index 6626200b..783b2e9c 100644
+--- a/addons/payment/__manifest__.py
++++ b/addons/payment/__manifest__.py
+@@ -11,7 +11,7 @@
+     'data': [
+         'data/account_data.xml',
+         'data/payment_icon_data.xml',
+-        'data/payment_acquirer_data.xml',
++        'data/payment_acquirer_data_ag.xml',
+         'data/payment_cron.xml',
+         'views/payment_views.xml',
+         'views/account_payment_views.xml',
+diff --git a/addons/payment/data/payment_acquirer_data_ag.xml b/addons/payment/data/payment_acquirer_data_ag.xml
+new file mode 100644
+index 00000000..117ef56a
+--- /dev/null
++++ b/addons/payment/data/payment_acquirer_data_ag.xml
+@@ -0,0 +1,85 @@
++<?xml version="1.0" encoding="utf-8"?>
++<odoo noupdate="1">
++
++    <template id="default_acquirer_button">
++        <input type="hidden" name="data_set" t-att-data-action-url="tx_url"/>
++        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
++        <t t-if="return_url">
++            <input type="hidden" name="return_url" t-att-value="return_url"/>
++        </t>
++        <input type="hidden" name="reference" t-att-value="reference"/>
++        <input type="hidden" name="amount" t-att-value="amount"/>
++        <input type="hidden" name="currency" t-att-value="currency.name"/>
++    </template>
++
++    <record id="payment_acquirer_transfer" model="payment.acquirer">
++        <field name="name">Wire Transfer</field>
++        <field name="sequence">2</field>
++        <field name="view_template_id" ref="default_acquirer_button"/>
++        <field name="image_128" type="base64" file="payment_transfer/static/src/img/transfer_icon.png"/>
++        <field name="module_id" ref="base.module_payment_transfer"/>
++        <field name="pending_msg">&lt;i&gt;Pending&lt;/i&gt;... The order will be validated after the payment.</field>
++        <field name="description" type="html">
++            <p>
++                Provide instructions to customers so that they can pay their orders manually.
++            </p>
++        </field>
++    </record>
++
++    <record id="payment_acquirer_paypal" model="payment.acquirer">
++        <field name="name">PayPal</field>
++        <field name="sequence">1</field>
++        <field name="view_template_id" ref="default_acquirer_button"/>
++        <field name="image_128" type="base64" file="payment_paypal/static/src/img/paypal_icon.png"/>
++        <field name="module_id" ref="base.module_payment_paypal"/>
++        <field name="description" type="html">
++            <p>
++                PayPal is the easiest way to accept payments via Paypal or credit cards.
++            </p>
++            <ul class="list-inline">
++                <li class="list-inline-item"><i class="fa fa-check"/>Online Payment</li>
++                <li class="list-inline-item"><i class="fa fa-check"/>Payment Status Tracking</li>
++            </ul>
++        </field>
++        <!-- https://www.paypal.com/us/selfhelp/article/Which-credit-cards-can-I-accept-with-PayPal-Merchant-Services-FAQ1525#business -->
++        <field name="payment_icon_ids" eval='[(6, 0, [ref("payment.payment_icon_cc_maestro"),
++                                                        ref("payment.payment_icon_cc_mastercard"),
++                                                        ref("payment.payment_icon_cc_discover"),
++                                                        ref("payment.payment_icon_cc_diners_club_intl"),
++                                                        ref("payment.payment_icon_cc_jcb"),
++                                                        ref("payment.payment_icon_cc_american_express"),
++                                                        ref("payment.payment_icon_cc_unionpay"),
++                                                        ref("payment.payment_icon_cc_visa")])]'/>
++    </record>
++
++    <record id="payment_acquirer_stripe" model="payment.acquirer">
++        <field name="name">Stripe</field>
++        <field name="display_as">Credit Card (powered by Stripe)</field>
++        <field name="view_template_id" ref="default_acquirer_button"/>
++        <field name="image_128" type="base64" file="payment_stripe/static/src/img/stripe_icon.png"/>
++        <field name="module_id" ref="base.module_payment_stripe"/>
++        <field name="description" type="html">
++            <p>
++                A payment gateway to accept online payments via credit cards.
++            </p>
++            <ul class="list-inline">
++                <li class="list-inline-item"><i class="fa fa-check"/>Online Payment</li>
++                <li class="list-inline-item"><i class="fa fa-check"/>Payment Status Tracking</li>
++                <li class="list-inline-item"><i class="fa fa-check"/>Subscriptions</li>
++                <li class="list-inline-item"><i class="fa fa-check"/>Save Cards</li>
++            </ul>
++        </field>
++        <!--
++            https://stripe.com/payments/payment-methods-guide
++            https://support.goteamup.com/hc/en-us/articles/115002089349-Which-cards-and-payment-types-can-I-accept-with-Stripe-
++        -->
++        <field name="payment_icon_ids" eval='[(6, 0, [ref("payment.payment_icon_cc_maestro"),
++                                                        ref("payment.payment_icon_cc_mastercard"),
++                                                        ref("payment.payment_icon_cc_discover"),
++                                                        ref("payment.payment_icon_cc_diners_club_intl"),
++                                                        ref("payment.payment_icon_cc_jcb"),
++                                                        ref("payment.payment_icon_cc_american_express"),
++                                                        ref("payment.payment_icon_cc_visa")])]'/>
++    </record>
++
++</odoo>
+diff --git a/addons/point_of_sale/models/pos_config.py b/addons/point_of_sale/models/pos_config.py
+index a26104ab..6b745f3b 100644
+--- a/addons/point_of_sale/models/pos_config.py
++++ b/addons/point_of_sale/models/pos_config.py
+@@ -654,6 +654,8 @@ class PosConfig(models.Model):
+     # a localisation installed
+     @api.model
+     def post_install_pos_localisation(self, companies=False):
++        if self.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
++            return
+         self = self.sudo()
+         if not companies:
+             companies = self.env['res.company'].search([])
+diff --git a/addons/product/models/product_template.py b/addons/product/models/product_template.py
+index 14bf40a1..21cb8d3e 100644
+--- a/addons/product/models/product_template.py
++++ b/addons/product/models/product_template.py
+@@ -21,7 +21,7 @@ class ProductTemplate(models.Model):
+     @tools.ormcache()
+     def _get_default_category_id(self):
+         # Deletion forbidden (at least through unlink)
+-        return self.env.ref('product.product_category_all')
++        return self.env.ref('product.product_category_all', raise_if_not_found=False)
+
+     @tools.ormcache()
+     def _get_default_uom_id(self):
+diff --git a/addons/web/controllers/main.py b/addons/web/controllers/main.py
+index 813a0d94..df95d986 100644
+--- a/addons/web/controllers/main.py
++++ b/addons/web/controllers/main.py
+@@ -1586,6 +1586,10 @@ class Binary(http.Controller):
+     def upload_attachment(self, model, id, ufile, callback=None):
+         files = request.httprequest.files.getlist('ufile')
+         Model = request.env['ir.attachment']
++        if request.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
++            company = request.env[model].sudo().browse(int(id)).company_id
++            if company:
++                Model = Model.with_company(company)
+         out = """<script language="javascript" type="text/javascript">
+                     var win = window.top.window;
+                     win.jQuery(win).trigger(%s, %s);
+diff --git a/addons/web_editor/controllers/main.py b/addons/web_editor/controllers/main.py
+index 92d79774..c50d7d84 100644
+--- a/addons/web_editor/controllers/main.py
++++ b/addons/web_editor/controllers/main.py
+@@ -279,8 +279,8 @@ class Web_Editor(http.Controller):
+
+     def _clean_context(self):
+         # avoid allowed_company_ids which may erroneously restrict based on website
++        # NO! WEBSITES NEED allowed_company_ids, OTHERWISE api.Environment.company WILL USE self.user.company_id
+         context = dict(request.context)
+-        context.pop('allowed_company_ids', None)
+         request.context = context
+
+     @http.route("/web_editor/get_assets_editor_resources", type="json", auth="user", website=True)
+diff --git a/addons/website/models/ir_http.py b/addons/website/models/ir_http.py
+index b758caba..0d31542e 100644
+--- a/addons/website/models/ir_http.py
++++ b/addons/website/models/ir_http.py
+@@ -180,6 +180,12 @@ class Http(models.AbstractModel):
+                 env = api.Environment(cr, SUPERUSER_ID, {})
+                 request.website_routing = env['website'].get_current_website().id
+
++        website_id = request.context.get('website_id')
++        if website_id:
++            company = request.env['website'].browse(website_id).record_company()
++            if company:
++                request.env.company = company
++
+         response = super(Http, cls)._dispatch()
+
+         if not is_rerouting:
+diff --git a/addons/website/models/ir_rule.py b/addons/website/models/ir_rule.py
+index a11ddef1..f0b883e0 100644
+--- a/addons/website/models/ir_rule.py
++++ b/addons/website/models/ir_rule.py
+@@ -16,6 +16,13 @@ class IrRule(models.Model):
+         # in backend (if domain set & match)..
+         is_frontend = ir_http.get_request_website()
+         Website = self.env['website']
++
++        # Problem: loop when website has ir.rule:
++        # _eval_context() > get_current_website() > _compute_domain() > _eval_context()
++        if self.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
++            res['website'] = is_frontend
++            return res
++
+         res['website'] = is_frontend and Website.get_current_website() or Website
+         return res
+
+diff --git a/addons/website/models/ir_ui_view.py b/addons/website/models/ir_ui_view.py
+index c0b89582..4f485c59 100644
+--- a/addons/website/models/ir_ui_view.py
++++ b/addons/website/models/ir_ui_view.py
+@@ -511,6 +511,9 @@ class View(models.Model):
+             ], limit=1)
+             if website_specific_view:
+                 self = website_specific_view
++        if current_website:
++            company = current_website.record_company()
++            self = self.with_company(company) if company else self
+         super(View, self).save(value, xpath=xpath)
+
+     # --------------------------------------------------------------------------
+diff --git a/addons/website/models/website.py b/addons/website/models/website.py
+index fecccced..0e6b9fb3 100644
+--- a/addons/website/models/website.py
++++ b/addons/website/models/website.py
+@@ -302,6 +302,7 @@ class Website(models.Model):
+             new_menu = menu.copy({
+                 'parent_id': t_menu.id,
+                 'website_id': self.id,
++                'page_id': None,
+             })
+             for submenu in menu.child_id:
+                 copy_menu(submenu, new_menu)
+diff --git a/addons/website_livechat/__manifest__.py b/addons/website_livechat/__manifest__.py
+index 0eb1eb3d..fff647d2 100644
+--- a/addons/website_livechat/__manifest__.py
++++ b/addons/website_livechat/__manifest__.py
+@@ -10,7 +10,7 @@ Allow website visitors to chat with the collaborators. This module also brings a
+     'depends': ['website', 'im_livechat'],
+     'installable': True,
+     'application': False,
+-    'auto_install': True,
++    'auto_install': False,
+     'data': [
+         'views/assets.xml',
+         'views/website_livechat.xml',
+diff --git a/addons/website_sale/controllers/main.py b/addons/website_sale/controllers/main.py
+index 0963a6d5..3ae0d718 100644
+--- a/addons/website_sale/controllers/main.py
++++ b/addons/website_sale/controllers/main.py
+@@ -883,7 +883,7 @@ class WebsiteSale(http.Controller):
+             errors=[],
+             partner=order.partner_id.id,
+             order=order,
+-            payment_action_id=request.env.ref('payment.action_payment_acquirer').id,
++            payment_action_id=request.env['ir.actions.act_window'].sudo().env.ref('payment.action_payment_acquirer').id,
+             return_url= '/shop/payment/validate',
+             bootstrap_formatting= True
+         )
+diff --git a/addons/website_sale/models/website.py b/addons/website_sale/models/website.py
+index 2e530271..6c9626b5 100644
+--- a/addons/website_sale/models/website.py
++++ b/addons/website_sale/models/website.py
+@@ -22,6 +22,8 @@ class Website(models.Model):
+     salesperson_id = fields.Many2one('res.users', string='Salesperson')
+
+     def _get_default_website_team(self):
++        if self.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
++            return None
+         try:
+             team = self.env.ref('sales_team.salesteam_website_sales')
+             return team if team.active else None
+diff --git a/addons/website_sale_delivery/controllers/main.py b/addons/website_sale_delivery/controllers/main.py
+index abd484c0..b9ce9c89 100644
+--- a/addons/website_sale_delivery/controllers/main.py
++++ b/addons/website_sale_delivery/controllers/main.py
+@@ -107,7 +107,7 @@ class WebsiteSaleDelivery(WebsiteSale):
+             values['deliveries'] = delivery_carriers.sudo()
+
+         values['delivery_has_storable'] = has_storable_products
+-        values['delivery_action_id'] = request.env.ref('delivery.action_delivery_carrier_form').id
++        values['delivery_action_id'] = request.env['ir.actions.act_window'].sudo().env.ref('delivery.action_delivery_carrier_form').id
+         return values
+
+     def _update_website_sale_delivery_return(self, order, **post):
+diff --git a/odoo/addons/base/__manifest__.py b/odoo/addons/base/__manifest__.py
+index 8ca87a20..c09195b1 100644
+--- a/odoo/addons/base/__manifest__.py
++++ b/odoo/addons/base/__manifest__.py
+@@ -47,7 +47,6 @@ The kernel of Odoo, needed for all installation.
+         'views/ir_qweb_widget_templates.xml',
+         'views/ir_module_views.xml',
+         'data/ir_module_category_data.xml',
+-        'data/ir_module_module.xml',
+         'report/ir_module_reports.xml',
+         'report/ir_module_report_templates.xml',
+         'wizard/base_module_update_views.xml',
+diff --git a/odoo/addons/base/models/__init__.py b/odoo/addons/base/models/__init__.py
+index bdc3d0b1..09774435 100644
+--- a/odoo/addons/base/models/__init__.py
++++ b/odoo/addons/base/models/__init__.py
+@@ -1,6 +1,12 @@
+ # -*- coding: utf-8 -*-
+ # Part of Odoo. See LICENSE file for full copyright and licensing details.
+
++from . import base
++try:
++    from . import base_sudo
++except:
++    pass
++
+ from . import assetsbundle
+ from . import qweb
+
+diff --git a/odoo/addons/base/models/base.py b/odoo/addons/base/models/base.py
+new file mode 100644
+index 00000000..8c1eec87
+--- /dev/null
++++ b/odoo/addons/base/models/base.py
+@@ -0,0 +1,177 @@
++from odoo import api, fields, models
++from odoo.exceptions import UserError
++from . import ir_model
++
++"""
++If company_id doesn't exist, look for it in a related record.
++Key: model name
++Value: field name to reference another record.
++"""
++FIELD_NAME_TO_GET_COMPANY = {
++    'ir.default': 'user_id',
++    'ir.model.data': 'res_id',
++    'ir.property': 'res_id',
++    'website.menu': 'website_id',
++}
++
++def _get_model_name_and_res_id(field, data):
++    if not _get_value(field.name, data):
++        comodel_name = res_id = None
++    elif field.type == 'many2one':
++        comodel_name = field.comodel_name
++        res_id = _get_value(field.name, data)
++    elif field.type == 'many2one_reference':
++        comodel_name = _get_value(field.model_field, data)
++        res_id = _get_value(field.name, data)
++    elif field.type == 'reference':
++        comodel_name, res_id = _get_value(field.name, data).split(',')
++        res_id = int(res_id)
++    elif field.type == 'char':
++      if (field.model_name == 'ir.property' and field.name in ('res_id', 'value_reference')):
++        comodel_name, res_id = _get_value(field.name, data).split(',')
++        res_id = int(res_id)
++      else:
++        comodel_name = res_id = None
++    elif field.type in ('one2many', 'many2many'):
++        comodel_name = field.comodel_name
++        commands = _get_value(field.name, data)
++        # for command in commands:
++        #     This is complex. Need recursive function to check nested values for command 0-1
++        #     Command 6 has ids, while the others have id.
++        #     TODO later
++        return []
++    else:
++        comodel_name = res_id = None
++    return [(comodel_name, res_id)]
++
++def _get_value(field_name, record_or_dict):
++    if type(record_or_dict) is dict:
++        return record_or_dict[field_name]
++    else:
++        return getattr(record_or_dict, field_name)
++
++
++class Base(models.AbstractModel):
++    _inherit = 'base'
++
++    """
++    This code cannot be inside multicompany_base; then it is not active on installing/updating modules.
++
++    If multicompany_base is installed:
++        Don't accept {'company_id': False}
++        (e.g. stock.location from XML)
++
++        Don't accept FK relations to records which the user cannot browse.
++    """
++
++    def create(self, vals_list):
++        for vals_dict in vals_list:
++            vals_dict = self._set_company_if_false_and_multicompany_base_is_installed(vals_dict)
++            self._security_check_that_user_can_browse_all_relations(vals_dict)
++        return super(Base, self).create(vals_list)
++
++    def write(self, vals_dict):
++        vals_dict = self._set_company_if_false_and_multicompany_base_is_installed(vals_dict)
++        self._security_check_that_user_can_browse_all_relations(vals_dict)
++        return super(Base, self).write(vals_dict)
++
++    def _set_company_if_false_and_multicompany_base_is_installed(self, vals_dict):
++        if 'company_id' in vals_dict and not vals_dict['company_id']:
++            if self.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
++                vals_dict['company_id'] = self._related_company(vals_dict).id
++        return vals_dict
++
++    # Also used in multicompany.security
++    def _related_company(self, record_or_values):
++        field_name = FIELD_NAME_TO_GET_COMPANY.get(self._name)
++        if not field_name:
++            return self.env.company
++
++        field = self._fields[field_name]
++        [(comodel_name, res_id)] = _get_model_name_and_res_id(field, record_or_values)
++        if res_id:
++            related_record = self.env[comodel_name].browse(res_id)
++            return related_record.company_id
++        else:
++            return self.env.company
++
++    def _security_check_that_user_can_browse_all_relations(self, vals_dict):
++        model_exceptions = [
++            'ir.mail_server', # Send mail from a mail server which the user cannot access.
++        ]
++        if not self.env.su:
++            for (key, value) in vals_dict.items():
++                field = self._fields[key]
++                if field.type in ('many2one', 'many2one_reference', 'reference', 'char', 'one2many', 'many2many'):
++                    model_name_res_id = _get_model_name_and_res_id(field, vals_dict)
++                    for model_name, res_id in model_name_res_id:
++                        if model_name and res_id and model_name not in model_exceptions:
++                            # access_control().field will give AccessError if the user cannot read the record.
++                            # This is super important for security!
++                            # Without this line, a company manager can get access to e.g. SYSTEM company
++                            # with user.write({'company_id': 1, 'company_ids': [[4, 1, 0]})
++                            self.env[model_name].browse(res_id).access_control(raise_if_access_error=True)
++
++    def access_control(self, raise_if_access_error):
++        """
++        Use cases:
++        - self.env.ref('xmlid'): .access_control() is added to the api.
++        - create() & write() for security reasons.
++        """
++        # access_rights will always return True in superuser mode.
++        access_rights = self.check_access_rights('read', raise_exception=raise_if_access_error)
++
++        # access_rule = record.check_access_rule('read') # will raise error if forbidden
++        def check_access_rule(operation):
++            if not self.env.user:
++                # cannot apply security rules for a user when there is no user
++                # example: ir_http.py _auth_method_public()
++                return
++            invalid = self - self._filter_access_rules_python(operation)
++            if not invalid:
++                return
++            forbidden = invalid.exists()
++            if forbidden:
++                return 'forbidden'
++            else:
++                return 'How can invalid evalutate True and forbidden evaluate False?'
++        access_rule = check_access_rule('read')
++
++        # Success if check_access_rights returns True and check_access_rule returns None
++        if access_rights and not access_rule:
++            return self
++        else:
++            if raise_if_access_error:
++                raise UserError("access_control() failed for this record: {},{}".format(self, id))
++
++    """
++    USE CASES:
++    - MULTICOMPANY CONTROLLER PATCHES
++    - STORED FIELDS COMPUTE ALL
++    When the active company is not the user's default company,
++    controllers may not know the company of a record,
++    and sudo() is necessary to find out.
++    In patches to fix controllers,
++    the methods .record_company() and .with_record_company() are often very useful.
++    Then sudo() is only one place here, not in every controller patch.
++    TODO:
++    Set the active company as env.company in a central place, so controllers will know the company by default?
++    request.httprequest.cookies.get("cids") - The first cid is the active company.
++    """
++
++    def record_company(self):
++        try:
++            self = self.sudo(bypass_global_rules=True)
++        except:
++            self = self.sudo()
++        try:
++            company = self.mapped('company_id')
++        except:
++            return
++        if len(company) == 1:
++            if company in self.env.user.company_ids:
++                return company
++
++    def with_record_company(self):
++        company = self.record_company()
++        return self.with_company(company) if company else self
+diff --git a/odoo/addons/base/models/ir_rule.py b/odoo/addons/base/models/ir_rule.py
+index 7bbf0305..b8369823 100644
+--- a/odoo/addons/base/models/ir_rule.py
++++ b/odoo/addons/base/models/ir_rule.py
+@@ -215,7 +215,7 @@ class IrRule(models.Model):
+         return res
+
+     def _make_access_error(self, operation, records):
+-        _logger.info('Access Denied by record rules for operation: %s on record ids: %r, uid: %s, model: %s', operation, records.ids[:6], self._uid, records._name)
++        _logger.info('Access Denied by record rules for operation: %s on record ids: %r, uid: %s, model: %s, company_id: %s', operation, records.ids[:6], self._uid, records._name, self.env.company.id)
+
+         model = records._name
+         description = self.env['ir.model']._get(model).name or model
+diff --git a/odoo/addons/base/models/res_company.py b/odoo/addons/base/models/res_company.py
+index 3b20cb9d..8fc69f73 100644
+--- a/odoo/addons/base/models/res_company.py
++++ b/odoo/addons/base/models/res_company.py
+@@ -119,7 +119,7 @@ class Company(models.Model):
+     # partner's contact address
+     def _compute_address(self):
+         for company in self.filtered(lambda company: company.partner_id):
+-            address_data = company.partner_id.sudo().address_get(adr_pref=['contact'])
++            address_data = company.partner_id.sudo().with_record_company().address_get(adr_pref=['contact'])
+             if address_data['contact']:
+                 partner = company.partner_id.browse(address_data['contact']).sudo()
+                 company.update(company._get_company_address_update(partner))
+@@ -213,7 +213,7 @@ class Company(models.Model):
+         self.clear_caches()
+         company = super(Company, self).create(vals)
+         # The write is made on the user to set it automatically in the multi company group.
+-        self.env.user.write({'company_ids': [(4, company.id)]})
++        self.env.user.sudo().write({'company_ids': [(4, company.id)]})
+
+         # Make sure that the selected currency is enabled
+         if vals.get('currency_id'):
+@@ -295,7 +295,7 @@ class Company(models.Model):
+     @api.model
+     def _get_main_company(self):
+         try:
+-            main_company = self.sudo().env.ref('base.main_company')
++            main_company = self.sudo().env.ref('base.main_company', raise_if_not_found=False)
+         except ValueError:
+             main_company = self.env['res.company'].sudo().search([], limit=1, order="id")
+
+diff --git a/odoo/addons/base/models/res_partner.py b/odoo/addons/base/models/res_partner.py
+index 07475451..ea2a6083 100644
+--- a/odoo/addons/base/models/res_partner.py
++++ b/odoo/addons/base/models/res_partner.py
+@@ -525,6 +525,7 @@ class Partner(models.Model):
+             self.invalidate_cache(['user_ids'], self._ids)
+             for partner in self:
+                 if partner.active and partner.user_ids:
++                  if partner.user_ids[0].active:
+                     raise ValidationError(_('You cannot archive a contact linked to a portal or internal user.'))
+         # res.partner must only allow to set the company_id of a partner if it
+         # is the same as the company of all users that inherit from this partner
+diff --git a/odoo/addons/base/models/res_users.py b/odoo/addons/base/models/res_users.py
+index 31de10c6..4376d060 100644
+--- a/odoo/addons/base/models/res_users.py
++++ b/odoo/addons/base/models/res_users.py
+@@ -658,6 +658,7 @@ class Users(models.Model):
+     def check_super(self, passwd):
+         return check_super(passwd)
+
++    # Replaced in multicompany_base
+     @api.model
+     def _update_last_login(self):
+         # only create new records to avoid any side-effect on concurrent transactions
+diff --git a/odoo/api.py b/odoo/api.py
+index 606a06e7..3404ce1a 100644
+--- a/odoo/api.py
++++ b/odoo/api.py
+@@ -511,7 +511,10 @@ class Environment(Mapping):
+
+     def ref(self, xml_id, raise_if_not_found=True):
+         """Return the record corresponding to the given ``xml_id``."""
+-        return self['ir.model.data'].xmlid_to_object(xml_id, raise_if_not_found=raise_if_not_found)
++        result = self['ir.model.data'].xmlid_to_object(xml_id, raise_if_not_found=raise_if_not_found)
++        if result:
++            return result.access_control(raise_if_access_error=raise_if_not_found)
++        return result
+
+     def is_superuser(self):
+         """ Return whether the environment is in superuser mode. """
+diff --git a/odoo/models.py b/odoo/models.py
+index fc18b27a..e91f0b1f 100644
+--- a/odoo/models.py
++++ b/odoo/models.py
+@@ -800,25 +800,43 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
+             for r in missing
+         )
+         fields = ['module', 'model', 'name', 'res_id']
++        if self.env['ir.model.fields'].search([('name', '=', 'company_id')]):
++            fields.append('company_id')
+
+         # disable eventual async callback / support for the extent of
+         # the COPY FROM, as these are apparently incompatible
+         callback = psycopg2.extensions.get_wait_callback()
+         psycopg2.extensions.set_wait_callback(None)
+         try:
+-            cr.copy_from(io.StringIO(
+-                u'\n'.join(
+-                    u"%s\t%s\t%s\t%d" % (
+-                        modname,
+-                        record._name,
+-                        xids[record.id][1],
+-                        record.id,
+-                    )
+-                    for record in missing
+-                )),
+-                table='ir_model_data',
+-                columns=fields,
+-            )
++            if 'company_id' in fields:
++                cr.copy_from(io.StringIO(
++                    u'\n'.join(
++                        u"%s\t%s\t%s\t%d\t%d" % (
++                            modname,
++                            record._name,
++                            xids[record.id][1],
++                            record.id,
++                            record.company_id.id,
++                        )
++                        for record in missing
++                    )),
++                    table='ir_model_data',
++                    columns=fields,
++                )
++            else:
++                cr.copy_from(io.StringIO(
++                    u'\n'.join(
++                        u"%s\t%s\t%s\t%d" % (
++                            modname,
++                            record._name,
++                            xids[record.id][1],
++                            record.id,
++                        )
++                        for record in missing
++                    )),
++                    table='ir_model_data',
++                    columns=fields,
++                )
+         finally:
+             psycopg2.extensions.set_wait_callback(callback)
+         self.env['ir.model.data'].invalidate_cache(fnames=fields)
+@@ -3251,10 +3269,12 @@ Fields:
+         """ Check the companies of the values of the given field names.
+
+         :param list fnames: names of relational fields to check
+-        :raises UserError: if the `company_id` of the value of any field is not
+-            in `[False, self.company_id]` (or `self` if
++        :raises UserError: if the `company_id.id` of the value of any field is not
++            in `[False, self.company_id.id]` (or `self.id` if
+             :class:`~odoo.addons.base.models.res_company`).
+
++        If multicompany_base is installed, also accept company_id 1.
++
+         For :class:`~odoo.addons.base.models.res_users` relational fields,
+         verifies record company is in `company_ids` fields.
+
+@@ -3279,6 +3299,9 @@ Fields:
+             return
+
+         inconsistencies = []
++        consistent_company_ids = [False]
++        if self.env['ir.module.module'].sudo().search([('name', '=', 'multicompany_base')]).state == 'installed':
++            consistent_company_ids.append(1)
+         for record in self:
+             company = record.company_id if record._name != 'res.company' else record
+             # The first part of the check verifies that all records linked via relation fields are compatible
+@@ -3287,9 +3310,9 @@ Fields:
+                 corecord = record.sudo()[name]
+                 # Special case with `res.users` since an user can belong to multiple companies.
+                 if corecord._name == 'res.users' and corecord.company_ids:
+-                    if not (company <= corecord.company_ids):
++                    if not (company.id in corecord.company_ids.ids + consistent_company_ids):
+                         inconsistencies.append((record, name, corecord))
+-                elif not (corecord.company_id <= company):
++                elif not (corecord.company_id.id in [company.id] + consistent_company_ids):
+                     inconsistencies.append((record, name, corecord))
+             # The second part of the check (for property / company-dependent fields) verifies that the records
+             # linked via those relation fields are compatible with the company that owns the property value, i.e.
+@@ -3300,9 +3323,9 @@ Fields:
+                 # Special case with `res.users` since an user can belong to multiple companies.
+                 corecord = record.sudo()[name]
+                 if corecord._name == 'res.users' and corecord.company_ids:
+-                    if not (company <= corecord.company_ids):
++                    if not (company.id in corecord.company_ids.ids + consistent_company_ids):
+                         inconsistencies.append((record, name, corecord))
+-                elif not (corecord.company_id <= company):
++                elif not (corecord.company_id.id in [company.id] + consistent_company_ids):
+                     inconsistencies.append((record, name, corecord))
+
+         if inconsistencies:
+@@ -5320,7 +5343,7 @@ Fields:
+             else:
+                 (key, comparator, value) = d
+                 if comparator in ('child_of', 'parent_of'):
+-                    result.append(self.search([('id', 'in', self.ids), d]))
++                    result.append(self.with_context(active_test=False).search([('id', 'in', self.ids), d]))
+                     continue
+                 if key.endswith('.id'):
+                     key = key[:-3]
+diff --git a/odoo/modules/loading.py b/odoo/modules/loading.py
+index 8093f14b..a064632d 100644
+--- a/odoo/modules/loading.py
++++ b/odoo/modules/loading.py
+@@ -568,7 +568,10 @@ def load_modules(db, force_demo=False, status=None, update_module=False):
+         # is False.
+         env = api.Environment(cr, SUPERUSER_ID, {})
+         for model in env.values():
+-            model._register_hook()
++            if model._name in ('multicompany.config', 'multicompany.security'):
++                model._register_hook(update_module=update_module)
++            else:
++                model._register_hook()
+         env['base'].flush()
+
+         # STEP 9: save installed/updated modules for post-install tests
+diff --git a/odoo/modules/module.py b/odoo/modules/module.py
+index f445b8d1..56767908 100644
+--- a/odoo/modules/module.py
++++ b/odoo/modules/module.py
+@@ -411,7 +411,8 @@ def get_modules():
+
+         def is_really_module(name):
+             for mname in MANIFEST_NAMES:
+-                if os.path.isfile(opj(dir, name, mname)):
++                # Patch removing 'test_' should not be in multicompany_base, but another place ...
++                if os.path.isfile(opj(dir, name, mname)) and name[:5] != 'test_':
+                     return True
+         return [
+             clean(it)
+diff --git a/odoo/modules/registry.py b/odoo/modules/registry.py
+index 6a09da86..10311d1a 100644
+--- a/odoo/modules/registry.py
++++ b/odoo/modules/registry.py
+@@ -282,7 +282,10 @@ class Registry(Mapping):
+         # on a fully loaded registry, and not on a registry being loaded.
+         if self.ready:
+             for model in env.values():
+-                model._register_hook()
++                if model._name in ('multicompany.config', 'multicompany.security'):
++                    model._register_hook(update_module=True)
++                else:
++                    model._register_hook()
+             env['base'].flush()
+
+     @lazy_property
+diff --git a/odoo/tools/safe_eval.py b/odoo/tools/safe_eval.py
+index ce47edb9..c010c0da 100644
+--- a/odoo/tools/safe_eval.py
++++ b/odoo/tools/safe_eval.py
+@@ -326,6 +326,38 @@ def safe_eval(expr, globals_dict=None, locals_dict=None, mode="eval", nocopy=Fal
+             locals_dict = {}
+         locals_dict.update(_BUILTINS)
+     c = test_expr(expr, _SAFE_OPCODES, mode=mode)
++    if mode == 'exec':
++        # Untrusted code should NOT use the database cursor to execute SQL commands!
++        # That would bypass all the security rules!
++        # key = unsafe
++        # value = list of safe exceptions
++        unsafe_except = {
++            'cache': [],
++            '.cr': ['.create', '.credit'],
++            '._cr': ['._cron'],
++            '.execute': [],
++            '._execute': [],
++            '.with': ['.with_context(active_test=False)'],
++            '._with': [],
++            '.sql': [],
++            '._sql': [],
++            '.sudo': [],
++            '._sudo': [],
++            '._': [],
++            '__': [],
++        }
++        if 'env' in globals_dict and globals_dict['env'].su == True:
++            # With superuser privileges, allow private methods
++            del unsafe_except['._']
++        testexpr = expr.decode() if isinstance(expr, bytes) else expr
++        for text in unsafe_except:
++            if text in testexpr:
++                count_total = expr.count(text)
++                safe_exceptions = unsafe_except[text]
++                count_safe = sum([expr.count(safe) for safe in safe_exceptions])
++                count_unsafe = count_total - count_safe
++                if count_unsafe:
++                    raise odoo.exceptions.UserError('safe_eval: The code cannot have this phrase:  {}'.format(text))
+     try:
+         return unsafe_eval(c, globals_dict, locals_dict)
+     except odoo.exceptions.UserError:

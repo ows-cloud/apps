@@ -1,5 +1,3 @@
-from openupgradelib import openupgrade
-
 # @openupgrade.migrate()
 # def migrate(env, version):
 #     module_names = [

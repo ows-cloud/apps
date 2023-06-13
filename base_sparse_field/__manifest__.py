@@ -1,21 +1,15 @@
-# -*- coding: utf-8 -*-
 {
-    'name': "Sparse Fields",
-    'summary': """Implementation of sparse fields.""",
-    'description': """
-        The purpose of this module is to implement "sparse" fields, i.e., fields
-        that are mostly null. This implementation circumvents the PostgreSQL
-        limitation on the number of columns in a table. The values of all sparse
-        fields are stored in a "serialized" field in the form of a JSON mapping.
-
-        Henrik Norlin added support for date and datetime in fields.py
-    """,
-    'category': 'Hidden',
-    'version': '1.0',
-    'depends': ['base'],
-    'data': [
-        'security/ir.model.access.csv',
-        'views/views.xml',
+    "name": "Sparse Fields",
+    "summary": """Implementation of sparse fields.""",
+    "author": "Odoo, " "AppsToGROW, " "Odoo Community Association (OCA)",
+    "category": "Hidden",
+    "version": "14.0.2.0.0",
+    "depends": ["base"],
+    "data": [
+        "security/ir.model.access.csv",
+        "views/views.xml",
     ],
-    'license': 'LGPL-3',
+    "license": "LGPL-3",
+    "maintainers": ["appstogrow"],
+    "website": "https://github.com/appstogrow/apps",
 }

@@ -1,4 +1,4 @@
-# Copyright 2019 Ecosoft Co., Ltd (http://ecosoft.co.th/)
+# Copyright 2022 AppsToGROW
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html)
 
 {
@@ -7,11 +7,10 @@
     "version": "14.0.1.0.0",
     "author": "AppsToGROW,Odoo Community Association (OCA)",
     "license": "AGPL-3",
-    "website": "https://github.com/OCA/server-tools",
+    "website": "https://github.com/appstogrow/apps",
     "category": "Tools",
     "depends": ["excel_import_export"],
-    "data": [
-    ],
+    "data": [],
     "installable": True,
     "development_status": "Beta",
     "maintainers": ["appstogrow"],

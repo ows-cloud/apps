@@ -1,99 +1,122 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data>
-    
+
         <!-- res.field -->
-        
-		<record model="ir.ui.view" id="view_res_field_tree">
-    	    <field name="name">res.field.tree</field>
+
+        <record model="ir.ui.view" id="view_res_field_tree">
+            <field name="name">res.field.tree</field>
             <field name="model">res.field</field>
-            <field name="priority" eval="20"/>
+            <field name="priority" eval="20" />
             <field name="arch" type="xml">
                 <tree>
-                    <field name="name"/>
-                    <field name="model"/>
-                    <field name="data_type"/>
-                    <field name="code"/>
-                    <field name="default_value"/>
-                    <field name="auto_create"/>
-                    <field name="company_id" groups="base.group_multi_company"/>
-                    <field name="country_id"/>
-                    <field name="app"/>
-                    <field name="active" invisible="1"/>
+                    <field name="name" />
+                    <field name="model" />
+                    <field name="data_type" />
+                    <field name="code" />
+                    <field name="default_value" />
+                    <field name="auto_create" />
+                    <field name="company_id" groups="base.group_multi_company" />
+                    <field name="country_id" />
+                    <field name="app" />
+                    <field name="active" invisible="1" />
                 </tree>
             </field>
         </record>
-        
+
         <record model="ir.ui.view" id="view_res_field_form">
             <field name="name">res.field.form</field>
             <field name="model">res.field</field>
-            <field name="priority" eval="20"/>
+            <field name="priority" eval="20" />
             <field name="arch" type="xml">
                 <form>
                     <group>
-                        <field name="name"/>
-                        <field name="model"/>
-                        <field name="data_type"/>
+                        <field name="name" />
+                        <field name="model" />
+                        <field name="data_type" />
                     </group>
                     <group>
-                        <field name="code"/>
-                        <field name="selection_value_ids" attrs="{'invisible': [('data_type','!=','selection')]}">
+                        <field name="code" />
+                        <field
+                            name="selection_value_ids"
+                            attrs="{'invisible': [('data_type','!=','selection')]}"
+                        >
                             <tree editable="bottom">
-                                <field name="code"/>
-                                <field name="name"/>
+                                <field name="code" />
+                                <field name="name" />
                             </tree>
                         </field>
                         <!-- <field name="reference_model" attrs="{'invisible': [('data_type','!=','reference')]}"/> -->
-                        <field name="default_value" attrs="{'invisible': [('data_type','in',['selection','reference'])]}"/>
-                        <field name="auto_create"/>
-                        <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
-                        <field name="country_id"/>
-                        <field name="app"/>
-                        <field name="active"/>
+                        <field
+                            name="default_value"
+                            attrs="{'invisible': [('data_type','in',['selection','reference'])]}"
+                        />
+                        <field name="auto_create" />
+                        <field
+                            name="company_id"
+                            groups="base.group_multi_company"
+                            options="{'no_create': True}"
+                        />
+                        <field name="country_id" />
+                        <field name="app" />
+                        <field name="active" />
                     </group>
                 </form>
             </field>
         </record>
-        
+
         <record model="ir.actions.act_window" id="action_res_field_tree">
             <field name="name">Fields</field>
             <field name="res_model">res.field</field>
             <field name="view_mode">tree,form</field>
         </record>
 
-        <menuitem id="menu_res_field" name="Fields" sequence="20" parent="base.next_id_2" action="action_res_field_tree"/>
+        <menuitem
+            id="menu_res_field"
+            name="Fields"
+            sequence="20"
+            parent="base.next_id_2"
+            action="action_res_field_tree"
+        />
 
         <!-- res.field.value -->
 
         <record model="ir.ui.view" id="view_res_field_value_form">
             <field name="name">res.field.value.form</field>
             <field name="model">res.field.value</field>
-            <field name="priority" eval="20"/>
+            <field name="priority" eval="20" />
             <field name="arch" type="xml">
                 <form>
                     <group>
-                        <field name="field_country_id" groups="base.group_no_one"/>
-                        <field name="field_app" groups="base.group_no_one"/>
-                        <field name="field_data_type" groups="base.group_no_one"/>
-                        <field name="field_id"/>
-                        <field name="field_code" groups="base.group_no_one"/>
-                        <field name="selection_value_id" domain="[('field_id','=',field_id)]"
-                            attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','selection')]}"/>
-                        <field name="reference_value"
-                            attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','reference')]}"/>
-                        <field name="value" 
-                            attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','in',['selection','reference'])]}"/>
-                        <field name="model" groups="base.group_no_one"/>
-                        <field name="res_id" groups="base.group_no_one"/>
-                        <field name="company_id" groups="base.group_no_one"/>
-                        <field name="company_country_id" groups="base.group_no_one"/>
+                        <field name="field_country_id" groups="base.group_no_one" />
+                        <field name="field_app" groups="base.group_no_one" />
+                        <field name="field_data_type" groups="base.group_no_one" />
+                        <field name="field_id" />
+                        <field name="field_code" groups="base.group_no_one" />
+                        <field
+                            name="selection_value_id"
+                            domain="[('field_id','=',field_id)]"
+                            attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','selection')]}"
+                        />
+                        <field
+                            name="reference_value"
+                            attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','reference')]}"
+                        />
+                        <field
+                            name="value"
+                            attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','in',['selection','reference'])]}"
+                        />
+                        <field name="model" groups="base.group_no_one" />
+                        <field name="res_id" groups="base.group_no_one" />
+                        <field name="company_id" groups="base.group_no_one" />
+                        <field name="company_country_id" groups="base.group_no_one" />
                     </group>
                 </form>
             </field>
         </record>
 
         <!-- IMPLEMENTATION EXAMPLE -->
-        
+
         <!-- res.company -->
         <!--
          <record model="ir.ui.view" id="view_res_company_form">
@@ -109,14 +132,14 @@
                                 <field name="field_country_id" groups="base.group_no_one"/>
                                 <field name="field_app" groups="base.group_no_one"/>
                                 <field name="field_data_type" groups="base.group_no_one"/>
-                                <field name="field_id" 
+                                <field name="field_id"
 domain="[('model','=','res.company'),('app','=',False),'|',('country_id','=',False),('country_id','=',company_country_id)]"/>
                                 <field name="field_code" groups="base.group_no_one"/>
                                 <field name="selection_value_id" domain="[('field_id','=',field_id)]"
                                     attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','selection')]}"/>
                                 <field name="reference_value"
                                     attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','reference')]}"/>
-                                <field name="value" 
+                                <field name="value"
                                     attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','in',['selection','reference'])]}"/>
                                 <field name="model" groups="base.group_no_one"/>
                                 <field name="res_id" groups="base.group_no_one"/>
@@ -144,14 +167,14 @@ domain="[('model','=','res.company'),('app','=',False),'|',('country_id','=',Fal
                                 <field name="field_country_id" groups="base.group_no_one"/>
                                 <field name="field_app" groups="base.group_no_one"/>
                                 <field name="field_data_type" groups="base.group_no_one"/>
-                                <field name="field_id" 
+                                <field name="field_id"
 domain="[('model','=','res.users'),('app','=',False),'|',('country_id','=',False),('country_id','=',company_country_id)]"/>
                                 <field name="field_code" groups="base.group_no_one"/>
                                 <field name="selection_value_id" domain="[('field_id','=',field_id)]"
                                     attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','selection')]}"/>
                                 <field name="reference_value"
                                     attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','reference')]}"/>
-                                <field name="value" 
+                                <field name="value"
                                     attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','in',['selection','reference'])]}"/>
                                 <field name="model" groups="base.group_no_one"/>
                                 <field name="res_id" groups="base.group_no_one"/>

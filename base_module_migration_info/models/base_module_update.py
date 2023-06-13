@@ -1,8 +1,9 @@
-from odoo import api, fields, models, _
-from odoo.release import major_version # 14.0
+import logging
 from datetime import date
 
-import logging
+from odoo import models
+from odoo.release import major_version  # 14.0
+
 _logger = logging.getLogger(__name__)
 
 
@@ -10,7 +11,7 @@ class BaseModuleUpdate(models.TransientModel):
     _inherit = "base.module.update"
 
     def button_get_migration_info(self):
-        mig_version = str(float(major_version) + 1.0)
+        str(float(major_version) + 1.0)
         for module in self.env["ir.module.module"].search([]):
             module.mig_url = "https://github.com/OCA/OpenUpgrade/pull/3265"
             module.mig_state = "merged"

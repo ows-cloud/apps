@@ -30,5 +30,5 @@ index c4d6915a..f149f1f2 100644
 +                              table=self._table,
 +                              where='noupdate IS TRUE' if self._overwrite else 'TRUE'))
          count += cr.rowcount
- 
+
          if self._debug:

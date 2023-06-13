@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?>
-
 <odoo>
 
     <record id="view_res_company_currency_form" model="ir.ui.view">
@@ -9,10 +8,22 @@
         <field name="arch" type="xml">
             <data>
                 <field name="favicon" position="after">
-                    <field name="currency_exchange_journal_id" groups="base.group_no_one"/>
-                    <field name="income_currency_exchange_account_id" groups="base.group_no_one"/>
-                    <field name="expense_currency_exchange_account_id" groups="base.group_no_one"/>
-                    <field name="account_default_pos_receivable_account_id" groups="base.group_no_one"/>
+                    <field
+                        name="currency_exchange_journal_id"
+                        groups="base.group_no_one"
+                    />
+                    <field
+                        name="income_currency_exchange_account_id"
+                        groups="base.group_no_one"
+                    />
+                    <field
+                        name="expense_currency_exchange_account_id"
+                        groups="base.group_no_one"
+                    />
+                    <field
+                        name="account_default_pos_receivable_account_id"
+                        groups="base.group_no_one"
+                    />
                 </field>
             </data>
         </field>

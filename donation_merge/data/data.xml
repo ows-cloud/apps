@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data>
 
@@ -52,29 +52,29 @@
 
         <!-- A4 res.partner -->
         <template id="report_address_sheet_a4">
-            <t t-set="envelope" t-value="0"/>
+            <t t-set="envelope" t-value="0" />
             <t t-call="donation_merge.report_address_main">
-                <br/>
-                <br/>
-                <br/>
-                <br/>
+                <br />
+                <br />
+                <br />
+                <br />
             </t>
         </template>
 
         <!-- ENVELOPE res.partner -->
         <template id="report_address_envelope_dle">
-            <t t-set="envelope" t-value="1"/>
+            <t t-set="envelope" t-value="1" />
             <t t-call="donation_merge.report_address_main">
-                <br/>
+                <br />
             </t>
         </template>
         <template id="report_address_envelope_c5">
-            <t t-set="envelope" t-value="1"/>
+            <t t-set="envelope" t-value="1" />
             <t t-call="donation_merge.report_address_main">
-                <br/>
-                <br/>
-                <br/>
-                <br/>
+                <br />
+                <br />
+                <br />
+                <br />
             </t>
         </template>
         <template id="report_address_main">
@@ -86,41 +86,61 @@
                                 <t t-if="envelope">
                                     <tr>
                                         <td style="width: 55%" valign="top">
-                                            <p style="font-size: 6px;"><br/></p>
+                                            <p style="font-size: 6px;"><br /></p>
                                             <p style="font-size: 18px;">
-                                                Granheimstiftelsen<br/>
-                                                Postboks 243<br/>
-                                                1851 Mysen <br/>
-                                                <t t-if="o.country_id.code == 'NO'"></t>
-                                                <t t-elif="o.country_id.code in ['SE', 'DK']">NORGE</t>
+                                                Granheimstiftelsen<br />
+                                                Postboks 243<br />
+                                                1851 Mysen <br />
+                                                <t t-if="o.country_id.code == 'NO'" />
+                                                <t
+                                                    t-elif="o.country_id.code in ['SE', 'DK']"
+                                                >NORGE</t>
                                                 <t t-else="">NORWAY</t>
                                             </p>
                                         </td>
                                         <td style="width: 45%" align="right">
-                                            <p style="font-size: 6px;"><br/></p>
-                                            <img src="https://granheims.no/wp-content/uploads/2021/07/Posten.png" alt="Demo Icon" width="100" height="100"/>
+                                            <p style="font-size: 6px;"><br /></p>
+                                            <img
+                                                src="https://granheims.no/wp-content/uploads/2021/07/Posten.png"
+                                                alt="Demo Icon"
+                                                width="100"
+                                                height="100"
+                                            />
                                             <p>
-                                                <br/>
-                                                <br/>
+                                                <br />
+                                                <br />
                                             </p>
                                         </td>
                                     </tr>
                                 </t>
                                 <tr>
-                                    <td style="width: 55%;"></td>
+                                    <td style="width: 55%;" />
                                     <td style="width: 45%;">
                                         <p style="font-size: 18px;">
-                                            <t t-raw="0"/>
-                                            <span t-field="o.name"/><br/>
-                                            <span t-field="o.street"/><br t-if="o.street"/>
-                                            <span t-field="o.street2"/><br t-if="o.street2"/>
-                                            <span t-field="o.zip"/> <span t-field="o.city"/><br t-if="o.zip or o.city"/>
-                                            <t t-if="o.country_id.code == 'NO'"></t>
-                                            <t t-elif="o.country_id.code == 'SE'">SVERIGE</t>
-                                            <t t-elif="o.country_id.code == 'DK'">DANMARK</t>
-                                            <t t-else=""><span style="text-transform: uppercase" t-esc="o.country_id.name"/></t>
+                                            <t t-raw="0" />
+                                            <span t-field="o.name" /><br />
+                                            <span t-field="o.street" /><br
+                                                t-if="o.street"
+                                            />
+                                            <span t-field="o.street2" /><br
+                                                t-if="o.street2"
+                                            />
+                                            <span t-field="o.zip" /> <span
+                                                t-field="o.city"
+                                            /><br t-if="o.zip or o.city" />
+                                            <t t-if="o.country_id.code == 'NO'" />
+                                            <t
+                                                t-elif="o.country_id.code == 'SE'"
+                                            >SVERIGE</t>
+                                            <t
+                                                t-elif="o.country_id.code == 'DK'"
+                                            >DANMARK</t>
+                                            <t t-else=""><span
+                                                    style="text-transform: uppercase"
+                                                    t-esc="o.country_id.name"
+                                                /></t>
                                         </p>
-                                        <!-- 
+                                        <!--
                                             <t t-set="address">
                                                 <address t-field="o" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
                                             </t>
@@ -146,43 +166,61 @@
                             <table style="width:100%;">
                                 <tr>
                                     <td colspan="2">
-                                        <img src="https://granheims.no/wp-content/uploads/2021/07/Hjertelig-takk-for-gaven.png" alt="Demo Icon" width="730" height="228"/>
+                                        <img
+                                            src="https://granheims.no/wp-content/uploads/2021/07/Hjertelig-takk-for-gaven.png"
+                                            alt="Demo Icon"
+                                            width="730"
+                                            height="228"
+                                        />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td valign="top" style="padding-right: 15px;">
-                                        <p style="font-size: 6px;"><br/></p>
-                                        <span t-field="o.campaign_id.text1"/>
+                                        <p style="font-size: 6px;"><br /></p>
+                                        <span t-field="o.campaign_id.text1" />
                                     </td>
                                     <td valign="top" align="center">
-                                        <p style="font-size: 6px;"><br/></p>
-                                        <img t-if="o.campaign_id.image" 
+                                        <p style="font-size: 6px;"><br /></p>
+                                        <img
+                                            t-if="o.campaign_id.image"
                                             t-att-src="image_data_uri(o.campaign_id.image)"
                                             t-att-height="o.campaign_id.image_height"
                                             t-att-width="o.campaign_id.image_width"
-                                            alt="Bilde av person"/>
-                                        <span t-field="o.campaign_id.image_text"/>
+                                            alt="Bilde av person"
+                                        />
+                                        <span t-field="o.campaign_id.image_text" />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
-                                        <span t-field="o.campaign_id.text2"/>
+                                        <span t-field="o.campaign_id.text2" />
                                     </td>
                                 </tr>
                             </table>
-                            <p/>
+                            <p />
                             <table style="width:100%; font-size: 18px;" align="center">
                                 <tr>
-                                    <td align="center" colspan="3" style="font-size: 18px;">
+                                    <td
+                                        align="center"
+                                        colspan="3"
+                                        style="font-size: 18px;"
+                                    >
                                         <t t-if="o.partner_id.lang == 'nb_NO'">
-                                            <b><i>Kvittering <span t-field="o.date" t-options='{"format": "dd.MM.yyyy"}'/></i></b> <br/>
-                                            Granheimstiftelsen har mottatt fra <br/>
-                                            <span t-field="o.partner_id.name"/>:
+                                            <b><i>Kvittering <span
+                                                        t-field="o.date"
+                                                        t-options='{"format": "dd.MM.yyyy"}'
+                                                    /></i></b> <br />
+                                            Granheimstiftelsen har mottatt fra <br />
+                                            <span t-field="o.partner_id.name" />:
                                         </t>
                                         <t t-else="">
-                                            <b><i>Receipt <span t-field="o.date" t-options='{"format": "MM/dd/yyyy"}'/></i></b> <br/>
-                                            The Granheim Foundation has received from <br/>
-                                            <span t-field="o.partner_id.name"/>:
+                                            <b><i>Receipt <span
+                                                        t-field="o.date"
+                                                        t-options='{"format": "MM/dd/yyyy"}'
+                                                    /></i></b> <br />
+                                            The Granheim Foundation has received from <br
+                                            />
+                                            <span t-field="o.partner_id.name" />:
                                         </t>
                                     </td>
                                 </tr>
@@ -192,20 +230,35 @@
                                             lang.date_format returns ERROR since the "lang" variable does not exist. -->
                                         <td style="width:35%;" align="right">
                                             <t t-if="o.partner_id.lang == 'nb_NO'">
-                                                <span t-field="d.donation_date" t-options='{"format": "dd.MM.yyyy"}'/>
+                                                <span
+                                                    t-field="d.donation_date"
+                                                    t-options='{"format": "dd.MM.yyyy"}'
+                                                />
                                             </t>
                                             <t t-else="">
-                                                <span t-field="d.donation_date" t-options='{"format": "MM/dd/yyyy"}'/>
+                                                <span
+                                                    t-field="d.donation_date"
+                                                    t-options='{"format": "MM/dd/yyyy"}'
+                                                />
                                             </t>
                                         </td>
-                                        <td style="width:30%;" align="center"><span t-field="dl.description"/></td>
-                                        <td style="width:35%;" align="left"><span t-field="dl.amount"/></td>
+                                        <td style="width:30%;" align="center"><span
+                                                t-field="dl.description"
+                                            /></td>
+                                        <td style="width:35%;" align="left"><span
+                                                t-field="dl.amount"
+                                            /></td>
                                     </tr>
                                 </t>
                             </table>
                             <div class="footer">
-                                <img src="https://granheims.no/wp-content/uploads/2021/07/Granheimstiftelsen-skaper-bærekraftige-løsninger.png" alt="Demo Icon" width="872" height="87"/>
-                                <p style="font-size: 15px;"><br/></p>
+                                <img
+                                    src="https://granheims.no/wp-content/uploads/2021/07/Granheimstiftelsen-skaper-bærekraftige-løsninger.png"
+                                    alt="Demo Icon"
+                                    width="872"
+                                    height="87"
+                                />
+                                <p style="font-size: 15px;"><br /></p>
                             </div>
                         </div>
                     </t>
@@ -219,7 +272,7 @@
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">donation_merge.report_address_sheet_a4</field>
             <field name="report_file">donation_merge.report_address_sheet_a4</field>
-            <field name="paperformat_id" ref="base.paperformat_euro"/>
+            <field name="paperformat_id" ref="base.paperformat_euro" />
             <field name="binding_type">report</field>
         </record>
 
@@ -229,7 +282,7 @@
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">donation_merge.report_address_envelope_dle</field>
             <field name="report_file">donation_merge.report_address_envelope_dle</field>
-            <field name="paperformat_id" ref="donation_merge.paperformat_dle"/>
+            <field name="paperformat_id" ref="donation_merge.paperformat_dle" />
             <field name="binding_type">report</field>
         </record>
 
@@ -239,7 +292,7 @@
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">donation_merge.report_address_envelope_c5</field>
             <field name="report_file">donation_merge.report_address_envelope_c5</field>
-            <field name="paperformat_id" ref="donation_merge.paperformat_c5"/>
+            <field name="paperformat_id" ref="donation_merge.paperformat_c5" />
             <field name="binding_type">report</field>
         </record>
 
@@ -249,56 +302,68 @@
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">donation_merge.report_donation_tax_receipt</field>
             <field name="report_file">donation_merge.report_donation_tax_receipt</field>
-            <field name="paperformat_id" ref="donation_merge.paperformat_a5"/>
+            <field name="paperformat_id" ref="donation_merge.paperformat_a5" />
             <field name="binding_type">report</field>
         </record>
 
         <record id="mail_template_donation_tax_receipt_english" model="mail.template">
             <field name="name">Donation Tax Receipt - English</field>
-            <field name="model_id" ref="donation_merge.model_donation_tax_receipt"/>
+            <field name="model_id" ref="donation_merge.model_donation_tax_receipt" />
             <field name="partner_to">${object.partner_id.id}</field>
             <field name="subject">Thank you!</field>
-            <field name="body_html"><![CDATA[
+            <field
+                name="body_html"
+            ><![CDATA[
 <div>
     <p>Dear ${object.partner_id.name},</p>
     <p>Thank you for supporting the work of the Granheim Foundation!</p>
     <p>Please find attached the latest newsletter from Matteson. I hope you will enjoy it.</p>
-    
+
     % if object.partner_id.donor_newsletter_delivery_method=='N':
     <p>We would like to continue sending you updates from Matteson Mission School. <b>Reply to this email</b> if you wish to continue receiving this newsletter.</p>
     % endif
-    
+
     <p>Kind  regards,</p>
 </div>
 <div>
     ${user.signature | safe}
 </div>]]></field>
-            <field name="report_template" ref="donation_merge.action_report_donation_tax_receipt"/>
+            <field
+                name="report_template"
+                ref="donation_merge.action_report_donation_tax_receipt"
+            />
             <field name="report_name">Receipt to ${object.partner_id.name}.pdf</field>
         </record>
 
         <record id="mail_template_donation_tax_receipt_norwegian" model="mail.template">
             <field name="name">Donation Tax Receipt - Norwegian</field>
-            <field name="model_id" ref="donation_merge.model_donation_tax_receipt"/>
+            <field name="model_id" ref="donation_merge.model_donation_tax_receipt" />
             <field name="partner_to">${object.partner_id.id}</field>
             <field name="subject">Tusen takk!</field>
-            <field name="body_html"><![CDATA[
+            <field
+                name="body_html"
+            ><![CDATA[
 <div>
     <p>Kjære ${object.partner_id.name}!</p>
     <p>Tusen takk for støtten til Granheimstiftelsen! Den verdsettes høyt!</p>
     <p>Her kommer Matteson Misjonsnytt som jeg håper du vil lese!</p>
-    
+
     % if object.partner_id.donor_newsletter_delivery_method=='N':
     <p>Vi sender deg gjerne oppdateringer fra Matteson Misjonsskole. <b>Svar på denne eposten</b> hvis du ønsker å fortsette å motta dette nyhetsbrevet.</p>
     % endif
-    
+
     <p>Vennlig hilsen, med ønske om Guds velsignelse,</p>
 </div>
 <div>
     ${user.signature | safe}
 </div>]]></field>
-            <field name="report_template" ref="donation_merge.action_report_donation_tax_receipt"/>
-            <field name="report_name">Kvittering til ${object.partner_id.name}.pdf</field>
+            <field
+                name="report_template"
+                ref="donation_merge.action_report_donation_tax_receipt"
+            />
+            <field
+                name="report_name"
+            >Kvittering til ${object.partner_id.name}.pdf</field>
         </record>
 
         <record id="action_donation_tax_receipt_english" model="ir.actions.act_window">
@@ -307,19 +372,34 @@
             <field name="res_model">mail.compose.message</field>
             <field name="target">new</field>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="mail.email_compose_message_wizard_form"/>
-            <field name="binding_model_id" ref="donation_base.model_donation_tax_receipt"/>
-            <field name="context" eval="{'default_composition_mode': 'mass_mail', 'default_template_id': ref('donation_merge.mail_template_donation_tax_receipt_english'), 'default_use_template': True}"/>
+            <field name="view_id" ref="mail.email_compose_message_wizard_form" />
+            <field
+                name="binding_model_id"
+                ref="donation_base.model_donation_tax_receipt"
+            />
+            <field
+                name="context"
+                eval="{'default_composition_mode': 'mass_mail', 'default_template_id': ref('donation_merge.mail_template_donation_tax_receipt_english'), 'default_use_template': True}"
+            />
         </record>
-        <record id="action_donation_tax_receipt_norwegian" model="ir.actions.act_window">
+        <record
+            id="action_donation_tax_receipt_norwegian"
+            model="ir.actions.act_window"
+        >
             <field name="name">Send Norwegian Donation Receipts on Email</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">mail.compose.message</field>
             <field name="target">new</field>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="mail.email_compose_message_wizard_form"/>
-            <field name="binding_model_id" ref="donation_base.model_donation_tax_receipt"/>
-            <field name="context" eval="{'default_composition_mode': 'mass_mail', 'default_template_id': ref('donation_merge.mail_template_donation_tax_receipt_norwegian'), 'default_use_template': True}"/>
+            <field name="view_id" ref="mail.email_compose_message_wizard_form" />
+            <field
+                name="binding_model_id"
+                ref="donation_base.model_donation_tax_receipt"
+            />
+            <field
+                name="context"
+                eval="{'default_composition_mode': 'mass_mail', 'default_template_id': ref('donation_merge.mail_template_donation_tax_receipt_norwegian'), 'default_use_template': True}"
+            />
         </record>
     </data>
 </odoo>

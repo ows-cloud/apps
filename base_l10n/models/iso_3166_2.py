@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # https://github.com/olahol/iso-3166-2.json/blob/master/data/eQuest.csv
 # Successfull implementation requires regular updates
 

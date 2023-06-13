@@ -1,16 +1,12 @@
-from odoo import fields, models
+from odoo import api, models
+
 
 class Base(models.AbstractModel):
     _inherit = "base"
 
-    def excel_post_import_hook(self, one2many_field_name):
+    def excel_post_import(self, one2many_field_name, excel_post_import_=[]):
         for record in self:
-            for line in getattr(record, one2many_field_name):
-                line.excel_post_import_hook_for_record_line()
-            record.excel_post_import_hook_for_record()
-
-    def _excel_post_import_hook_for_record(self):
-        self.ensure_one()
-
-    def _excel_post_import_hook_for_record_line(self):
-        self.ensure_one()
+            lines = getattr(record, one2many_field_name)
+            for name in excel_post_import_:
+                method = "excel_post_import_{}".format(name)
+                api.call_kw(lines, method, [lines.ids], {})

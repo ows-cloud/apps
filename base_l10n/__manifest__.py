@@ -2,29 +2,18 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': 'Base Localization',
-    'summary': 'Address Format',
-
-    'author': 'AppsToGROW',
-    'category': 'Administration',
-    'data': [
-        'views/views.xml',
-        'data/data.xml',
-        'execute_functions.xml',
+    "name": "Base Localization",
+    "summary": "Address Format",
+    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
+    "category": "Administration",
+    "data": [
+        "views/views.xml",
+        "data/data.xml",
+        "execute_functions.xml",
     ],
-    'depends': ['base'],
-    'license': 'AGPL-3',
-    'version': '14.0.1.0.0',
-    'website': 'http://www.appstogrow.co',
-
-    'description': '''
-        Odoo 12 has res.country address_view_id and name_position and vat_label for better localization.
-        address_format is for the reports.
-        address_view_id is for the contact UI.
-        
-        TODO:
-        address_format_domestic field: 1850 Mysen | NO-1850 Mysen, NORWAY
-        country states always up-to-date worldwide
-        zip -> prefill city
-    ''',
+    "depends": ["base"],
+    "license": "AGPL-3",
+    "maintainers": ["appstogrow"],
+    "version": "14.0.1.0.0",
+    "website": "https://github.com/appstogrow/apps",
 }
