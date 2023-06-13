@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
+
+    <record id="view_calendar_event_form" model="ir.ui.view">
+        <field name="name">calendar.event form</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="allow_portal_users_to_sign_up" />
+            </field>
+        </field>
+    </record>
     <!--
     <record id="view_calendar_event_tree_mobile" model="ir.ui.view">
         <field name="name">calendar tree mobile</field>
         <field name="model">calendar.event</field>
-        <field name="inherit_id" ref="calendar.view_calendar_event_tree"/>
         <field name="type">tree</field>
-        <field name="priority" eval="16"/>
+        <field name="priority" eval="20"/>
         <field name="arch" type="xml">
-            <tree position="replace">
-                <tree string="Meetings" multi_edit="1">
+                <tree string="Calendar" multi_edit="1" editable="top">
                     <field name="name" string="Subject" readonly="1"/>
                     <field name="start" string="Start Date"/>
                     <field name="duration" widget="float_time" readonly="1"/>
+                    <field name="is_attending" readonly="0" />
+                    <button name="open_form" type="object" string="Details" />
                 </tree>
-              </tree>
         </field>
     </record>
 
@@ -22,6 +33,7 @@
         <field name="name">Portal Calendar</field>
         <field name="res_model">calendar.event</field>
         <field name="view_mode">tree,kanban,form</field>
+        <field name="view_id" ref="view_calendar_event_tree_mobile"/>
     </record>
 
     <menuitem
@@ -30,6 +42,6 @@
         parent="calendar.mail_menu_calendar"
         action="action_calendar_event_portal"
         groups="group_calendar_event_matrix"
-    /> -->
-
+    />
+    -->
 </odoo>

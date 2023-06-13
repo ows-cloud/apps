@@ -86,4 +86,33 @@ class CalendarEvent(models.Model):
             else:
                 record.is_attending = False
 
-    is_attending = fields.Boolean(string="Is Attending", compute="_compute_is_attending")
+    def _inverse_is_attending(self):
+        for record in self:
+            partner_id = self.env.user.partner_id
+            if record.allow_portal_users_to_sign_up:
+                # The best would be to disable only calendar.event rules, not all rules.
+                record = record.sudo()
+            if record.is_attending:
+                record.write({"partner_ids": [(4, partner_id.id, 0)]})
+            else:
+                record.write({"partner_ids": [(3, partner_id.id, 0)]})
+
+    is_attending = fields.Boolean(
+        string="Is Attending",
+        compute="_compute_is_attending",
+        inverse="_inverse_is_attending",
+    )
+    allow_portal_users_to_sign_up = fields.Boolean(
+        string="Allow portal users to sign up",
+        help="Allow portal users to sign up for this calendar event."
+    )
+
+    def open_form(self):
+        self.ensure_one()
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "form,tree",
+          "res_model": self._name,
+          "res_id": self.id,
+        }
+        return action

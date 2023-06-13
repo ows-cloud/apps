@@ -14,8 +14,9 @@
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
-        "views/calendar.event.matrix.xml",
         "views/calendar_attendee_views.xml",
+        "views/calendar_event_matrix_views.xml",
+        "views/calendar_event_views.xml",
         "report/report_templates.xml",
         "report/report_views.xml",
     ],
