@@ -151,6 +151,10 @@ COMPANY_FIELD = {
         "read_if": "id",
         "edit_if": "id",
     },
+    # "mis.report.instance": {
+    #     "read_if": "edit_company_id",
+    #     "edit_if": "edit_company_id",
+    # },
     "default": "company_id",
 }
 
