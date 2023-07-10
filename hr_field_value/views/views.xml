@@ -1,0 +1,433 @@
+<odoo>
+    <data>
+
+      <!-- hr.contract -->
+
+        <record model="ir.ui.view" id="hr_contract_view_form">
+            <field name="name">hr.contract.form.hr_professional</field>
+            <field name="model">hr.contract</field>
+            <field name="inherit_id" ref="hr_contract.hr_contract_view_form" />
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page name="fields" string="Fields">
+                        <field name="field_value_ids">
+                            <tree editable="bottom">
+                                <field
+                                    name="field_country_id"
+                                    groups="base.group_no_one"
+                                />
+                                <field name="field_app" groups="base.group_no_one" />
+                                <field
+                                    name="field_data_type"
+                                    groups="base.group_no_one"
+                                />
+                                <field
+                                    name="field_id"
+                                    domain="[('model','=','hr.contract'),'|',('country_id','=',False),('country_id','=',company_country_id)]"
+                                />
+                                <field name="field_code" groups="base.group_no_one" />
+                                <field
+                                    name="selection_value_id"
+                                    domain="[('field_id','=',field_id)]"
+                                    attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','selection')]}"
+                                />
+                                <field
+                                    name="reference_value"
+                                    attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','reference')]}"
+                                />
+                                <field
+                                    name="value"
+                                    attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','in',['selection','reference'])]}"
+                                />
+                                <field name="model" groups="base.group_no_one" />
+                                <field name="res_id" groups="base.group_no_one" />
+                                <field name="company_id" groups="base.group_no_one" />
+                                <field
+                                    name="company_country_id"
+                                    groups="base.group_no_one"
+                                />
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+        <!-- hr.employee -->
+
+        <record model="ir.ui.view" id="view_hr_employee_form">
+            <field name="name">hr.employee.form.hr_professional</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form" />
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page name="fields" string="Fields">
+                        <field name="field_value_ids">
+                            <tree editable="bottom">
+                                <field
+                                    name="field_country_id"
+                                    groups="base.group_no_one"
+                                />
+                                <field name="field_app" groups="base.group_no_one" />
+                                <field
+                                    name="field_data_type"
+                                    groups="base.group_no_one"
+                                />
+                                <field
+                                    name="field_id"
+                                    domain="[('model','=','hr.employee'),'|',('country_id','=',False),('country_id','=',company_country_id)]"
+                                />
+                                <field name="field_code" groups="base.group_no_one" />
+                                <field
+                                    name="selection_value_id"
+                                    domain="[('field_id','=',field_id)]"
+                                    attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','selection')]}"
+                                />
+                                <field
+                                    name="reference_value"
+                                    attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','reference')]}"
+                                />
+                                <field
+                                    name="value"
+                                    attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','in',['selection','reference'])]}"
+                                />
+                                <field name="model" groups="base.group_no_one" />
+                                <field name="res_id" groups="base.group_no_one" />
+                                <field name="company_id" groups="base.group_no_one" />
+                                <field
+                                    name="company_country_id"
+                                    groups="base.group_no_one"
+                                />
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+        <!-- hr.job -->
+
+        <record model="ir.ui.view" id="view_hr_job_form">
+            <field name="name">hr.job.form.hr_professional</field>
+            <field name="model">hr.job</field>
+            <field name="inherit_id" ref="hr.view_hr_job_form" />
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+                <field name="description" position="after">
+
+                        <field name="field_value_ids">
+                            <tree editable="bottom">
+                                <field
+                                name="field_country_id"
+                                groups="base.group_no_one"
+                            />
+                                <field name="field_app" groups="base.group_no_one" />
+                                <field
+                                name="field_data_type"
+                                groups="base.group_no_one"
+                            />
+                                <field
+                                name="field_id"
+                                domain="[('model','=','hr.job'),'|',('country_id','=',False),('country_id','=',company_country_id)]"
+                            />
+                                <field name="field_code" groups="base.group_no_one" />
+                                <field
+                                name="selection_value_id"
+                                domain="[('field_id','=',field_id)]"
+                                attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','selection')]}"
+                            />
+                                <field
+                                name="reference_value"
+                                attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','reference')]}"
+                            />
+                                <field
+                                name="value"
+                                attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','in',['selection','reference'])]}"
+                            />
+                                <field name="model" groups="base.group_no_one" />
+                                <field name="res_id" groups="base.group_no_one" />
+                                <field name="company_id" groups="base.group_no_one" />
+                                <field
+                                name="company_country_id"
+                                groups="base.group_no_one"
+                            />
+                            </tree>
+                        </field>
+
+                </field>
+            </field>
+        </record>
+
+        <!-- hr.leave.type -->
+
+        <record model="ir.ui.view" id="hr_leave_type_view_form">
+            <field name="name">hr.leave.type.form</field>
+            <field name="model">hr.leave.type</field>
+            <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form" />
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+                <sheet position="inside">
+
+                        <field name="field_value_ids">
+                            <tree editable="bottom">
+                                <field
+                                name="field_country_id"
+                                groups="base.group_no_one"
+                            />
+                                <field name="field_app" groups="base.group_no_one" />
+                                <field
+                                name="field_data_type"
+                                groups="base.group_no_one"
+                            />
+                                <field
+                                name="field_id"
+                                domain="[('model','=','hr.leave.type'),'|',('country_id','=',False),('country_id','=',company_country_id)]"
+                            />
+                                <field name="field_code" groups="base.group_no_one" />
+                                <field
+                                name="selection_value_id"
+                                domain="[('field_id','=',field_id)]"
+                                attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','selection')]}"
+                            />
+                                <field
+                                name="reference_value"
+                                attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','reference')]}"
+                            />
+                                <field
+                                name="value"
+                                attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','in',['selection','reference'])]}"
+                            />
+                                <field name="model" groups="base.group_no_one" />
+                                <field name="res_id" groups="base.group_no_one" />
+                                <field name="company_id" groups="base.group_no_one" />
+                                <field
+                                name="company_country_id"
+                                groups="base.group_no_one"
+                            />
+                            </tree>
+                        </field>
+
+                </sheet>
+            </field>
+        </record>
+
+        <!-- hr.payslip -->
+
+        <record model="ir.ui.view" id="hr_payslip_view_form">
+            <field name="name">hr.payslip.form field_value_ids</field>
+            <field name="model">hr.payslip</field>
+            <field name="inherit_id" ref="payroll.hr_payslip_view_form" />
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='input_line_ids']" position="after">
+                    <separator string="Fields" />
+                    <field name="field_value_ids">
+                        <tree editable="bottom">
+                            <field name="field_country_id" groups="base.group_no_one" />
+                            <field name="field_app" groups="base.group_no_one" />
+                            <field name="field_data_type" groups="base.group_no_one" />
+                            <field
+                                name="field_id"
+                                domain="[('model','=','hr.payslip'),'|',('country_id','=',False),('country_id','=',company_country_id)]"
+                            />
+                            <field name="field_code" groups="base.group_no_one" />
+                            <field
+                                name="selection_value_id"
+                                domain="[('field_id','=',field_id)]"
+                                attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','selection')]}"
+                            />
+                            <field
+                                name="reference_value"
+                                attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','reference')]}"
+                            />
+                            <field
+                                name="value"
+                                attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','in',['selection','reference'])]}"
+                            />
+                            <field name="model" groups="base.group_no_one" />
+                            <field name="res_id" groups="base.group_no_one" />
+                            <field name="company_id" groups="base.group_no_one" />
+                            <field
+                                name="company_country_id"
+                                groups="base.group_no_one"
+                            />
+                        </tree>
+                    </field>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- hr.payslip.run -->
+
+        <record id="view_hr_payslip_run_form" model="ir.ui.view">
+            <field name="name">hr.payslip.run.form field_value_ids</field>
+            <field name="model">hr.payslip.run</field>
+            <field name="inherit_id" ref="payroll.hr_payslip_run_view_form" />
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+                <sheet position="inside">
+
+                        <field name="field_value_ids">
+                            <tree editable="bottom">
+                                <field
+                                name="field_country_id"
+                                groups="base.group_no_one"
+                            />
+                                <field name="field_app" groups="base.group_no_one" />
+                                <field
+                                name="field_data_type"
+                                groups="base.group_no_one"
+                            />
+                                <field
+                                name="field_id"
+                                domain="[('model','=','hr.payslip.run'),'|',('country_id','=',False),('country_id','=',company_country_id)]"
+                            />
+                                <field name="field_code" groups="base.group_no_one" />
+                                <field
+                                name="selection_value_id"
+                                domain="[('field_id','=',field_id)]"
+                                attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','selection')]}"
+                            />
+                                <field
+                                name="reference_value"
+                                attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','reference')]}"
+                            />
+                                <field
+                                name="value"
+                                attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','in',['selection','reference'])]}"
+                            />
+                                <field name="model" groups="base.group_no_one" />
+                                <field name="res_id" groups="base.group_no_one" />
+                                <field name="company_id" groups="base.group_no_one" />
+                                <field
+                                name="company_country_id"
+                                groups="base.group_no_one"
+                            />
+                            </tree>
+                        </field>
+
+                </sheet>
+            </field>
+        </record>
+
+        <!-- hr.salary.rule -->
+
+        <record model="ir.ui.view" id="hr_salary_rule_view_form">
+            <field name="name">hr.salary.rule.form.hr_professional</field>
+            <field name="model">hr.salary.rule</field>
+            <field name="inherit_id" ref="payroll.hr_salary_rule_view_form" />
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+                <data>
+                    <notebook position="inside">
+                        <page name="fields" string="Fields">
+                            <field name="field_value_ids">
+                                <tree editable="bottom">
+                                    <field
+                                        name="field_country_id"
+                                        groups="base.group_no_one"
+                                    />
+                                    <field
+                                        name="field_app"
+                                        groups="base.group_no_one"
+                                    />
+                                    <field
+                                        name="field_data_type"
+                                        groups="base.group_no_one"
+                                    />
+                                    <field
+                                        name="field_id"
+                                        domain="[('model','=','hr.salary.rule'),'|',('country_id','=',False),('country_id','=',company_country_id)]"
+                                    />
+                                    <field
+                                        name="field_code"
+                                        groups="base.group_no_one"
+                                    />
+                                    <field
+                                        name="selection_value_id"
+                                        domain="[('field_id','=',field_id)]"
+                                        attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','selection')]}"
+                                    />
+                                    <field
+                                        name="reference_value"
+                                        attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','reference')]}"
+                                    />
+                                    <field
+                                        name="value"
+                                        attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','in',['selection','reference'])]}"
+                                    />
+                                    <field name="model" groups="base.group_no_one" />
+                                    <field name="res_id" groups="base.group_no_one" />
+                                    <field
+                                        name="company_id"
+                                        groups="base.group_no_one"
+                                    />
+                                    <field
+                                        name="company_country_id"
+                                        groups="base.group_no_one"
+                                    />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </data>
+            </field>
+        </record>
+
+        <!-- res.company -->
+
+        <record model="ir.ui.view" id="view_res_company_form">
+            <field name="name">res.company.hr_professional</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form" />
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page name="hr_fields" string="HR Fields">
+                        <field name="field_value_hr_ids">
+                            <tree editable="bottom">
+                                <field
+                                    name="field_country_id"
+                                    groups="base.group_no_one"
+                                />
+                                <field name="field_app" groups="base.group_no_one" />
+                                <field
+                                    name="field_data_type"
+                                    groups="base.group_no_one"
+                                />
+                                <field
+                                    name="field_id"
+                                    domain="[('model','=','res.company'),('app','=like','hr%'),'|',('country_id','=',False),('country_id','=',company_country_id)]"
+                                />
+                                <field name="field_code" groups="base.group_no_one" />
+                                <field
+                                    name="selection_value_id"
+                                    domain="[('field_id','=',field_id)]"
+                                    attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','selection')]}"
+                                />
+                                <field
+                                    name="reference_value"
+                                    attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','!=','reference')]}"
+                                />
+                                <field
+                                    name="value"
+                                    attrs="{'invisible': ['|',('field_id','&lt;',1),('field_data_type','in',['selection','reference'])]}"
+                                />
+                                <field name="model" groups="base.group_no_one" />
+                                <field name="res_id" groups="base.group_no_one" />
+                                <field name="company_id" groups="base.group_no_one" />
+                                <field
+                                    name="company_country_id"
+                                    groups="base.group_no_one"
+                                />
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+    </data>
+</odoo>

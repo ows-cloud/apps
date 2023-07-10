@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="res_users_form_view">
+            <field name="name">res.users select partner if missing</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form" />
+            <field name="priority" eval="30" />
+            <field name="arch" type="xml">
+                <data>
+                    <xpath
+                        expr="//group/field[@name='partner_id']"
+                        position="attributes"
+                    >
+                        <attribute name="readonly" />
+                        <attribute
+                            name="attrs"
+                        >{'invisible': [('id', '=', False)], 'readonly': [('partner_id', '!=', False)]}</attribute>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+    </data>
+</odoo>
