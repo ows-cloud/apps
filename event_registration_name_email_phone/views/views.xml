@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+
+        <!-- event.event -->
+
+        <record model="ir.ui.view" id="view_event_form_require_email_phone">
+            <field name="name">Require email or phone</field>
+            <field name="model">event.event</field>
+            <field name="inherit_id" ref="event.view_event_form" />
+            <field name="priority" eval="20" />
+            <field name="groups_id" eval="[(4, ref('base.group_user'))]" />
+            <field name="arch" type="xml">
+                <data>
+                    <field name="auto_confirm" position="after">
+                        <field name="require_email" />
+                        <field name="require_phone" />
+                    </field>
+                </data>
+            </field>
+        </record>
+
+        <!-- qweb -->
+
+        <template
+            id="registration_attendee_details"
+            inherit_id="website_event.registration_attendee_details"
+        >
+            <data>
+                <xpath expr="//div[hasclass('row')]" position="replace">
+                    <div class="row">
+                        <t t-set="user_id" t-value="request.env.user" />
+                        <t t-set="public_user_id" t-value="request.website.user_id" />
+                        <t
+                            t-if="user_id != public_user_id"
+                            t-set="name"
+                            t-value="request.env.user.name"
+                        /><t t-else="" t-set="name" t-value="" />
+                        <t
+                            t-if="user_id != public_user_id"
+                            t-set="email"
+                            t-value="request.env.user.email"
+                        /><t t-else="" t-set="email" t-value="" />
+                        <t
+                            t-if="user_id != public_user_id"
+                            t-set="phone"
+                            t-value="request.env.user.phone"
+                        /><t t-else="" t-set="phone" t-value="" />
+                        <div class="col-lg my-2">
+                            <label>Name</label>
+                            <input
+                                class="form-control"
+                                type="text"
+                                t-attf-name="#{counter}-name"
+                                t-att-value="name"
+                                required="This field is required"
+                            />
+                        </div>
+                        <div class="col-lg my-2">
+                            <label>Email
+                                <t t-if="not event.require_email">
+                                    <small>(Optional)</small>
+                                </t>
+                            </label>
+                            <input
+                                t-if="event.require_email"
+                                class="form-control"
+                                type="email"
+                                t-attf-name="#{counter}-email"
+                                t-att-value="email"
+                                required="This field is required"
+                            />
+                            <input
+                                t-else=""
+                                class="form-control"
+                                type="email"
+                                t-attf-name="#{counter}-email"
+                                t-att-value="email"
+                            />
+                        </div>
+                        <div class="col-lg my-2">
+                            <label>Phone
+                                <t t-if="not event.require_phone">
+                                    <small>(Optional)</small>
+                                </t>
+                            </label>
+                            <input
+                                t-if="event.require_phone"
+                                class="form-control"
+                                type="tel"
+                                t-attf-name="#{counter}-phone"
+                                t-att-value="phone"
+                                required="This field is required"
+                            />
+                            <input
+                                t-else=""
+                                class="form-control"
+                                type="tel"
+                                t-attf-name="#{counter}-phone"
+                                t-att-value="phone"
+                            />
+                        </div>
+                        <input
+                            class="d-none"
+                            type="text"
+                            t-attf-name="#{counter}-event_ticket_id"
+                            t-attf-value="#{ticket['id']}"
+                        />
+                    </div>
+                </xpath>
+
+            </data>
+        </template>
+
+    </data>
+</odoo>
