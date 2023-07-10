@@ -1,8 +1,8 @@
 <odoo>
     <data>
         <record id="hr_payslip_line_view_tree" model="ir.ui.view">
-            <field name="name">hr.payslip.line.tree new</field>
-            <field name="model">hr.payslip.line</field>
+            <field name="name">hr.payslip.line.report.view.tree</field>
+            <field name="model">hr.payslip.line.report</field>
             <field name="priority" eval="10" />
             <field name="arch" type="xml">
                 <tree string="Salary Structure" decoration-info="total == 0">
@@ -18,12 +18,13 @@
                     <field name="amount_select" invisible="1" />
                     <field name="register_id" invisible="1" />
                     <field name="date_from" />
+                    <field name="credit_note" />
                 </tree>
             </field>
         </record>
-        <record id="hr_payslip_line_view_pivot" model="ir.ui.view">
-            <field name="name">hr.payslip.line.pivot</field>
-            <field name="model">hr.payslip.line</field>
+        <record id="hr_payslip_line_report_view_pivot" model="ir.ui.view">
+            <field name="name">hr.payslip.line.report.view.pivot</field>
+            <field name="model">hr.payslip.line.report</field>
             <field name="mode">primary</field>
             <field name="priority" eval="20" />
             <field name="arch" type="xml">
@@ -33,9 +34,9 @@
                 </pivot>
             </field>
         </record>
-        <record id="hr_payslip_line_view_search" model="ir.ui.view">
-            <field name="name">hr.payslip.line.search.hr_new_fields</field>
-            <field name="model">hr.payslip.line</field>
+        <record id="hr_payslip_line_report_view_search" model="ir.ui.view">
+            <field name="name">hr.payslip.line.report.view.search</field>
+            <field name="model">hr.payslip.line.report</field>
             <field name="inherit_id" ref="payroll.hr_payslip_line_view_search" />
             <field name="priority" eval="20" />
             <field name="arch" type="xml">
@@ -45,18 +46,18 @@
                 </search>
             </field>
         </record>
-        <record id="action_hr_payslip_line" model="ir.actions.act_window">
-            <field name="name">hr.payslip.line</field>
+        <record id="action_hr_payslip_line_report" model="ir.actions.act_window">
+            <field name="name">hr.payslip.line.report</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">hr.payslip.line</field>
+            <field name="res_model">hr.payslip.line.report</field>
             <field name="view_mode">tree,pivot</field>
         </record>
         <menuitem
-            id="menu_hr_payslip_line"
+            id="menu_hr_payslip_line_report"
             name="Payslip Lines"
             sequence="11"
             parent="payroll.payroll_menu_root"
-            action="action_hr_payslip_line"
+            action="action_hr_payslip_line_report"
         />
     </data>
 </odoo>
