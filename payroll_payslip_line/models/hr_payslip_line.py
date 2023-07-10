@@ -4,6 +4,14 @@ from odoo import fields, models
 class HrPayslipLine(models.Model):
     _inherit = "hr.payslip.line"
 
+    def _compute_net(self):
+        for record in self:
+            factor = -1 if record.credit_note else 1
+            record.net_quantity = record.quantity * factor
+            record.net_rate = record.rate * factor
+            record.net_amount = record.amount * factor
+            record.net_total = record.total * factor
+
     # date_from is very useful for pivoting. Shold be added to payroll.
     date_from = fields.Date("Date From", related="slip_id.date_from", store=True)
     payslip_run_id = fields.Many2one(
@@ -43,10 +51,3 @@ class HrPayslipLine(models.Model):
         compute="_compute_net",
         store=True,
     )
-
-    def _compute_net(self):
-        factor = -1 if self.credit_note else 1
-        self.net_quantity = self.quantity * factor
-        self.net_rate = self.rate * factor
-        self.net_amount = self.amount * factor
-        self.net_total = self.total * factor
