@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class CalendarEvent(models.Model):
@@ -22,8 +22,37 @@ class CalendarEvent(models.Model):
             else:
                 record.start_date_str = str(record.start_date)
 
+    def write(self, values):
+        # Don't allow matrix_row_id without the correct matrix_id.
+        if "matrix_row_id" in values:
+            values["matrix_id"] =  self.env["calendar.event.matrix.row"].browse(values["matrix_row_id"]).matrix_id.id
+        elif "matrix_id" in values:
+            if values["matrix_id"]:
+                # Allow matrix_id with empty matrix_row_id
+                if self.mapped("matrix_row_id"):
+                    assert self.mapped("matrix_row_id").mapped("matrix_id").ids == [values["matrix_id"]]
+            else:
+                assert not self.mapped("matrix_row_id")
+        super().write(values)
+
+    matrix_id = fields.Many2one(
+        "calendar.event.matrix", string="Matrix", ondelete="cascade"
+    )
     matrix_row_id = fields.Many2one(
         "calendar.event.matrix.row", string="Matrix Row", ondelete="cascade"
+    )
+
+    def _compute_visible_matrix_row_id(self):
+        for record in self:
+            if record.matrix_row_id and record.matrix_row_id.show_in_matrix:
+                record.visible_matrix_row_id = record.matrix_row_id.id
+            else:
+                record.visible_matrix_row_id = None
+
+    visible_matrix_row_id = fields.Many2one(
+        "calendar.event.matrix.row",
+        string="Visible Matrix Row",
+        compute="_compute_visible_matrix_row_id",
     )
     matrix_row_sequence = fields.Integer(
         "Matrix Row Sequence", related="matrix_row_id.sequence"
@@ -89,22 +118,48 @@ class CalendarEvent(models.Model):
     def _inverse_is_attending(self):
         for record in self:
             partner_id = self.env.user.partner_id
-            if record.allow_portal_users_to_sign_up:
-                # The best would be to disable only calendar.event rules, not all rules.
-                record = record.sudo()
-            if record.is_attending:
-                record.write({"partner_ids": [(4, partner_id.id, 0)]})
-            else:
-                record.write({"partner_ids": [(3, partner_id.id, 0)]})
+            if record.allow_to_sign_up:
+                if record.is_attending:
+                    record.write({"partner_ids": [(4, partner_id.id, 0)]})
+                else:
+                    record.write({"partner_ids": [(3, partner_id.id, 0)]})
 
     is_attending = fields.Boolean(
-        string="Is Attending",
+        string="Attending",
         compute="_compute_is_attending",
         inverse="_inverse_is_attending",
     )
-    allow_portal_users_to_sign_up = fields.Boolean(
-        string="Allow portal users to sign up",
-        help="Allow portal users to sign up for this calendar event."
+
+    def _update_allow_to_sign_up(self):
+        for record in self:
+            if record.matrix_row_id:
+                record.allow_to_sign_up = record.matrix_row_id.allow_to_sign_up
+            else:
+                record.allow_to_sign_up = False
+
+    allow_to_sign_up = fields.Boolean(
+        string="Allow to sign up",
+        help="Allow to sign up for this calendar event.",
+        default=lambda self: self._update_allow_to_sign_up(),
+    )
+    parent_id = fields.Many2one(
+        "calendar.event",
+        string="Attendee filter",
+    )
+    child_ids = fields.One2many("calendar.event", "parent_id", string="Child events")
+
+    @api.depends("parent_id")
+    def _compute_available_partner_ids(self):
+        for record in self:
+            domain = []
+            if record.parent_id:
+                domain = [("id", "in", record.parent_id.partner_ids.ids)]
+            record.available_partner_ids = self.env["res.partner"].search(domain).ids
+
+    available_partner_ids = fields.Many2many(
+        "res.partner",
+        string="Available attendees",
+        compute="_compute_available_partner_ids",
     )
 
     def open_form(self):
@@ -116,3 +171,34 @@ class CalendarEvent(models.Model):
           "res_id": self.id,
         }
         return action
+
+    def update_parent_id(self):
+        for record in self:
+            if record.matrix_row_id and record.matrix_row_id.parent_id:
+                domain = [
+                    ("matrix_row_id", "=", record.matrix_row_id.parent_id.id),
+                    ("id", "!=", record.id),
+                    "|",
+                    "&",
+                    ("start", ">=", record.start),
+                    ("start", "<=", record.stop),
+                    "&",
+                    ("stop", ">=", record.start),
+                    ("stop", "<=", record.stop),
+                ]
+                parent_event = self.search(domain)
+                if parent_event and len(parent_event) == 1:
+                    record.parent_id = parent_event.id
+                else:
+                    record.parent_id = None
+            else:
+                record.parent_id = None
+
+    attendee_partner_ids = fields.Many2many(
+        "res.partner",
+        string="Invited Attendees",
+        help="Invited attendee contacts (attendee_ids.partner_id)",
+        relation="calendar_attendee",
+        column1="event_id",
+        column2="partner_id",
+    )

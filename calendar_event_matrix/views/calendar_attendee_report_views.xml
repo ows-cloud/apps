@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
 
-    <record id="calendar_attendee_view_tree" model="ir.ui.view">
-        <field name="name">calendar.attendee.view.tree</field>
-        <field name="model">calendar.attendee</field>
+    <record id="calendar_attendee_report_view_tree" model="ir.ui.view">
+        <field name="name">calendar.attendee.report.view.tree</field>
+        <field name="model">calendar.attendee.report</field>
         <field name="type">tree</field>
         <field name="priority" eval="16" />
         <field name="arch" type="xml">
@@ -18,9 +18,9 @@
         </field>
     </record>
 
-    <record id="calendar_attendee_view_form" model="ir.ui.view">
-        <field name="name">calendar.attendee.view.form</field>
-        <field name="model">calendar.attendee</field>
+    <record id="calendar_attendee_report_view_form" model="ir.ui.view">
+        <field name="name">calendar.attendee.report.view.form</field>
+        <field name="model">calendar.attendee.report</field>
         <field name="type">form</field>
         <field name="priority" eval="16" />
         <field name="arch" type="xml">
@@ -37,9 +37,9 @@
         </field>
     </record>
 
-    <record id="calendar_attendee_view_kanban" model="ir.ui.view">
-        <field name="name">calendar.attendee.kanban</field>
-        <field name="model">calendar.attendee</field>
+    <record id="calendar_attendee_report_view_kanban" model="ir.ui.view">
+        <field name="name">calendar.attendee.report.kanban</field>
+        <field name="model">calendar.attendee.report</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile" sample="1">
                 <field name="event_id" />
@@ -63,13 +63,30 @@
         </field>
     </record>
 
-    <record id="calendar_attendee_view_search" model="ir.ui.view">
-        <field name="name">calendar.attendee.view.search</field>
-        <field name="model">calendar.attendee</field>
-        <field name="mode">primary</field>
+    <record model="ir.ui.view" id="calendar_attendee_report_view_pivot">
+        <field name="name">calendar.attendee.report.view.pivot</field>
+        <field name="model">calendar.attendee.report</field>
+        <field name="priority" eval="20" />
+        <field name="arch" type="xml">
+            <pivot>
+
+            </pivot>
+        </field>
+    </record>
+
+    <record id="calendar_attendee_report_view_search" model="ir.ui.view">
+        <field name="name">calendar.attendee.report.view.search</field>
+        <field name="model">calendar.attendee.report</field>
         <field name="arch" type="xml">
             <search>
                 <field name="event_id" />
+                <field name="partner_id" />
+                <field name="matrix_id" />
+                <field name="matrix_row_id" />
+                <field string="Start Date" name="start_date" filter_domain="[('start_date', '=', self)]"/>
+                <!-- <field string="Date" name="create_date" filter_domain="[('start', '=', self), ('stop', '=', self)]"/> -->
+                <field string="Start earlest" name="start" filter_domain="[('start', '&gt;=', self)]"/>
+                <field string="Stop latest" name="stop" filter_domain="[('stop', '&lt;=', self)]"/>
                 <group expand="1" string="Group By">
                     <filter string="Calendar Event" name="calendar_event" context="{'group_by': 'event_id'}"/>
                 </group>
@@ -77,18 +94,10 @@
         </field>
     </record>
 
-    <record id="action_calendar_attendee" model="ir.actions.act_window">
-        <field name="name">Calendar Attendee</field>
-        <field name="res_model">calendar.attendee</field>
-        <field name="view_mode">tree,kanban,form</field>
+    <record id="calendar_attendee_report_action" model="ir.actions.act_window">
+        <field name="name">Calendar Attendee Report</field>
+        <field name="res_model">calendar.attendee.report</field>
+        <field name="view_mode">pivot,kanban,tree,form</field>
     </record>
-
-    <menuitem
-        id="menu_calendar_attendee"
-        name="Attendees"
-        parent="calendar.mail_menu_calendar"
-        action="action_calendar_attendee"
-        groups="group_calendar_event_matrix"
-    />
 
 </odoo>

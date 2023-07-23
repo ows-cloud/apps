@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from odoo import fields, models
 
 
@@ -11,16 +13,36 @@ class CalendarEventMatrixRow(models.Model):
     matrix_id = fields.Many2one("calendar.event.matrix", string="Group")
     allday = fields.Boolean(
         string="All day",
-        default=True,
+        default=False,
         help="If True, don't use default_start & default_stop",
     )
     default_start = fields.Datetime(
-        "Default Start Time", help="Any date; only the time is relevant."
+        string="Default Start Time",
+        help="Any date; only the time is relevant.",
+        default=datetime(year=2000, month=1, day=1, hour=12, minute=15),
     )
     # default_duration = fields.Float("Default Duration")
     default_stop = fields.Datetime(
-        "Default Stop Time", help="Any date; only the time is relevant."
+        string="Default Stop Time",
+        help="Any date; only the time is relevant.",
+        default=datetime(year=2000, month=1, day=1, hour=12, minute=45),
     )
+    add_company_partner = fields.Boolean(
+        string="Non-empty",
+        help="To drag/drop attendees between events, the events must be non-empty. Therefore add the company partner.",
+    )
+    show_in_matrix = fields.Boolean("Show in Matrix", default=True)
+    allow_to_sign_up = fields.Boolean(
+        string="Allow to sign up",
+        help="Allow to sign up for this calendar event."
+    )
+    parent_id = fields.Many2one(
+        "calendar.event.matrix.row",
+        string="Parent Row",
+    )
+    # child_ids = fields.One2many("calendar.event.matrix.row", "parent_id", string="Child Records")
+    # show_in_matrix_event_ids = fields.One2many("calendar.event", "matrix_row_id", string="Calendar Events")
+
     # Not implemented
     # default_all_matrix_partners = fields.Boolean("Add all participants")
     # allowed_partner_ids = fields.Many2many('res.partner', string="Allowed contacts")

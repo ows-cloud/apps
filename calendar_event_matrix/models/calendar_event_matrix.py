@@ -25,8 +25,15 @@ class CalendarEventMatrix(models.Model):
     date_to = fields.Date("Show To Date")
     date_action = fields.Date("Add Date", default=datetime.now().date())
     row_ids = fields.One2many("calendar.event.matrix.row", "matrix_id", string="Types")
-    event_ids = fields.Many2many("calendar.event")
-    partner_ids = fields.Many2many("res.partner")
+    event_ids = fields.One2many("calendar.event", "matrix_id", string="Events")
+    # event_ids = fields.Many2many("calendar.event", string="DEPRECATED", relation="event_ids_deprecated")
+    show_in_matrix_event_ids = fields.Many2many("calendar.event")
+    partner_ids = fields.Many2many(
+        "res.partner",
+        relation="matrix_partner_rel",
+        column1="matrix_id",
+        column2="partner_id",
+    )
     matrix_partner_id = fields.Many2one(
         "res.partner",
         "Matrix Partner",
@@ -36,25 +43,31 @@ class CalendarEventMatrix(models.Model):
     )
 
     def add_date(self):
-        self.event_ids = self._default_event_ids(add_date=self.date_action)
+        self._create_event_ids(add_date=self.date_action)
 
     def remove_date(self):
         self.write(
             {
-                "event_ids": [
+                "show_in_matrix_event_ids": [
                     (2, calendar_event.id)
-                    for calendar_event in self.event_ids
+                    for calendar_event in self.show_in_matrix_event_ids
                     if calendar_event.start_date == self.date_action
                     or calendar_event.start.date() == self.date_action
                 ]
             }
         )
-        self.event_ids = self._default_event_ids()
+        self._create_event_ids()
 
     def show_matrix(self):
-        self.event_ids = self._default_event_ids(
+        self.ensure_one()
+        self._create_event_ids(
             date_from=self.date_from, date_to=self.date_to
         )
+        event_ids = self.env["calendar.event"].search(
+            [("matrix_row_id.matrix_id", "=", self.id)]
+        )
+        event_ids.update_parent_id()
+        event_ids._update_allow_to_sign_up()
         view_ref = self.env.context.get("view_ref")
         view = self.env.ref(view_ref)
         return {
@@ -65,17 +78,26 @@ class CalendarEventMatrix(models.Model):
             "context": {"form_view_initial_mode": "edit"},
         }
 
-    def _default_event_ids(self, add_date=None, date_from=None, date_to=None):
-        """take care that the widget gets records passed for every combination
-        of calendar.event.matrix.row and start/start_date involved"""
+    def _create_event_ids(self, add_date=None, date_from=None, date_to=None):
+        """
+        (1) Create (if missing) a calendar.event for each combination of
+            calendar.event.matrix.row and start/start_date.
 
+        (2) Return the calendar events of the matrix rows which should show_in_matrix.
+
+        More info: https://github.com/OCA/web/tree/16.0/web_widget_x2many_2d_matrix
+        """
         # required: name, privacy, show_as, start, stop
 
+        self.ensure_one()
         if not date_from:
             date_from = datetime(2000, 1, 1).date()
         if not date_to:
             date_to = datetime(2099, 1, 1).date()
-        calendar_events = self.env["calendar.event"].search(
+
+        calendar_events = self.env["calendar.event"].with_context(
+            active_test=False
+        ).search(
             [
                 ("matrix_row_id", "in", self.row_ids.ids),
                 "|",
@@ -86,6 +108,7 @@ class CalendarEventMatrix(models.Model):
                 ("stop_date", "<=", str(date_to)),
             ]
         )
+        calendar_events.filtered(lambda ce: not ce.active).active = True
         calendar_event_dates_str = calendar_events.mapped("start_date_str")
         calendar_event_dates = {
             datetime.strptime(s, "%Y-%m-%d").date() for s in calendar_event_dates_str
@@ -101,31 +124,38 @@ class CalendarEventMatrix(models.Model):
 
             calendar_event_dates.add(add_date)
 
-        result = []
+        to_create = []
+        to_show = []
         for matrix_date in calendar_event_dates:
             for matrix_row in self.row_ids:
+                # EXISTS
                 allday = matrix_row.allday
                 if allday:
                     ce = calendar_events.filtered(
-                        lambda x: x.matrix_row_id == matrix_row
-                        and x.start_date == matrix_date
+                        lambda ce: ce.matrix_row_id == matrix_row
+                        and ce.start_date == matrix_date
                     )
                 else:
                     # TODO: get hours from timezone
                     ce = calendar_events.filtered(
-                        lambda x: x.matrix_row_id == matrix_row
-                        and (x.start + timedelta(hours=2)).date() == matrix_date
+                        lambda ce: ce.matrix_row_id == matrix_row
+                        and (ce.start + timedelta(hours=2)).date() == matrix_date
                     )
                 if ce:
-                    result.append((4, ce.ensure_one().id))
+                    if ce.visible_matrix_row_id:
+                        to_show.append((4, ce.ensure_one().id))
+                # CREATE
                 else:
                     my_dict = {
                         "name": "{}".format(matrix_row.name),
+                        "matrix_id": self.id,
                         "matrix_row_id": matrix_row.id,
                         "privacy": "public",
                         "show_as": "busy",
                         "partner_ids": [],
                     }
+                    if matrix_row.add_company_partner:
+                        my_dict["partner_ids"] = [(4, self.env.company.partner_id.id)]
                     if allday:
                         my_dict["allday"] = True
                         my_dict["start_date"] = matrix_date
@@ -149,27 +179,27 @@ class CalendarEventMatrix(models.Model):
                         )
                         if my_dict["stop"] < my_dict["start"]:
                             my_dict["stop"] = my_dict["stop"] + timedelta(days=1)
-                    result.append((0, 0, my_dict))
+                    to_create.append(my_dict)
+        new_ce = self.env["calendar.event"].create(to_create)
+        self.show_in_matrix_event_ids = [(5, 0, 0)] + to_show + [
+            (4, ce.id) for ce in new_ce if ce.visible_matrix_row_id
+        ]
 
-        return [(5, 0, 0)] + result
-
-    # def create(self, values):
-    #     super(CalendarEventMatrix, self).create(values)
-    #     if "partner_ids" in values:
-    #         self._update_partner_ids(values["partner_ids"][0][2])
-
-    # def write(self, values):
-    #     super(CalendarEventMatrix, self).write(values)
-    #     if "partner_ids" in values:
-    #         self._update_partner_ids(values["partner_ids"][0][2])
-
-    # def _update_partner_ids(self, partner_ids):
-    #     """ remove partner not implemented """
-    #     self.ensure_one()
-    #     for row in self.row_ids:
-    #         if row.default_all_matrix_partners:
-    #             # search for calendar.event with this row without the partners
-    #             calendar_events = self.env["calendar.event"].search(
-    #               [("matrix_row_id", "=", row.id)])
-    #             for ce in calendar_events:
-    #                 todo = "add partners"
+    def write(self, values):
+        # Delete partners from matrix -> Delete partners from calendar events
+        self.ensure_one()
+        command = values.get("partner_ids")
+        if command:
+            assert len(command) == 1 and command[0][0] == 6  # SET command
+            new_ids = command[0][2]
+            old_ids = self.partner_ids.ids
+            delete_partner_ids = set(old_ids) - set(new_ids)
+            for delete_partner_id in delete_partner_ids:
+                events = self.env["calendar.event"].search(
+                    [
+                        ("partner_ids", "=", delete_partner_id),
+                        ("matrix_id", "=", self.id)
+                    ]
+                )
+                events.partner_ids = [(3, delete_partner_id)]
+        super(CalendarEventMatrix, self).write(values)
