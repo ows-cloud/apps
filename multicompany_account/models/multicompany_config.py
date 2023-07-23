@@ -34,6 +34,7 @@ class MulticompanyConfig(models.AbstractModel):
             ]
         }
         User = self.env["res.users"].with_context(active_test=False)
+        self.flush()
         default_user = User.search(
             [("default_user", "=", True), ("company_id", "=", company.id)]
         ).ensure_one()
