@@ -5,6 +5,12 @@ from odoo.exceptions import UserError
 class Attendee(models.Model):
     _inherit = "calendar.attendee"
 
+    company_id = fields.Many2one(
+        "res.company",
+        string="Company",
+        default=lambda self: self.env.company,
+    )
+
     _sql_constraints= [
         (
             "unique_event_partner",

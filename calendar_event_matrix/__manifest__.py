@@ -10,6 +10,7 @@
     "depends": [
         "calendar",
         "web_widget_x2many_2d_matrix",
+        "website_partner",
     ],
     "data": [
         "security/calendar_event_matrix_security.xml",
@@ -21,6 +22,7 @@
         "views/menus.xml",
         "report/report_templates.xml",
         "report/report_views.xml",
+        "views/templates.xml",  # depends on website_partner
     ],
     "installable": True,
     "maintainers": ["appstogrow"],
