@@ -67,108 +67,27 @@ class HrPayslipLine(models.Model):
     def l10n_no_feriepenger(self):
 
         # Get key variables
-        fp_prosent = (
-            float(
-                self.env["res.field.value"]
-                .search(
-                    [
-                        ("model", "=", "res.company"),
-                        (
-                            "field_id",
-                            "=",
-                            self.env.ref(
-                                "l10n_no_payroll.res_field_l10n_no_fp_prosent"
-                            ).id,
-                        ),
-                    ]
-                )
-                .ensure_one()
-                .value
-            )
-            / 100
-        )
-        fp_prosent_senior = (
-            float(
-                self.env["res.field.value"]
-                .search(
-                    [
-                        ("model", "=", "res.company"),
-                        (
-                            "field_id",
-                            "=",
-                            self.env.ref(
-                                "l10n_no_payroll.res_field_l10n_no_fp_prosent_senior"
-                            ).id,
-                        ),
-                    ]
-                )
-                .ensure_one()
-                .value
-            )
-            / 100
-        )
-        loennsart_fp_i_aar_id = (
-            self.env["res.field.value"]
-            .search(
-                [
-                    ("model", "=", "res.company"),
-                    (
-                        "field_id",
-                        "=",
-                        self.env.ref(
-                            "l10n_no_payroll.res_field_l10n_no_loennsart_fp_i_aar"
-                        ).id,
-                    ),
-                ]
-            )
-            .ensure_one()
-            .reference_value.id
-        )
-        loennsart_fp_i_fjor_id = (
-            self.env["res.field.value"]
-            .search(
-                [
-                    ("model", "=", "res.company"),
-                    (
-                        "field_id",
-                        "=",
-                        self.env.ref(
-                            "l10n_no_payroll.res_field_l10n_no_loennsart_fp_i_fjor"
-                        ).id,
-                    ),
-                ]
-            )
-            .ensure_one()
-            .reference_value.id
-        )
-        loennsarter_beregn_fp_ids = [
-            r.res_id
-            for r in self.env["res.field.value"].search(
-                [
-                    ("model", "=", "hr.salary.rule"),
-                    (
-                        "field_id",
-                        "=",
-                        self.env.ref("l10n_no_payroll.res_field_l10n_no_BeregnFP").id,
-                    ),
-                ]
-            )
-        ]
-        salary_rule_ids = loennsarter_beregn_fp_ids[:]  # copy list by value
-        salary_rule_ids.extend([loennsart_fp_i_aar_id, loennsart_fp_i_fjor_id])
+        fp_prosent = self.env.company.l10n_no_fp_prosent / 100
+        fp_prosent_senior = self.env.company.l10n_no_fp_prosent_senior / 100
+        loennsart_fp_i_aar_id = self.env.company.l10n_no_loennsart_fp_i_aar
+        loennsart_fp_i_fjor_id = self.env.company.l10n_no_loennsart_fp_i_fjor
 
         # Get info from the payslip lines into dictinary 'd'
         d = defaultdict(dict)
-        payslip_lines = self.search([("salary_rule_id", "in", salary_rule_ids)])
+        payslip_lines = self.search([])
         for line in payslip_lines:
             employee_id = line.employee_id.id
-            rule_id = line.salary_rule_id.id
+            rule = line.salary_rule_id
             year = line.slip_id.date_to.year
-            if rule_id == loennsart_fp_i_fjor_id:
+            if rule == loennsart_fp_i_fjor_id:
                 year -= 1
 
             if not employee_id in d:
                 d[employee_id]["name"] = line.employee_id.name
+                if not line.employee_id.birthday:
+                    raise UserError("Please register birthdate for {}.".format(
+                        line.employee_id.name
+                    ))
                 d[employee_id]["birthyear"] = line.employee_id.birthday.year
                 d[employee_id]["year"] = {}
             if not year in d[employee_id]["year"]:
@@ -183,9 +102,9 @@ class HrPayslipLine(models.Model):
                     d[employee_id]["year"][year]["rate"] = fp_prosent_senior
                 else:
                     d[employee_id]["year"][year]["rate"] = fp_prosent
-            if rule_id in [loennsart_fp_i_fjor_id, loennsart_fp_i_aar_id]:
+            if rule in [loennsart_fp_i_fjor_id, loennsart_fp_i_aar_id]:
                 d[employee_id]["year"][year]["paid"] += line.total
-            else:
+            elif line.salary_rule_id.l10n_no_BeregnFP:
                 d[employee_id]["year"][year]["basis"] += line.total
 
         # Create a CSV report

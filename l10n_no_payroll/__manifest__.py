@@ -22,7 +22,7 @@
         "views/menus.xml",
         "data_old/res.field.csv",  # remove after manual migration
         "data_old/res.field.selection_value.csv",  # remove after manual migration
-        "views/res_field_views.xml",  # remove after manual migration
+        # "views/res_field_views.xml",  # remove after manual migration
     ],
     "demo": [
         # "demo/hr_contribution_register_data.xml",
