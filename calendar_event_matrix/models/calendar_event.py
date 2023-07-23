@@ -110,7 +110,7 @@ class CalendarEvent(models.Model):
     def _compute_is_attending(self):
         for record in self:
             # <filter string="My Meetings" help="My Meetings" name="mymeetings" domain="[('partner_ids.user_ids', 'in', [uid])]"/>
-            if self.env.user in record.partner_ids.user_ids:
+            if self.env.user in record.attendee_partner_ids.user_ids:
                 record.is_attending = True
             else:
                 record.is_attending = False
@@ -120,9 +120,9 @@ class CalendarEvent(models.Model):
             partner_id = self.env.user.partner_id
             if record.allow_to_sign_up:
                 if record.is_attending:
-                    record.write({"partner_ids": [(4, partner_id.id, 0)]})
+                    record.write({"attendee_partner_ids": [(4, partner_id.id, 0)]})
                 else:
-                    record.write({"partner_ids": [(3, partner_id.id, 0)]})
+                    record.write({"attendee_partner_ids": [(3, partner_id.id, 0)]})
 
     is_attending = fields.Boolean(
         string="Attending",

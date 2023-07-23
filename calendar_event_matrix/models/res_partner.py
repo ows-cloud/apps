@@ -40,3 +40,5 @@ class Partner(models.Model):
 
     no_of_events = fields.Integer("No of events", compute="_compute_no_of_events_and_hours")
     no_of_hours = fields.Float("No of hours", compute="_compute_no_of_events_and_hours")
+
+    calendar_attendee_ids = fields.One2many("calendar.attendee", "partner_id", string="Calendar Attendee")

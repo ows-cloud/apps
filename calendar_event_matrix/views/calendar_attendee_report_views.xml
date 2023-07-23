@@ -41,19 +41,25 @@
         <field name="name">calendar.attendee.report.kanban</field>
         <field name="model">calendar.attendee.report</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile" sample="1">
-                <field name="event_id" />
-                <field name="recurrence_id" />
-                <field name="partner_id" />
-                <field name="common_name" />
-                <field name="state" />
-                <field name="availability" />
+            <kanban class="o_kanban_mobile">
+                <field name="partner_id"/>
+                <field name="event_id"/>
+                <field name="start"/>
+                <field name="duration"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="row">
                                 <div class="col-12">
-                                    <strong><t t-esc="record.common_name.value"/></strong>
+                                  <p>
+                                    <strong><t t-esc="record.partner_id.value"/></strong>
+                                    <br/>
+                                    <span t-esc="record.event_id.value"/>
+                                    <br/>
+                                    <span t-esc="record.start.value"/>
+                                    <br/>
+                                    <span t-esc="record.duration.value"/> hours
+                                  </p>
                                 </div>
                             </div>
                         </div>
@@ -82,7 +88,7 @@
                 <field name="event_id" />
                 <field name="partner_id" />
                 <field name="matrix_id" />
-                <field name="matrix_row_id" />
+                <field name="matrix_row_id" string="Responsibility" />
                 <field string="Start Date" name="start_date" filter_domain="[('start_date', '=', self)]"/>
                 <!-- <field string="Date" name="create_date" filter_domain="[('start', '=', self), ('stop', '=', self)]"/> -->
                 <field string="Start earlest" name="start" filter_domain="[('start', '&gt;=', self)]"/>
@@ -90,6 +96,9 @@
                 <group expand="1" string="Group By">
                     <filter string="Calendar Event" name="calendar_event" context="{'group_by': 'event_id'}"/>
                 </group>
+                <filter name="today" string="Today" domain="[('start_date','=',context_today().strftime('%Y-%m-%d'))]" />
+                <filter name="tomorrow" string="Tomorrow" domain="[('start_date','=',(context_today()+relativedelta(days=1)).strftime('%Y-%m-%d'))]" />
+                <filter name="in_2_days" string="In 2 days" domain="[('start_date','=',(context_today()+relativedelta(days=2)).strftime('%Y-%m-%d'))]" />
             </search>
         </field>
     </record>

@@ -152,10 +152,10 @@ class CalendarEventMatrix(models.Model):
                         "matrix_row_id": matrix_row.id,
                         "privacy": "public",
                         "show_as": "busy",
-                        "partner_ids": [],
+                        "attendee_partner_ids": [],
                     }
                     if matrix_row.add_company_partner:
-                        my_dict["partner_ids"] = [(4, self.env.company.partner_id.id)]
+                        my_dict["attendee_partner_ids"] = [(4, self.env.company.partner_id.id)]
                     if allday:
                         my_dict["allday"] = True
                         my_dict["start_date"] = matrix_date
@@ -188,18 +188,18 @@ class CalendarEventMatrix(models.Model):
     def write(self, values):
         # Delete partners from matrix -> Delete partners from calendar events
         self.ensure_one()
-        command = values.get("partner_ids")
+        command = values.get("attendee_partner_ids")
         if command:
             assert len(command) == 1 and command[0][0] == 6  # SET command
             new_ids = command[0][2]
-            old_ids = self.partner_ids.ids
+            old_ids = self.attendee_partner_ids.ids
             delete_partner_ids = set(old_ids) - set(new_ids)
             for delete_partner_id in delete_partner_ids:
                 events = self.env["calendar.event"].search(
                     [
-                        ("partner_ids", "=", delete_partner_id),
+                        ("attendee_partner_ids", "=", delete_partner_id),
                         ("matrix_id", "=", self.id)
                     ]
                 )
-                events.partner_ids = [(3, delete_partner_id)]
+                events.attendee_partner_ids = [(3, delete_partner_id)]
         super(CalendarEventMatrix, self).write(values)

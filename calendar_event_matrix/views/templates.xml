@@ -2,22 +2,22 @@
 <odoo>
     <template id='partner_detail_meetings' inherit_id="website_partner.partner_detail" name="partner_detail_meetings">
         <xpath expr="//h1" position="after">
-            <table class="col-lg-12 text-center" t-if="partner.meeting_ids">
+            <table class="col-lg-12 text-center" t-if="partner.calendar_attendee_ids">
                 <tr valign="top">
                     <th>Responsibility</th>
                     <th>Start</th>
                     <th>Hours</th>
                     <th>Team</th>
                 </tr>
-                <t t-foreach="partner.meeting_ids" t-as="meeting">
+                <t t-foreach="partner.calendar_attendee_ids" t-as="attendee">
                     <tr valign="top">
-                        <td><span t-field="meeting.name"/></td>
-                        <td><span t-field="meeting.start" t-options='{"widget": "datetime", "format": "dd-MM-yyyy HH:mm"}'/></td>
-                        <td><span t-field="meeting.duration"/></td>
+                        <td><span t-field="attendee.event_id.name"/></td>
+                        <td><span t-field="attendee.event_id.start" t-options='{"widget": "datetime", "format": "dd-MM-yyyy HH:mm"}'/></td>
+                        <td><span t-field="attendee.event_id.duration"/></td>
                         <td>
                             <p>
-                            <t t-foreach="meeting.attendee_partner_ids" t-as="attendee">
-                                <span t-field="attendee.name"/><br/>
+                            <t t-foreach="attendee.event_id.attendee_partner_ids" t-as="foreach_attendee">
+                                <span t-field="foreach_attendee.name"/><br/>
                             </t>
                             </p>
                         </td>

@@ -165,7 +165,7 @@
                         widget="x2many_2d_matrix"
                         field_x_axis="start_date_str"
                         field_y_axis="visible_matrix_row_id"
-                        field_value="partner_ids"
+                        field_value="attendee_partner_ids"
                     >
                         <tree default_order="start_date_str,matrix_row_sequence">
                             <field name="start_date_str" />
@@ -173,7 +173,7 @@
                             <field name="matrix_row_sequence" invisible="1" />
                             <field name="matrix_available_partner_ids" invisible="1" />
                             <field
-                                name="partner_ids"
+                                name="attendee_partner_ids"
                                 widget="many2many_tags"
                                 domain="[('id', 'in', matrix_available_partner_ids)]"
                             />
