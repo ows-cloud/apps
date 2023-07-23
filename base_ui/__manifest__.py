@@ -7,7 +7,8 @@
     "author": "AppsToGROW, Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
-        "views/ir_actions_actions.xml",
+        "views/ir_actions_actions_views.xml",
+        "views/ir_module_module_views.xml",
     ],
     "depends": ["base"],
     "license": "AGPL-3",
