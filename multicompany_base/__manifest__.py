@@ -17,6 +17,7 @@
         "base_set_record_values_mixin",
         "base_setup",
         "base_sparse_field",
+        "web",
     ],
     "post_init_hook": "post_init_hook",
     "pre_init_hook": "pre_init_hook",
