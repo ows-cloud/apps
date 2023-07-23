@@ -5,12 +5,6 @@ from odoo.exceptions import UserError
 class Attendee(models.Model):
     _inherit = "calendar.attendee"
 
-    company_id = fields.Many2one(
-        "res.company",
-        string="Company",
-        default=lambda self: self.env.company,
-    )
-
     _sql_constraints= [
         (
             "unique_event_partner",
@@ -22,15 +16,6 @@ class Attendee(models.Model):
     def _compute_start_date(self):
         for record in self:
             record.start_date = record.start.date()
-
-    # start_date = fields.Date("Start Date", compute="_compute_start_date")
-    # start = fields.Datetime("Start", related="event_id.start")
-    # stop = fields.Datetime("Stop", related="event_id.stop")
-    # matrix_row_id = fields.Many2one(
-    #     "calendar.event.matrix.row",
-    #     related="event_id.matrix_row_id",
-    # )
-    # # allow_to_sign_up = fields...
 
     def unlink(self):
         # Restrict: Raise error if there is any child event with the attendee partner.

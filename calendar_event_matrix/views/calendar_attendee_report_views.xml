@@ -8,12 +8,10 @@
         <field name="priority" eval="16" />
         <field name="arch" type="xml">
             <tree>
-                <field name="event_id" />
-                <field name="recurrence_id" />
                 <field name="partner_id" />
-                <field name="common_name" />
-                <field name="state" />
-                <field name="availability" />
+                <field name="event_id" />
+                <field name="start_date" />
+                <field name="duration" />
             </tree>
         </field>
     </record>
@@ -26,12 +24,14 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="event_id" />
-                    <field name="recurrence_id" />
                     <field name="partner_id" />
+                    <field name="event_id" />
+                    <field name="start_date" />
+                    <field name="duration" />
                     <field name="common_name" />
                     <field name="state" />
                     <field name="availability" />
+                    <field name="recurrence_id" />
                 </group>
             </form>
         </field>
@@ -99,6 +99,7 @@
                 <filter name="today" string="Today" domain="[('start_date','=',context_today().strftime('%Y-%m-%d'))]" />
                 <filter name="tomorrow" string="Tomorrow" domain="[('start_date','=',(context_today()+relativedelta(days=1)).strftime('%Y-%m-%d'))]" />
                 <filter name="in_2_days" string="In 2 days" domain="[('start_date','=',(context_today()+relativedelta(days=2)).strftime('%Y-%m-%d'))]" />
+                <filter name="filter_start_date" string="Start Date" date="start_date" />
             </search>
         </field>
     </record>
