@@ -1,23 +1,24 @@
 <odoo>
     <data>
         <record id="hr_payslip_line_view_tree" model="ir.ui.view">
-            <field name="name">hr.payslip.line.tree new</field>
+            <field name="name">hr.payslip.line.tree net</field>
             <field name="model">hr.payslip.line</field>
             <field name="priority" eval="10" />
             <field name="arch" type="xml">
-                <tree string="Salary Structure" decoration-info="total == 0">
+                <tree>
                     <field name="category_id" />
                     <field name="employee_id" />
                     <field name="sequence" />
                     <field name="name" />
                     <field name="code" />
-                    <field name="quantity" />
-                    <field name="rate" />
-                    <field name="amount" />
-                    <field name="total" sum="Total" />
+                    <field name="net_quantity" />
+                    <field name="net_rate" />
+                    <field name="net_amount" />
+                    <field name="net_total" sum="Total" />
                     <field name="amount_select" invisible="1" />
                     <field name="register_id" invisible="1" />
                     <field name="date_from" />
+                    <field name="credit_note" optional="hide" />
                 </tree>
             </field>
         </record>
@@ -25,11 +26,11 @@
             <field name="name">hr.payslip.line.pivot</field>
             <field name="model">hr.payslip.line</field>
             <field name="mode">primary</field>
-            <field name="priority" eval="20" />
+            <field name="priority" eval="10" />
             <field name="arch" type="xml">
                 <pivot>
                     <field name="salary_rule_id" type="row" />
-                    <field name="total" type="measure" />
+                    <field name="net_total" type="measure" />
                 </pivot>
             </field>
         </record>
@@ -42,6 +43,7 @@
                 <search position="inside">
                     <field name="date_from" />
                     <field name="payslip_run_id" />
+                    <field name="credit_note" />
                 </search>
             </field>
         </record>
