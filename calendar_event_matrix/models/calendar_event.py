@@ -22,6 +22,12 @@ class CalendarEvent(models.Model):
             else:
                 record.start_date_str = str(record.start_date)
 
+    @api.model
+    def create(self, vals):
+        records = super().create(vals)
+
+        return records
+
     def write(self, values):
         # Don't allow matrix_row_id without the correct matrix_id.
         if "matrix_row_id" in values:
@@ -34,6 +40,9 @@ class CalendarEvent(models.Model):
             else:
                 assert not self.mapped("matrix_row_id")
         super().write(values)
+        # Set attendee company.
+        for record in self:
+            record.attendee_ids.company_id = record.company_id
 
     matrix_id = fields.Many2one(
         "calendar.event.matrix", string="Matrix", ondelete="cascade"

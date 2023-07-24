@@ -1,9 +1,24 @@
-from odoo import _, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
 class Attendee(models.Model):
     _inherit = "calendar.attendee"
+
+    """
+    calendar.attendee is a relation table between calendar.event and res.partner.
+    The many2many relation creates records with only event_id and partner_id.
+    Multicompany implementations may also require company_id.
+    calendar.event write() will update the company of the related attendees.
+    """
+
+    company_id = fields.Many2one(
+        "res.company",
+        string="Company",
+        store=True,
+        index=True,
+        default=lambda self: self.env.company,
+    )
 
     _sql_constraints= [
         (

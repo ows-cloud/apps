@@ -62,7 +62,7 @@ class CalendarAttendeeReport(models.Model):
                 a.event_id,
                 a.partner_id,
                 a.state,
-                e.company_id,
+                a.company_id,
                 e.duration,
                 e.recurrence_id,
                 e.start,
