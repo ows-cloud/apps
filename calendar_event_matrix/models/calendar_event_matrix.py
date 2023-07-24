@@ -46,17 +46,15 @@ class CalendarEventMatrix(models.Model):
         self._create_event_ids(add_date=self.date_action)
 
     def remove_date(self):
-        self.write(
-            {
-                "show_in_matrix_event_ids": [
-                    (2, calendar_event.id)
-                    for calendar_event in self.show_in_matrix_event_ids
-                    if calendar_event.start_date == self.date_action
-                    or calendar_event.start.date() == self.date_action
+        for matrix in self:
+            events = self.env["calendar.event"].search(
+                [
+                    ("matrix_id", "=", matrix.id),
+                    ('start', '>=', matrix.date_action),
+                    ('start', '<', (matrix.date_action + timedelta(days=1))),
                 ]
-            }
-        )
-        self._create_event_ids()
+            )
+            events.unlink()
 
     def show_matrix(self):
         self.ensure_one()

@@ -53,10 +53,10 @@
                     <page name="matrix_rows" string="Rows">
                         <field name="row_ids">
                             <tree editable="bottom">
-                                <field name="add_company_partner" />
-                                <field name="show_in_matrix" />
-                                <field name="allow_to_sign_up" />
-                                <field name="parent_id" />
+                                <field name="add_company_partner" optional="hide" />
+                                <field name="show_in_matrix" optional="hide" />
+                                <field name="allow_to_sign_up" optional="hide" />
+                                <field name="parent_id" optional="hide" />
                                 <field name="sequence" widget="handle" />
                                 <field name="name" />
                                 <field name="allday" invisible="1" />
