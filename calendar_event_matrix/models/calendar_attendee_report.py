@@ -56,7 +56,7 @@ class CalendarAttendeeReport(models.Model):
         self._cr.execute(
             """
             CREATE OR REPLACE VIEW calendar_attendee_report AS
-             SELECT a.id,
+            SELECT a.id,
                 a.availability,
                 a.common_name,
                 a.event_id,
@@ -71,18 +71,14 @@ class CalendarAttendeeReport(models.Model):
                 e.stop::DATE AS stop_date,
                 e.matrix_id,
                 e.matrix_row_id
-                --r.allow_to_sign_up
-               FROM calendar_attendee a
-                -- LEFT JOIN res_partner p ON a.partner_id = p.id
-                LEFT JOIN calendar_event e ON a.event_id = e.id
-                    -- LEFT JOIN calendar_event_matrix m ON e.matrix_id = m.id
-                    -- LEFT JOIN calendar_event_matrix_row r ON e.matrix_row_id = r.id
+            FROM calendar_attendee a
+            LEFT JOIN calendar_event e ON a.event_id = e.id
             """
         )
 
     @api.model
     def create(self, values):
-        return self.env["calenda.attendee"].create(values)
+        return self.env["calendar.attendee"].create(values)
 
     def write(self, values):
         return (

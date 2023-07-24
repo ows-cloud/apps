@@ -15,15 +15,7 @@
                 </p>
             </h1>
             <field name="partner_ids" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </field>
-            <field name="partner_ids" position="after">
-                <field
-                    name="attendee_partner_ids"
-                    domain="[('id', 'in', available_partner_ids)]"
-                    widget="many2many_tags"
-                    groups="calendar_event_matrix.calendar_event_matrix_group"
-                />
+                <attribute name="domain">[('id', 'in', available_partner_ids)]</attribute>
             </field>
             <field name="user_id" position="after">
                 <field name="allow_to_sign_up" groups="calendar_event_matrix.calendar_event_matrix_group" />
@@ -83,7 +75,7 @@
                 <field name="is_attending" readonly="0" widget="boolean_toggle" />
                 <field name="allow_to_sign_up" invisible="1" />
                 <field name="parent_id" />
-                <field name="attendee_partner_ids" widget="many2many_tags" domain="[('id', 'in', available_partner_ids)]" />
+                <field name="partner_ids" widget="many2many_tags" domain="[('id', 'in', available_partner_ids)]" />
                 <button name="open_form" type="object" string="Details" class="btn btn-primary" />
                 <field name="available_partner_ids" invisible="1" />
             </tree>

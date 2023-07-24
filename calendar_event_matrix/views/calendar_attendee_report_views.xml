@@ -24,14 +24,14 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="partner_id" />
-                    <field name="event_id" />
-                    <field name="start_date" />
-                    <field name="duration" />
-                    <field name="common_name" />
-                    <field name="state" />
-                    <field name="availability" />
-                    <field name="recurrence_id" />
+                    <field name="partner_id" readonly="1" />
+                    <field name="event_id" readonly="1" />
+                    <field name="start_date" readonly="1" />
+                    <field name="duration" readonly="1" />
+                    <field name="common_name" readonly="1" />
+                    <field name="state" readonly="1" />
+                    <field name="availability" readonly="1" />
+                    <field name="recurrence_id" readonly="1" />
                 </group>
             </form>
         </field>

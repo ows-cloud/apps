@@ -10,7 +10,7 @@
     "depends": [
         "calendar",
         "web_widget_x2many_2d_matrix",
-        "website_partner",
+        "website_partner",  # views/templates.xml
     ],
     "data": [
         "security/calendar_event_matrix_security.xml",

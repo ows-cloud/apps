@@ -16,8 +16,8 @@
                         <td><span t-field="attendee.event_id.duration"/></td>
                         <td>
                             <p>
-                            <t t-foreach="attendee.event_id.attendee_partner_ids" t-as="foreach_attendee">
-                                <span t-field="foreach_attendee.name"/><br/>
+                            <t t-foreach="attendee.event_id.partner_ids" t-as="partner">
+                                <span t-field="partner.name"/><br/>
                             </t>
                             </p>
                         </td>
@@ -27,21 +27,3 @@
         </xpath>
     </template>
 </odoo>
-
-<!-- <?xml version="1.0" encoding="UTF-8"?>
-<templates xml:space="preserve">
-    <t t-inherit="website_partner.partner_detail" t-inherit-mode="extension">
-        <xpath expr="//h1" position="after">
-            <table>
-                <t t-foreach="meeting_ids" t-as="meeting">
-                    <tr>
-                        <td><p><t t-esc="meeting.name"/></p></td>
-                        <td><p><t t-esc="meeting.start"/></p></td>
-                        <td><p><t t-esc="meeting.duration"/></p></td>
-                        <td><p><t t-esc="meeting.attendee_partner_ids"/></p></td>
-                    </tr>
-                </t>
-            </table>
-        </xpath>
-    </t>
-</templates> -->
