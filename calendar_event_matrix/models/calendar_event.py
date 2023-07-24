@@ -6,6 +6,14 @@ from odoo import api, fields, models
 class CalendarEvent(models.Model):
     _inherit = "calendar.event"
 
+    company_id = fields.Many2one(
+        "res.company",
+        string="Company",
+        store=True,
+        index=True,
+        default=lambda self: self.env.company,
+    )
+
     partner_count = fields.Integer("No of attendees", compute="_compute_partner_count")
 
     def _compute_partner_count(self):

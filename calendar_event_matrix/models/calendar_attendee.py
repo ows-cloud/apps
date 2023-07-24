@@ -25,17 +25,23 @@ class Attendee(models.Model):
         # Update event partner
         if "event_id" in values or "partner_id" in values:
             for attendee in self:
-                # Delete event partner
-                attendee.event_id.write({"partner_ids": [(3, attendee.partner_id.id)]})
-                # Create event partner
-                event = attendee.event_id
-                if "event_id" in values:
-                    event = self.env["calendar.event"].browse(values["event_id"])
+                event_id = attendee.event_id.id
                 partner_id = attendee.partner_id.id
+                # Delete event partner
+                self.env.cr.execute(
+                    "DELETE FROM calendar_event_res_partner_rel WHERE calendar_event_id = {} AND res_partner_id = {};".format(event_id, partner_id)
+                )
+                # Create event partner
+                if "event_id" in values:
+                    event_id = values["event_id"]
                 if "partner_id" in values:
                     partner_id = values["partner_id"]
-                event.write({"partner_ids": [(4, partner_id)]})
-        return super().write(values)
+                self.env.cr.execute(
+                    "INSERT INTO calendar_event_res_partner_rel (calendar_event_id, res_partner_id) VALUES ({}, {});".format(event_id, partner_id)
+                )
+        self._unsubscribe_partner()
+        super(Attendee, self).write(values)
+        self._subscribe_partner()
 
     def unlink(self):
         # Restrict: Raise error if there is any child event with the attendee partner.
@@ -53,7 +59,11 @@ class Attendee(models.Model):
                     ))
         # Delete event partner
         for attendee in self:
-            attendee.event_id.write({"partner_ids": [(3, attendee.partner_id.id)]})
+            self.env.cr.execute(
+                "DELETE FROM calendar_event_res_partner_rel WHERE calendar_event_id = {} AND res_partner_id = {};".format(
+                    attendee.event_id.id, attendee.partner_id.id
+                )
+            )
 
         return super().unlink()
 
