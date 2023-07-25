@@ -249,6 +249,12 @@
                     <field name="account_id" />
 
                     <filter
+                        string="Posted"
+                        name="posted"
+                        domain="[('parent_state', '=', 'posted')]"
+                    />
+                    <separator />
+                    <filter
                         string="Profit/Loss"
                         name="profit_loss"
                         domain="[('include_initial_balance', '=', False)]"

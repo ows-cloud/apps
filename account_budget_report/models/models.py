@@ -275,6 +275,16 @@ class AccountBudgetReport(models.Model):
     journal_id = fields.Many2one("account.journal", string="Journal", store=True)
     move_id = fields.Many2one("account.move", string="Journal Entry", store=True)
     name = fields.Char(string="Name", store=True)
+    parent_state = fields.Selection(
+        selection=[
+            ('draft', 'Draft'),
+            ('posted', 'Posted'),
+            ('cancel', 'Cancelled'),
+        ],
+        string='Parent Status',
+        required=True,
+        readonly=True,
+    )
     partner_id = fields.Many2one("res.partner", string="Partner", store=True)
     product_id = fields.Many2one("product.product", string="Product", store=True)
     user_type_id = fields.Many2one(
@@ -338,6 +348,7 @@ class AccountBudgetReport(models.Model):
                 t0.journal_id,
                 t0.move_id,
                 t0.name,
+                t0.parent_state,
                 t0.partner_id,
                 t0.product_id,
                 t1.user_type_id AS user_type_id,
@@ -372,6 +383,7 @@ class AccountBudgetReport(models.Model):
                 null AS journal_id,
                 null AS move_id,
                 t0.name,
+                null AS parent_state,
                 t0.partner_id,
                 t0.product_id,
                 t1.user_type_id AS user_type_id,
