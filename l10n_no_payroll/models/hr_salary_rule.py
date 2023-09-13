@@ -52,10 +52,6 @@ class SalaryRule(models.Model):
     )
     l10n_no_Loennsbeskrivelse = fields.Selection(
         string="Loennsbeskrivelse",
-        # hr.payslip.line needs l10n_no_Loennsbeskrivelse to compute mon months.
-        # With sparse="json", the field is always empty on the payslip line.
-        # TODO: Removing sparse="json" requires a migration script !!!
-        # TODO: Move man month computation to another module. Use another field for month / hour.
         sparse="json",
         selection=[
             ("administrativForpleining", "administrativForpleining"),

@@ -20,14 +20,14 @@ class HrPayslipLine(models.Model):
     )
 
     @api.depends(
-        "l10n_no_Loennsbeskrivelse",
+        "salary_rule_id.l10n_no_Loennsbeskrivelse",
         # "l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer",
         "quantity",
         "rate",
     )
     def _compute_man_months(self):
         for line in self:
-            code = line.l10n_no_Loennsbeskrivelse
+            code = line.salary_rule_id.l10n_no_Loennsbeskrivelse
             if code == "fastloenn":
                 line.l10n_no_man_months = line.quantity * line.rate / 100.0
             elif code == "timeloenn":
@@ -42,6 +42,8 @@ class HrPayslipLine(models.Model):
                 line.l10n_no_man_months = (
                     line.quantity * line.rate / 100.0 / hours_per_month
                 )
+            else:
+                line.l10n_no_man_months = 0.0
             if len(self) == 1:
                 return line.l10n_no_man_months
 
