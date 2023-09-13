@@ -19,14 +19,21 @@ class HrPayslipLine(models.Model):
         "Total, year to date", compute="_compute_l10n_no_total_ytd"
     )
 
+    @api.depends(
+        "l10n_no_Loennsbeskrivelse",
+        # "l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer",
+        "quantity",
+        "rate",
+    )
     def _compute_man_months(self):
         for line in self:
-            rule = line.salary_rule_id
             code = line.l10n_no_Loennsbeskrivelse
             if code == "fastloenn":
                 line.l10n_no_man_months = line.quantity * line.rate / 100.0
             elif code == "timeloenn":
-                hours_per_week = line.l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer
+                # hours_per_week = line.l10n_no_antallTimerPerUkeSomEnFullStillingTilsvarer
+                # TODO: Get hours per week from the hr.contract. How, when the payslip.contract_id is empty?
+                hours_per_week = 37.5
                 weeks_per_year = 52.0
                 months_per_year = 12.0
                 hours_per_month = (
