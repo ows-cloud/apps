@@ -1,10 +1,10 @@
-# Copyright 2019 AppsToGROW - Henrik Norlin
+# Copyright 2019-2023 Ows - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     "name": "Attendee name/email/phone",
     "summary": "Require email and/or phone. Get values from contact.",
-    "author": "AppsToGROW, Odoo Community Association (OCA)",
+    "author": "Ows, Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "report/report.xml",
@@ -14,7 +14,7 @@
         "website_event",
     ],
     "license": "AGPL-3",
-    "maintainers": ["appstogrow"],
-    "version": "14.0.1.0.0",
-    "website": "https://github.com/appstogrow/apps",
+    "maintainers": ["ows-cloud"],
+    "version": "15.0.1.0.0",
+    "website": "https://github.com/OCA",
 }
