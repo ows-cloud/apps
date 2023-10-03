@@ -1,10 +1,10 @@
-# Copyright 2019 AppsToGROW - Henrik Norlin
+# Copyright 2019-2023 Ows - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     "name": "Donation Fundrace",
     "summary": "Add field/value to any object",
-    "author": "AppsToGROW, " "Odoo Community Association (OCA)",
+    "author": "Ows, Odoo Community Association (OCA)",
     "category": "Events",
     "data": [
         "security/security.xml",
@@ -15,7 +15,7 @@
     ],
     "depends": ["event"],
     "license": "AGPL-3",
-    "maintainers": ["appstogrow"],
-    "version": "14.0.1.0.0",
-    "website": "https://github.com/appstogrow/apps",
+    "maintainers": ["ows-cloud"],
+    "version": "15.0.1.0.0",
+    "website": "https://github.com/OCA",
 }
