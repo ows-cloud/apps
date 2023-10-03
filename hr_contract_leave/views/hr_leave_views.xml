@@ -6,9 +6,9 @@
         <field name="inherit_id" ref="hr_holidays.hr_leave_view_form_manager" />
         <field name="priority" eval="20" />
         <field name="arch" type="xml">
-            <field name="payslip_status" position="after">
+            <group name="col_left" position="inside">
                 <field name="contract_id" domain="[('employee_id','=',employee_id)]" />
-            </field>
+            </group>
         </field>
     </record>
 </odoo>
