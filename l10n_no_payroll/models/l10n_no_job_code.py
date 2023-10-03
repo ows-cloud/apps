@@ -23,7 +23,7 @@ class JobCode(models.Model):
                     "res_model": "l10n.no.job.code",
                 }
             )
-            import_record.do(
+            import_record.execute_import(
                 columns=["code", "parentCode", "level", "name", "shortName", "notes", "validFrom", "validTo"],
                 fields=["code", False, False, "name", False, False, False, False],
                 # options changed:

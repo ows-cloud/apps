@@ -1,11 +1,11 @@
-# Copyright 2019 AppsToGROW - Henrik Norlin
+# Copyright 2019 Ows - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     "name": "Norway - SAF-T",
     "summary": "",
-    "version": "14.0.1.0.0",
-    "author": "AppsToGROW, Odoo Community Association (OCA)",
+    "version": "15.0.1.0.0",
+    "author": "Ows, Odoo Community Association (OCA)",
     "category": "Localization",
     "data": [
         "security/ir.rule.csv",
@@ -16,6 +16,6 @@
         "account",
     ],
     "license": "AGPL-3",
-    "maintainers": ["appstogrow"],
-    "website": "https://github.com/appstogrow/apps",
+    "maintainers": ["ows-cloud"],
+    "website": "https://github.com/OCA",
 }

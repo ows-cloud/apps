@@ -1,4 +1,4 @@
-# Copyright 2023 AppsToGROW - Henrik Norlin
+# Copyright 2023 Ows - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 # The General Ledger Standard Accounts code lists are Copyright Regnskap Norge AS, 2018.
@@ -8,7 +8,7 @@
 {
     "name": "Norway - Accounting",
     "summary": "",
-    "author": "AppsToGROW, Odoo Community Association (OCA)",
+    "author": "Ows, Odoo Community Association (OCA)",
     "category": "Accounting",
     "data": [
         "data/account_chart_template_data.xml",
@@ -21,7 +21,7 @@
     ],
     "development_status": "Alpha",
     "license": "AGPL-3",
-    "maintainers": ["appstogrow"],
-    "version": "14.0.1.0.0",
-    "website": "https://github.com/appstogrow/apps",
+    "maintainers": ["ows-cloud"],
+    "version": "15.0.1.0.0",
+    "website": "https://github.com/OCA",
 }
