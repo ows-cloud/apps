@@ -1,10 +1,10 @@
-# Copyright 2019 AppsToGROW - Henrik Norlin
+# Copyright 2019 Ows - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     "name": "Account Regex Fix",
     "summary": "Journal Sequence",
-    "author": "AppsToGROW, Odoo Community Association (OCA)",
+    "author": "Ows, Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
         "views/account.account.type.xml",
@@ -19,7 +19,7 @@
         "account_financial_report",
     ],
     "license": "AGPL-3",
-    "maintainers": ["appstogrow"],
-    "version": "14.0.1.0.0",
-    "website": "https://github.com/appstogrow/apps",
+    "maintainers": ["ows-cloud"],
+    "version": "15.0.1.0.0",
+    "website": "https://github.com/OCA",
 }
