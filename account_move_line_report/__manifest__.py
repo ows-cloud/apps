@@ -1,10 +1,10 @@
-# Copyright 2019-2022 AppsToGROW - Henrik Norlin
+# Copyright 2019-2022 Ows - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     "name": "Accounting Statistics",
-    "summary": "",
-    "author": "AppsToGROW, Odoo Community Association (OCA)",
+    "summary": "Similar to accouont_pivot",
+    "author": "Ows, Odoo Community Association (OCA)",
     "category": "account",
     "data": [
         "report/account_move_line_report_views.xml",
@@ -14,7 +14,7 @@
         "account",
     ],
     "license": "AGPL-3",
-    "maintainers": ["appstogrow"],
-    "version": "14.0.1.0.0",
-    "website": "https://github.com/appstogrow/apps",
+    "maintainers": ["ows-cloud"],
+    "version": "15.0.1.0.0",
+    "website": "https://github.com/OCA",
 }

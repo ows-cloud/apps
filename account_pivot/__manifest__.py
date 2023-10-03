@@ -3,7 +3,7 @@
 
 {
     "name": "Account Pivot",
-    "summary": "",
+    "summary": "Similar to account_move_line_report",
     "author": "Ows, " "Odoo Community Association (OCA)",
     "category": "account",
     "data": [
