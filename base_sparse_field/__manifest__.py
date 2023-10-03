@@ -1,15 +1,15 @@
 {
     "name": "Sparse Fields",
     "summary": """Implementation of sparse fields.""",
-    "author": "Odoo, " "AppsToGROW, " "Odoo Community Association (OCA)",
+    "author": "Odoo, Ows, Odoo Community Association (OCA)",
     "category": "Hidden",
-    "version": "14.0.2.0.0",
+    "version": "15.0.1.0.0",
     "depends": ["base"],
     "data": [
         "security/ir.model.access.csv",
         "views/views.xml",
     ],
     "license": "LGPL-3",
-    "maintainers": ["appstogrow"],
-    "website": "https://github.com/appstogrow/apps",
+    "maintainers": ["ows-cloud"],
+    "website": "https://github.com/OCA",
 }
