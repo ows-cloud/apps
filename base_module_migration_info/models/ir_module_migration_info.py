@@ -3,7 +3,7 @@ from odoo.release import major_version  # 14.0
 
 
 class IrModuleMigrationInfo(models.Model):
-    _inherit = "ir.module.migration.info"
+    _name = "ir.module.migration.info"
 
     module_id = fields.Many2one("Module")
     module_name = fields.Char("Module Name")

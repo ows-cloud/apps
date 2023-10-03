@@ -13,7 +13,6 @@
                     <field name="mig_state" optional="hide" />
                     <field name="mig_opened" optional="hide" />
                     <field name="mig_merged" optional="hide" />
-                    <field name="mig_last_commented" optional="hide" />
                 </tree>
             </field>
         </record>
