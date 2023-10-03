@@ -2,9 +2,9 @@
 {
     "name": "Calendar Event Matrix",
     "summary": "Schedule attendees",
-    "version": "14.0.1.0.0",
-    "author": "AppsToGROW," "Odoo Community Association (OCA)",
-    "website": "https://github.com/appstogrow/apps",
+    "version": "15.0.1.0.0",
+    "author": "Ows, Odoo Community Association (OCA)",
+    "website": "https://github.com/OCA",
     "license": "AGPL-3",
     "category": "Hidden/Dependency",
     "depends": [
@@ -25,5 +25,5 @@
         "views/templates.xml",  # depends on website_partner
     ],
     "installable": True,
-    "maintainers": ["appstogrow"],
+    "maintainers": ["ows-cloud"],
 }
