@@ -1,10 +1,10 @@
-# Copyright 2021 AppsToGROW - Henrik Norlin
+# Copyright 2021 Ows - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     "name": "multicompany_base",
     "summary": "",
-    "author": "AppsToGROW, Odoo Community Association (OCA)",
+    "author": "Ows, Odoo Community Association (OCA)",
     "category": "Uncategorized",
     "data": [
         "security/security.xml",
@@ -22,8 +22,8 @@
     "post_init_hook": "post_init_hook",
     "pre_init_hook": "pre_init_hook",
     "license": "AGPL-3",
-    "maintainers": ["appstogrow"],
+    "maintainers": ["ows-cloud"],
     "uninstall_hook": "WARNING_DELETE_RULES_uninstall_hook",
-    "version": "14.0.1.0.0",
-    "website": "https://github.com/appstogrow/apps",
+    "version": "15.0.1.0.0",
+    "website": "https://github.com",
 }
