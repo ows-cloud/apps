@@ -10,13 +10,13 @@
             <field name="inherit_id" ref="survey.survey_form" />
             <field name="priority" eval="20" />
             <field name="arch" type="xml">
-                <field name="state" position="before">
+                <header position="inside">
                     <button
                         name="export_answers"
                         string="Export Answers"
                         type="object"
                     />
-                </field>
+                </header>
             </field>
         </record>
 
