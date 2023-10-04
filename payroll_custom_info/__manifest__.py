@@ -1,10 +1,10 @@
-# Copyright 2019 AppsToGROW - Henrik Norlin
+# Copyright 2019 Ows - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     "name": "Payroll Custom Info",
     "summary": "Add custom HR info",
-    "author": "AppsToGROW, Odoo Community Association (OCA)",
+    "author": "Ows, Odoo Community Association (OCA)",
     "category": "Uncategorized",
     "data": [
         "views/hr_contract_view.xml",
@@ -25,7 +25,7 @@
         # 'payroll_analytic_qty_rate_amount',
     ],
     "license": "AGPL-3",
-    "maintainers": ["appstogrow"],
+    "maintainers": ["ows-cloud"],
     "version": "14.0.1.0.0",
-    "website": "https://github.com/appstogrow/apps",
+    "website": "https://github.com/OCA",
 }

@@ -1,10 +1,10 @@
-# Copyright 2019-2022 AppsToGROW - Henrik Norlin
+# Copyright 2019-2022 Ows - Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     "name": "Manual payslip lines, with analytic account",
     "summary": "Easily create and use salary rules",
-    "author": "AppsToGROW, Odoo Community Association (OCA)",
+    "author": "Ows, Odoo Community Association (OCA)",
     "category": "Human Resources",
     "data": [
         "security/ir.model.access.csv",
@@ -20,9 +20,9 @@
         "payroll",
     ],
     "license": "AGPL-3",
-    "maintainers": ["appstogrow"],
+    "maintainers": ["ows-cloud"],
     "post_init_hook": "post_init_hook",
     "pre_init_hook": "pre_init_hook",
-    "version": "14.0.1.0.0",
-    "website": "https://github.com/appstogrow/apps",
+    "version": "15.0.1.0.0",
+    "website": "https://github.com/OCA",
 }
