@@ -17,9 +17,9 @@
         "views/hr_payslip_run_views.xml",
         "views/hr_salary_rule_views.xml",
         "views/l10n_no_amelding_views.xml",
-        # "views/l10n_no_amelding_wizard_views.xml",
+        "views/l10n_no_amelding_wizard_views.xml",
         "views/res_company_views.xml",
-        # "views/menus.xml",
+        "views/menus.xml",
     ],
     "demo": [
         # "demo/hr_contribution_register_data.xml",

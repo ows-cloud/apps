@@ -6,7 +6,12 @@ import pyxb
 from odoo import _, fields, models
 from odoo.exceptions import UserError
 
-from . import amelding_logic
+# from . import amelding_logic
+
+#   File "C:\o150\.venv\Lib\site-packages\pyxb\binding\content.py", line 807, in <module>
+#     class _PluralBinding (collections.MutableSequence):
+# AttributeError: module 'collections' has no attribute 'MutableSequence'
+# Should be "collections.abc.MutableSequence"
 
 _logger = logging.getLogger(__name__)
 
@@ -48,11 +53,11 @@ class AmeldingWizard(models.TransientModel):
 
             record = self.env["l10n.no.amelding"].create(d)
 
-        logic = amelding_logic.AmeldingLogikk(record)
-        record.amelding = logic.melding_xml()
-        return {
-            "type": "ir.actions.act_window",
-            "res_model": "l10n.no.amelding",
-            "res_id": record.id,
-            "view_mode": "form",
-        }
+        # logic = amelding_logic.AmeldingLogikk(record)
+        # record.amelding = logic.melding_xml()
+        # return {
+        #     "type": "ir.actions.act_window",
+        #     "res_model": "l10n.no.amelding",
+        #     "res_id": record.id,
+        #     "view_mode": "form",
+        # }
