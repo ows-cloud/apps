@@ -8,6 +8,11 @@ from odoo.exceptions import UserError
 
 from . import amelding_logic
 
+#   File "C:\o150\.venv\Lib\site-packages\pyxb\binding\content.py", line 807, in <module>
+#     class _PluralBinding (collections.MutableSequence):
+# AttributeError: module 'collections' has no attribute 'MutableSequence'
+# Should be "collections.abc.MutableSequence"
+
 _logger = logging.getLogger(__name__)
 
 pyxb.RequireValidWhenGenerating(True)

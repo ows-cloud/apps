@@ -100,14 +100,14 @@ class AmeldingLogikk:
             "hr.salary.rule",
             "res.company",
         ]
-        self.field_values = self._get_records(
-            "res.field.value",
-            [("company_id", "=", company_id), ("model", "in", models)],
-            self.company,
-        )
-        self.field_selection_values = self._get_records(
-            "res.field.selection_value", [], self.company
-        )  # security rule: 1_or_company_id
+        # self.field_values = self._get_records(
+        #     "res.field.value",
+        #     [("company_id", "=", company_id), ("model", "in", models)],
+        #     self.company,
+        # )
+        # self.field_selection_values = self._get_records(
+        #     "res.field.selection_value", [], self.company
+        # )  # security rule: 1_or_company_id
 
         self.je = {
             "annenBagatellmessigStoette": 0,
