@@ -354,7 +354,7 @@
         <field name="type">service</field>
         <field name="website_published" eval="1" />
         <field name="resource_booking_type_id" ref="resource_booking_type_massage"/>
-        <field name="public_categ_ids" eval="[(6, 0, [ref('website_sale.services')])]"/>
+        <field name="public_categ_ids" eval="[(6, 0, [ref('resource_booking_demo.website_sale_services')])]"/>
     </record>
     <record id="consultation_pp" model="product.product">
         <field name="name">Consultation 25 minutes</field>
@@ -363,7 +363,7 @@
         <field name="type">service</field>
         <field name="website_published" eval="1" />
         <field name="resource_booking_type_id" ref="resource_booking_type_consultation"/>
-        <field name="public_categ_ids" eval="[(6, 0, [ref('website_sale.services')])]"/>
+        <field name="public_categ_ids" eval="[(6, 0, [ref('resource_booking_demo.website_sale_services')])]"/>
     </record>
     <record id="doctor_pp" model="product.product">
         <field name="name">Doctor 25 minutes</field>
@@ -372,7 +372,7 @@
         <field name="type">service</field>
         <field name="website_published" eval="1" />
         <field name="resource_booking_type_id" ref="resource_booking_type_doctor"/>
-        <field name="public_categ_ids" eval="[(6, 0, [ref('website_sale.services')])]"/>
+        <field name="public_categ_ids" eval="[(6, 0, [ref('resource_booking_demo.website_sale_services')])]"/>
     </record>
 
     <!--
