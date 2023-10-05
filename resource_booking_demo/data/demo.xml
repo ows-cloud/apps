@@ -343,7 +343,8 @@
 
     <!-- SERVICES -->
 
-    <record id="website_sale.services" model="product.public.category">
+    <record id="website_sale_services" model="product.public.category">
+        <field name="name">Services</field>
         <field name="sequence">1</field>
     </record>
     <record id="massage_pp" model="product.product">
