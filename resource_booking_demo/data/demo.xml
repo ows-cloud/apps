@@ -696,8 +696,8 @@
 
     <!-- PAYMENT PROVIDER -->
 
-    <record id="payment.payment_provider_transfer" model="payment.provider">
+    <!-- <record id="payment.payment_provider_transfer" model="payment.provider">
         <field name="state">enabled</field>
-    </record>
+    </record> -->
 
 </data>
