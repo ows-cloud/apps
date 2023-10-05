@@ -33,7 +33,7 @@
     "depends": [
         "base_sparse_field",
         "hr_contract_leave",
-        "hr_field_value",  # remove after manual migration
+        # "hr_field_value",  # remove after manual migration
         "l10n_no_oca",
         "payroll_account_analytic",
         "payroll_custom_info",
