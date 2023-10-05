@@ -350,7 +350,7 @@
         <field name="name">Massage 25 minutes</field>
         <field name="categ_id" ref="product.product_category_all"/>
         <field name="list_price">20.0</field>
-        <field name="detailed_type">service</field>
+        <field name="type">service</field>
         <field name="website_published" eval="1" />
         <field name="resource_booking_type_id" ref="resource_booking_type_massage"/>
         <field name="public_categ_ids" eval="[(6, 0, [ref('website_sale.services')])]"/>
@@ -359,7 +359,7 @@
         <field name="name">Consultation 25 minutes</field>
         <field name="categ_id" ref="product.product_category_all"/>
         <field name="list_price">20.0</field>
-        <field name="detailed_type">service</field>
+        <field name="type">service</field>
         <field name="website_published" eval="1" />
         <field name="resource_booking_type_id" ref="resource_booking_type_consultation"/>
         <field name="public_categ_ids" eval="[(6, 0, [ref('website_sale.services')])]"/>
@@ -368,7 +368,7 @@
         <field name="name">Doctor 25 minutes</field>
         <field name="categ_id" ref="product.product_category_all"/>
         <field name="list_price">40.0</field>
-        <field name="detailed_type">service</field>
+        <field name="type">service</field>
         <field name="website_published" eval="1" />
         <field name="resource_booking_type_id" ref="resource_booking_type_doctor"/>
         <field name="public_categ_ids" eval="[(6, 0, [ref('website_sale.services')])]"/>
@@ -412,7 +412,7 @@
         <field name="name">NEWSTART Silver 10 days</field>
         <field name="categ_id" ref="product.product_category_all"/>
         <field name="list_price">1500.0</field>
-        <field name="detailed_type">service</field>
+        <field name="type">service</field>
         <field name="website_published" eval="1" />
         <field name="pack_ok" eval="1" />
         <field name="pack_type">non_detailed</field>
@@ -482,7 +482,7 @@
         <field name="name">NEWSTART Gold 10 days</field>
         <field name="categ_id" ref="product.product_category_all"/>
         <field name="list_price">2000.0</field>
-        <field name="detailed_type">service</field>
+        <field name="type">service</field>
         <field name="website_published" eval="1" />
         <field name="pack_ok" eval="1" />
         <field name="pack_type">non_detailed</field>
@@ -552,7 +552,7 @@
         <field name="name">Out of DEPRESSION in 10 days</field>
         <field name="categ_id" ref="product.product_category_all"/>
         <field name="list_price">2500.0</field>
-        <field name="detailed_type">service</field>
+        <field name="type">service</field>
         <field name="website_published" eval="1" />
         <field name="pack_ok" eval="1" />
         <field name="pack_type">non_detailed</field>
