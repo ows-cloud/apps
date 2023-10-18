@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from odoo import SUPERUSER_ID, api
 
-import odoo.addons.base.models.base as base
+from odoo.addons.base.models import base
 from odoo.exceptions import UserError
 
 from .models.multicompany_security import SECURITY_DO_IF, NO_ACCESS_MODEL, NO_EDIT_MODEL

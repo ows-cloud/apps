@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from odoo import models
 
-import odoo.addons.base.models.base as base
+from odoo.addons.base.models import base
 
 _logger = logging.getLogger(__name__)
 

@@ -42,6 +42,11 @@ class MulticompanyConfig(models.AbstractModel):
 
     def _configure_system(self):
 
+        # New users auto-subscribe to the digest. AccessError or annoying emails.
+        digest = self.env["digest.digest"].search([("company_id", "=", 1)])
+        if digest:
+            digest.unlink()
+
         product_module = self.env["ir.module.module"].search([("name", "=", "product")])
         if product_module and product_module.state == "installed":
             # Create a new pricelist so it is possible to archive the system pricelist.
@@ -390,6 +395,7 @@ class MulticompanyConfig(models.AbstractModel):
         )
         if website:
             if not company.website_id.id:
+                company = _prepare(company, company)
                 company.write({"website_id": website.id})
             # crm.team
             crm_team_field = self._ref("website_crm.field_website__crm_default_team_id")
