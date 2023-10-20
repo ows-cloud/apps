@@ -12,7 +12,7 @@ _logger = logging.getLogger(__name__)
 class IrAttachment(models.Model):
     _inherit = "ir.attachment"
 
-    def _action_vacuum_filestore(self):
+    def _action_filestore_cleanup(self):
         if not self.env.user.has_group('base.group_system') :
             raise AccessError("Access Denied")
 

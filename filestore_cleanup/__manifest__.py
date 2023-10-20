@@ -7,7 +7,7 @@
     "author": "Ows, Odoo Community Association (OCA)",
     "category": "Administration",
     "data": [
-        "data/vacuum_filestore.xml",
+        "data/filestore_cleanup.xml",
     ],
     "depends": ["base"],
     "license": "AGPL-3",
