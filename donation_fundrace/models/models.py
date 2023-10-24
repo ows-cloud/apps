@@ -98,3 +98,11 @@ class DonationFundracePartner(models.Model):
         "res.partner", string="Partner", required=True, ondelete="restrict"
     )
     event_id = fields.Many2one("event.event", string="Event")
+    company_id = fields.Many2one(
+        "res.company",
+        string="Company",
+        required=True,
+        store=True,
+        index=True,
+        default=lambda self: self.env.company,
+    )
