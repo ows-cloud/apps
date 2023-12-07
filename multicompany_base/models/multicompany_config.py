@@ -42,10 +42,13 @@ class MulticompanyConfig(models.AbstractModel):
 
     def _configure_system(self):
 
-        # New users auto-subscribe to the digest. AccessError or annoying emails.
-        digest = self.env["digest.digest"].search([("company_id", "=", 1)])
-        if digest:
-            digest.unlink()
+        try:
+            # New users auto-subscribe to the digest. AccessError or annoying emails.
+            digest = self.env["digest.digest"].search([("company_id", "=", 1)])
+            if digest:
+                digest.unlink()
+        except:
+            pass
 
         product_module = self.env["ir.module.module"].search([("name", "=", "product")])
         if product_module and product_module.state == "installed":
