@@ -2,7 +2,6 @@
 <odoo>
     <template id="product_item" inherit_id="website_sale.products_item">
         <xpath expr="//form/div[2]/div" position="inside">
-            <t t-set="qty" t-value="int(product.qty_available)"/>
             <!-- TODO: "given" if product.is_donation, else "sold" -->
             <h6>
                 <span t-field="product.sales_count" t-options='{"widget": "integer"}' />
