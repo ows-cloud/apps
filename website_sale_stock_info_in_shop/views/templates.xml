@@ -6,7 +6,7 @@
             <!-- TODO: "given" if product.is_donation, else "sold" -->
             <h6>
                 <span t-field="product.sales_count" t-options='{"widget": "integer"}' />
-                given,
+                out,
                 <span t-field="product.qty_available" t-options='{"widget": "integer"}' />
                 available
             </h6>
