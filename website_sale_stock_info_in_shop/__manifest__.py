@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "website_sale_show_sales_and_stock",
+    "name": "# given, # available",
     "summary": "",
     "author": "Ows, Odoo Community Association (OCA)",
     "category": "uncategorized",
