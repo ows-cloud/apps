@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "# out, # available",
+    "name": "# gone, # available",
     "summary": "",
     "author": "Ows, Odoo Community Association (OCA)",
     "category": "uncategorized",

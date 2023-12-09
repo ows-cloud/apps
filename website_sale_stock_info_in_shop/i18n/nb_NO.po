@@ -1,0 +1,63 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* website_sale_stock_info_in_shop
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-12-09 16:14+0000\n"
+"PO-Revision-Date: 2023-12-09 17:16+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: nb_NO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.4.1\n"
+
+#. module: website_sale_stock_info_in_shop
+#: model:ir.model.fields,field_description:website_sale_stock_info_in_shop.field_product_product__company_id
+msgid "Company"
+msgstr "Firma"
+
+#. module: website_sale_stock_info_in_shop
+#: model:ir.model.fields,field_description:website_sale_stock_info_in_shop.field_product_product__display_name
+msgid "Display Name"
+msgstr "Visningsnavn"
+
+#. module: website_sale_stock_info_in_shop
+#: model:ir.model.fields,field_description:website_sale_stock_info_in_shop.field_product_product__id
+msgid "ID"
+msgstr ""
+
+#. module: website_sale_stock_info_in_shop
+#: model:ir.model.fields,field_description:website_sale_stock_info_in_shop.field_product_product____last_update
+msgid "Last Modified on"
+msgstr "Sist endret"
+
+#. module: website_sale_stock_info_in_shop
+#: model:ir.model,name:website_sale_stock_info_in_shop.model_product_product
+msgid "Product"
+msgstr "Produkt"
+
+#. module: website_sale_stock_info_in_shop
+#: model:ir.model.fields,field_description:website_sale_stock_info_in_shop.field_product_product__sales_count
+msgid "Sold"
+msgstr "Solgt"
+
+#. module: website_sale_stock_info_in_shop
+#: model_terms:ir.ui.view,arch_db:website_sale_stock_info_in_shop.product_item
+msgid "available"
+msgstr "tilgjengelig"
+
+#. module: website_sale_stock_info_in_shop
+#: model_terms:ir.ui.view,arch_db:website_sale_stock_info_in_shop.product_item
+msgid "gone"
+msgstr "borte"
+
+#. module: website_sale_stock_info_in_shop
+#: model_terms:ir.ui.view,arch_db:website_sale_stock_info_in_shop.product_item
+msgid "gone,"
+msgstr "borte,"

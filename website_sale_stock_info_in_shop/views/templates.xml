@@ -2,12 +2,14 @@
 <odoo>
     <template id="product_item" inherit_id="website_sale.products_item">
         <xpath expr="//form/div[2]/div" position="inside">
-            <!-- TODO: "given" if product.is_donation, else "sold" -->
             <h6>
+                <!-- TODO: "given" if product.is_donation, else "sold" -->
                 <span t-field="product.sales_count" t-options='{"widget": "integer"}' />
-                out,
-                <span t-field="product.qty_available" t-options='{"widget": "integer"}' />
-                available
+                <t t-if="product.type != 'product'">gone</t>
+                <t t-else="">gone,
+                    <span t-field="product.qty_available" t-options='{"widget": "integer"}' />
+                    available
+                </t>
             </h6>
         </xpath>
     </template>
