@@ -30,5 +30,5 @@ TODO:
 Set the active company as env.company in a central place, so controllers will know the company by default?
 request.httprequest.cookies.get("cids") - The first cid is the active company.
 
-`sudo_bypass_global_rules()` will bypass the global rules in sudo mode.
-Never use this method, except when there is no alternative.
+`bypass_company_rules()` will bypass the company rules created by multicompany_base.
+Use this method only when there is no better alternative.

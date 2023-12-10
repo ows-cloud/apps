@@ -35,7 +35,7 @@ def post_init_hook(cr, registry):
     )
     if module.state == "installed":
 
-        for rule in env["hr.salary.rule"].sudo_bypass_global_rules().search([]):
+        for rule in env["hr.salary.rule"].sudo().bypass_company_rules().search([]):
             if "qty_rate_amount_ids" in rule.condition_python:
                 rule.condition_python = rule.condition_python.replace(
                     "qty_rate_amount_ids", "line_manually_ids"

@@ -37,10 +37,9 @@ class Users(models.Model):
         return super(Users, self).write(vals)
 
     def _remove_admin_access(self, vals):
-        self_sudo = self.sudo_bypass_global_rules()
         admin_access = "sel_groups_{erp}_{system}".format(
-            erp=str(self_sudo.env.ref("base.group_erp_manager").id),
-            system=str(self_sudo.env.ref("base.group_system").id),
+            erp=str(self.env.ref("base.group_erp_manager").id),
+            system=str(self.env.ref("base.group_system").id),
         )
         vals.pop(admin_access, None)
         return vals

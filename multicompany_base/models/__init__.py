@@ -4,7 +4,6 @@ from . import (
     ir_attachment,
     ir_cron,
     ir_model_data,
-    ir_rule,
     ir_ui_menu,
     ir_ui_view,
     multicompany_config,

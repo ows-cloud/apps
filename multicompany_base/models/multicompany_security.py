@@ -419,7 +419,7 @@ class MulticompanySecurity(models.AbstractModel):
             SECURITY_TYPE = _get_security_type(model.model)
             for do_if, domain_words in SECURITY_RULE[SECURITY_TYPE].items():
                 values = copy.deepcopy(SECURITY_DO_IF[do_if])
-                values["auto_secure"] = True
+                values["company_rule"] = True
                 values["groups"] = []
                 values["model_id"] = model.id
                 values["domain_force"] = self._words2domain(

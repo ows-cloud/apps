@@ -6,7 +6,7 @@ class IrCron(models.Model):
 
     def method_direct_trigger(self):
         self.check_access_rights('write')
-        companies = self.env["res.company"].sudo_bypass_global_rules().search([])
+        companies = self.env["res.company"].bypass_company_rules().search([])
 
         for cron in self:
             for company in companies:

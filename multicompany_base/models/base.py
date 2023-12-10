@@ -40,8 +40,7 @@ class Base(models.AbstractModel):
 
         if "website_id" in vals.keys() and default and "website_id" in default.keys():
             vals["company_id"] = (
-                self.sudo_bypass_global_rules()
-                .env["website"]
+                self.env["website"].bypass_company_rules()
                 .browse(default["website_id"])
                 .company_id.id
             )

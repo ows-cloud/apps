@@ -11,17 +11,18 @@ class Company(models.Model):
 
     @api.model
     def create(self, vals):
-        new_company = super(Company, self.sudo_bypass_global_rules()).create(vals)
-        new_company.sudo().partner_id.write({"company_id": new_company.id})
+        new_company = super(Company, self.bypass_company_rules()).create(vals)
+        new_company.partner_id.write({"company_id": new_company.id})
 
         # Give access to SUPPORT USER and CURRENT USER
-        support_user = self.sudo_bypass_global_rules().env.ref(
+        # Configure public/default user fails without sudo() here.
+        support_user = self.sudo().bypass_company_rules().env.ref(
             "__multicompany_base__.support_user"
         )
-        support_user.sudo_bypass_global_rules().write(
+        support_user.bypass_company_rules().write(
             {"company_ids": [(4, new_company.id)]}
         )
-        self.env["res.users"].flush(["company_ids"])
+        self.flush()
 
         # Auto-configure company
         config = (

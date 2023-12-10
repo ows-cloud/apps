@@ -108,7 +108,7 @@ def _create_support_user(env):
 
 
 def _set_company_id_where_null(env):
-    self = env["base"].sudo_bypass_global_rules()
+    self = env["base"].sudo().bypass_company_rules()
     _logger.info("Starting _set_company_id_where_null")
 
     last_model_names = ["ir.property", "ir.model.data"]
@@ -135,7 +135,7 @@ def _set_company_id_where_null(env):
             .with_context(
                 active_test=False,
             )
-            .sudo_bypass_global_rules()
+            .sudo().bypass_company_rules()
             .search([("company_id", "=", False)])
         )
         if not records_with_no_company:
@@ -186,11 +186,11 @@ def _set_company_id_where_null(env):
         related_field_name = base.FIELD_NAME_TO_GET_COMPANY.get(model.model)
         if not related_field_name:
             if model_name in NO_ACCESS_MODEL or model_name in NO_EDIT_MODEL:
-                records_with_no_company.sudo_bypass_global_rules().write(
+                records_with_no_company.write(
                     {"company_id": self.env.company.id}
                 )
             else:
-                _logger.warning("No company -> 1 for {}".format(records_with_no_company))
+                _logger.warning("These records did not get a company_id. multicompany.security will set company_id -> 1 for {}".format(records_with_no_company))
             continue
         related_field = self.env[model.model]._fields[related_field_name]
         related_models_and_record_ids = defaultdict(
@@ -211,7 +211,7 @@ def _set_company_id_where_null(env):
             # Related records may not exist. Search for existing related records.
             related_records = (
                 self.env[related_model_name]
-                .sudo_bypass_global_rules()
+                .sudo().bypass_company_rules()
                 .search([("id", "in", related_record_ids)])
             )
             related_companies = related_records.mapped("company_id")
@@ -229,7 +229,7 @@ def _set_company_id_where_null(env):
                 #   lambda r: id in update_record_ids
                 # ).sudo().write({'company_id': related_company.id})
                 # Option 2
-                self.env[model.model].sudo_bypass_global_rules().browse(
+                self.env[model.model].sudo().bypass_company_rules().browse(
                     update_record_ids
                 ).write({"company_id": related_company.id})
 
@@ -241,6 +241,6 @@ def _set_company_id_where_null(env):
             #   lambda r: id in record_ids_with_no_related_record
             # ).sudo().write({'company_id': self.env.company.id})
             # Option 2
-            self.env[model.model].sudo_bypass_global_rules().browse(
+            self.env[model.model].sudo().bypass_company_rules().browse(
                 record_ids_with_no_related_record
             ).write({"company_id": self.env.company.id})
