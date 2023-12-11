@@ -54,10 +54,20 @@ msgstr "tilgjengelig"
 
 #. module: website_sale_stock_info_in_shop
 #: model_terms:ir.ui.view,arch_db:website_sale_stock_info_in_shop.product_item
-msgid "gone"
-msgstr "borte"
+msgid "sold"
+msgstr "solgt"
 
 #. module: website_sale_stock_info_in_shop
 #: model_terms:ir.ui.view,arch_db:website_sale_stock_info_in_shop.product_item
-msgid "gone,"
-msgstr "borte,"
+msgid "sold,"
+msgstr "solgt,"
+
+#. module: website_sale_stock_info_in_shop
+#: model_terms:ir.ui.view,arch_db:website_sale_stock_info_in_shop.product_item
+msgid "of"
+msgstr "av"
+
+#. module: website_sale_stock_info_in_shop
+#: model_terms:ir.ui.view,arch_db:website_sale_stock_info_in_shop.product_item
+msgid "given"
+msgstr "gitt"

@@ -2,11 +2,12 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "# gone, # available",
+    "name": "# sold, # available",
     "summary": "",
     "author": "Ows, Odoo Community Association (OCA)",
     "category": "uncategorized",
     "data": [
+        "views/product_template_views.xml",
         "views/templates.xml",
     ],
     "depends": [

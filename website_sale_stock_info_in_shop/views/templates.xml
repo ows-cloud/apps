@@ -3,13 +3,23 @@
     <template id="product_item" inherit_id="website_sale.products_item">
         <xpath expr="//form/div[2]/div" position="inside">
             <h6>
-                <!-- TODO: "given" if product.is_donation, else "sold" -->
-                <span t-field="product.sales_count" t-options='{"widget": "integer"}' />
-                <t t-if="product.type != 'product'">gone</t>
-                <t t-else="">gone,
-                    <span t-field="product.qty_available" t-options='{"widget": "integer"}' />
-                    available
+                <t t-if="product.is_donation">
+                    <t t-set="total" t-value="product.sales_count+product.qty_available"/>
+                    <span t-field="product.sales_count" t-options='{"widget": "integer"}' />
+                    of
+                    <span t-esc="total" t-options='{"widget": "integer"}' />
+                    given
                 </t>
+                <!--
+                <t t-else="">
+                    <span t-field="product.sales_count" t-options='{"widget": "integer"}' />
+                    <t t-if="product.type != 'product'">sold</t>
+                    <t t-else="">sold,
+                        <span t-field="product.qty_available" t-options='{"widget": "integer"}' />
+                        available
+                    </t>
+                </t>
+                -->
             </h6>
         </xpath>
     </template>
