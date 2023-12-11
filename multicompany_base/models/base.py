@@ -44,7 +44,7 @@ class Base(models.AbstractModel):
                 .browse(default["website_id"])
                 .company_id.id
             )
-        elif "company_id" not in vals.keys():
+        else:
             try:
                 vals["company_id"] = self.env.company.id
             except:
