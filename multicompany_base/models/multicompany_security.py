@@ -205,10 +205,11 @@ SECURITY_RULE = {
         "read_if": "system_company OR in_companies/parent/child",
         "edit_if": "in_company AND in_companies",
     },
-    # Relevant if some fields will use JSON format
+    # System company may create database fields.
+    # Any company may create non-database fields (store data in an existing JSON field).
     "IR_MODEL_FIELDS_MODEL": {
         "read_if": "system_company OR in_companies/parent/child",
-        "edit_if": "in_company AND in_companies AND json",
+        "edit_if": "( system_company OR json ) AND ( in_company AND in_companies )",
     },
     "NO_EDIT_MODEL": {
         "edit_if": "system_company AND ( in_company AND in_companies )",
