@@ -12,12 +12,18 @@ class FleetVehicleOdometer(models.Model):
 
     @api.depends("date", "vehicle_id")
     def _compute_value_start(self):
-        self.ensure_one()
-        rec = self.search([
-            ("vehicle_id", "=", self.vehicle_id.id),
-            ("date", "<=", self.date),
-        ], order="value desc", limit=1)
-        self.value_start = rec.value
+        for record in self:
+            if record.distance:
+                record.value_start = record.value - record.distance
+            else:
+                record.value_start = self.search(
+                    [
+                        ("vehicle_id", "=", record.vehicle_id.id),
+                        ("date", "<=", record.date),
+                    ],
+                    order="value desc",
+                    limit=1,
+                ).value
 
     analytic_account_id = fields.Many2one(
         "account.analytic.account", string="Analytic Account"
