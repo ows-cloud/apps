@@ -10,6 +10,8 @@ _logger = logging.getLogger(__name__)
 class FleetVehicleOdometer(models.Model):
     _inherit = "fleet.vehicle.odometer"
 
+    driver_id = fields.Many2one("res.partner", related=None)
+
     @api.depends("date", "vehicle_id")
     def _compute_value_start(self):
         for record in self:
