@@ -19,6 +19,9 @@
             <field name="value" position="before">
                 <field name="value_start" />
             </field>
+            <field name="value" position="attributes">
+                <attribute name="widget">integer</attribute>
+            </field>
             <tree position="inside">
                 <field name="analytic_account_id" options="{'no_create': True, 'no_create_edit':True}"/>
                 <field name="comment"/>
@@ -41,6 +44,9 @@
             <field name="value" position="before">
                 <field name="value_start" />
             </field>
+            <field name="value" position="attributes">
+                <attribute name="widget">integer</attribute>
+            </field>
             <field name="value" position="after">
                 <field name="distance" />
             </field>
@@ -56,15 +62,13 @@
         <field name="inherit_id" ref="fleet_vehicle_odometer_view_form" />
         <field name="mode">primary</field>
         <field name="arch" type="xml">
-            <data>
-                <field name="vehicle_id" position="attributes">
-                    <attribute name="readonly">1</attribute>
-                </field>
-                <!-- Cannot save readonly vehicle_id. Therefore vehicle_id twice. -->
-                <field name="vehicle_id" position="after">
-                  <field name="vehicle_id" invisible="1" />
-                </field>
-                </data>
+            <field name="vehicle_id" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+            <!-- Cannot save readonly vehicle_id. Therefore vehicle_id twice. -->
+            <field name="vehicle_id" position="after">
+                <field name="vehicle_id" invisible="1" />
+            </field>
         </field>
     </record>
 
