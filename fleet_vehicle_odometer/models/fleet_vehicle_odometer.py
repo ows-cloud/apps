@@ -10,17 +10,25 @@ _logger = logging.getLogger(__name__)
 class FleetVehicleOdometer(models.Model):
     _inherit = "fleet.vehicle.odometer"
 
+    @api.depends("date", "vehicle_id")
+    def _compute_value_start(self):
+        self.ensure_one()
+        rec = self.search([
+            ("vehicle_id", "=", self.vehicle_id.id),
+            ("date", "<=", self.date),
+        ], order="value desc", limit=1)
+        self.value_start = rec.value
+
     analytic_account_id = fields.Many2one(
         "account.analytic.account", string="Analytic Account"
     )
     comment = fields.Char("Comment")
-    distance = fields.Integer("Distance")
-    value_int = fields.Integer("Odometer")
-
-    @api.onchange("value_int")
-    def _onchange_set_value(self):
-        for record in self:
-            record.value = float(record.value_int)
+    distance = fields.Integer("Distance", readonly=True)
+    value_start = fields.Integer(
+        "Start Value",
+        compute="_compute_value_start",
+        store=True,
+    )
 
     def unlink(self):
         self._recompute_distance_before_unlink()
