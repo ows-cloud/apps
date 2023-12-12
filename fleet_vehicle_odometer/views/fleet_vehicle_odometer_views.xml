@@ -39,6 +39,7 @@
         <field name="arch" type="xml">
             <field name="date" position="replace" />
             <field name="vehicle_id" position="after">
+                <field name="driver_id" />
                 <field name="date" />
             </field>
             <field name="value" position="before">
