@@ -33,4 +33,7 @@
     <record id="hr_contract.action_hr_contract" model="ir.actions.act_window">
         <field name="context">{'active_test': False, 'search_default_current':1, 'search_default_group_by_state': 1}</field>
     </record>
+    <record id="hr_contract.action_hr_contract" model="ir.actions.act_window">
+        <field name="context">{'active_test': False, 'search_default_employee_id': [active_id], 'default_employee_id': active_id, 'search_default_group_by_state': 1}</field>
+    </record>
 </odoo>
