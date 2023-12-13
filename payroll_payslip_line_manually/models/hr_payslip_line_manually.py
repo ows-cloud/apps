@@ -25,6 +25,7 @@ class HrAnalyticQtyRateAmount(models.Model):
     analytic_account_id = fields.Many2one(
         "account.analytic.account", string="Analytic Account", ondelete="restrict"
     )
+    active = fields.Boolean(default=True)
     quantity = fields.Float(default=1.0)
     rate = fields.Float("Rate (%)", default=100.0)
     amount = fields.Float()

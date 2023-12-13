@@ -9,6 +9,7 @@
                 <page name="fields" string="Recurring payslip lines">
                     <field name="line_manually_ids">
                         <tree editable="bottom">
+                            <field name="active" />
                             <field
                                 name="salary_rule_id"
                                 domain="[('line_manually_model','=','hr.contract')]"
@@ -29,5 +30,7 @@
             </notebook>
         </field>
     </record>
-
+    <record id="hr_contract.action_hr_contract" model="ir.actions.act_window">
+        <field name="context">{'active_test': False, 'search_default_current':1, 'search_default_group_by_state': 1}</field>
+    </record>
 </odoo>
