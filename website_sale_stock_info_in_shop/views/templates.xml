@@ -103,4 +103,9 @@
             <attribute name="t-att-value">'name'</attribute>
         </input>
     </template>
+    <template id="confirmation" inherit_id="website_sale.confirmation">
+        <t t-if="same_shipping and not only_services" position="attributes">
+            <attribute name="t-if">same_shipping and not order.only_services</attribute>
+        </t>
+    </template>
 </odoo>
