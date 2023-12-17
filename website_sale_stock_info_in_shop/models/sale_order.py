@@ -22,3 +22,13 @@ class SaleOrder(models.Model):
                 l.product_id.is_donation
                 for l in order.website_order_line
             )
+
+    is_all_service = fields.Boolean("Service Product", compute="_compute_is_service_products")
+
+    @api.depends('order_line')
+    def _compute_is_service_products(self):
+        for so in self:
+            so.is_all_service = all(
+                line.product_id.type == 'service' or line.product_id.is_donation
+                for line in so.order_line.filtered(lambda x: not x.display_type)
+            )
