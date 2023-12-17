@@ -11,6 +11,7 @@
         "views/templates.xml",
     ],
     "depends": [
+        "website_sale_delivery",
         "website_sale_stock",
     ],
     "license": "AGPL-3",
