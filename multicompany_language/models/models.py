@@ -51,7 +51,7 @@ class IrTranslation(models.Model):
             # insert missing translations for each term in src
             query = """
 INSERT INTO ir_translation (lang, type, name, res_id, src, value, module, company_id)
-SELECT l.code, 'model', %(name)s, %(res_id)s, %(src)s, %(src)s, %(module)s, %(company_id)s
+SELECT l.code, 'model_terms', %(name)s, %(res_id)s, %(src)s, %(src)s, %(module)s, %(company_id)s
 FROM res_lang l
 WHERE l.id IN %(language_ids)s AND l.active AND NOT EXISTS (
     SELECT 1 FROM ir_translation
