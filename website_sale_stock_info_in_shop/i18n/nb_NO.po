@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-18 07:54+0000\n"
-"PO-Revision-Date: 2023-12-18 08:57+0100\n"
+"POT-Creation-Date: 2023-12-18 08:45+0000\n"
+"PO-Revision-Date: 2023-12-18 09:47+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: no\n"
@@ -16,6 +16,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.4.1\n"
+
+#. module: website_sale_stock_info_in_shop
+#: model_terms:ir.ui.view,arch_db:website_sale_stock_info_in_shop.confirmation
+msgid "&amp; Shipping"
+msgstr ""
+
+#. module: website_sale_stock_info_in_shop
+#: model_terms:ir.ui.view,arch_db:website_sale_stock_info_in_shop.confirmation
+msgid "Address"
+msgstr "Adresse"
+
+#. module: website_sale_stock_info_in_shop
+#: model_terms:ir.ui.view,arch_db:website_sale_stock_info_in_shop.confirmation
+msgid "Billing"
+msgstr "Fakturering"
 
 #. module: website_sale_stock_info_in_shop
 #: model:ir.model.fields,field_description:website_sale_stock_info_in_shop.field_sale_order__cart_quantity
@@ -46,7 +61,7 @@ msgstr "Gaver"
 #: model:ir.model.fields,field_description:website_sale_stock_info_in_shop.field_product_template__id
 #: model:ir.model.fields,field_description:website_sale_stock_info_in_shop.field_sale_order__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: website_sale_stock_info_in_shop
 #: model:ir.model.fields,field_description:website_sale_stock_info_in_shop.field_product_product__is_donation

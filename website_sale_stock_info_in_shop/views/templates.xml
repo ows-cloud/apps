@@ -104,8 +104,13 @@
         </input>
     </template>
     <template id="confirmation" inherit_id="website_sale.confirmation">
-        <t t-if="same_shipping and not only_services" position="attributes">
-            <attribute name="t-if">same_shipping and not order.only_services</attribute>
-        </t>
+        <xpath expr="//div[@class='card-body']/div/b" position="replace">
+            <b>
+                <t t-if="order.only_donations">Address</t>
+                <t t-else="">Billing</t>
+                <t t-if="same_shipping and not order.only_services"> &amp; Shipping</t>
+                :
+            </b>
+        </xpath>
     </template>
 </odoo>
