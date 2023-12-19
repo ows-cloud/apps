@@ -10,9 +10,9 @@
                 <group name="norway" string="Norway">
                     <field
                         name="contract_id"
-                        domain="[('employee_id','=',employee_id)]"
+                        required="1"
                     />
-                    <field name="percent" />
+                    <field name="percent" required="1" />
                 </group>
             </xpath>
         </field>
