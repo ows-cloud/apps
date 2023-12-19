@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="product_item" inherit_id="website_sale.products_item">
+    <template id="products_item" inherit_id="website_sale.products_item">
         <xpath expr="//form/div[2]/div" position="inside">
             <h6>
                 <t t-if="product.is_donation">
-                    <t t-set="total" t-value="product.sales_count+product.qty_available"/>
+                    <t t-set="total" t-value="product.sales_count + product.qty_available + product.incoming_qty - product.outgoing_qty"/>
                     <span t-field="product.sales_count" t-options='{"widget": "integer"}' />
                     of
                     <span t-esc="total" t-options='{"widget": "integer"}' />
