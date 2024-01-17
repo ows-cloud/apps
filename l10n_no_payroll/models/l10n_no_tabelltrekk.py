@@ -1,6 +1,6 @@
 import logging
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 from .tabelltrekk2024 import tabelltrekk2024 as tabelltrekk20xx
 
@@ -20,6 +20,7 @@ class Tabelltrekk(models.Model):
     trekkgrunnlag = fields.Integer("Trekkgrunnlag")
     trekk = fields.Integer("Trekk")
 
+    @api.model
     def post_init_hook_import_tax_deduction_tables(self):
         year_exists = self.search([("year", "=", YEAR)], limit=1)
         if not year_exists:

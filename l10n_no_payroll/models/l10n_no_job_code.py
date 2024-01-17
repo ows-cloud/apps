@@ -1,7 +1,7 @@
 import inspect
 import os
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class JobCode(models.Model):
@@ -11,6 +11,7 @@ class JobCode(models.Model):
     name = fields.Char()
     code = fields.Char()
 
+    @api.model
     def post_init_hook_import_job_codes(self):
         directory_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         file_path =  os.path.join(directory_path, '../data/l10n.no.job.code.csv')

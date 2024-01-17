@@ -20,6 +20,8 @@
         "views/l10n_no_amelding_wizard_views.xml",
         "views/res_company_views.xml",
         "views/menus.xml",
+        "data/l10n_no_job_code.xml",
+        "data/l10n_no_tabelltrekk.xml",
     ],
     "demo": [
         # "demo/hr_contribution_register_data.xml",
@@ -37,7 +39,6 @@
     "external_dependencies": {"python": ["pyxb"]},
     "license": "AGPL-3",
     "maintainers": ["ows-cloud"],
-    "post_init_hook": "post_init_hook",
     "version": "15.0.1.0.0",
     "website": "https://github.com/OCA",
 }
