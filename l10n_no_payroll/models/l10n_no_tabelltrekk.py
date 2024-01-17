@@ -2,9 +2,9 @@ import logging
 
 from odoo import fields, models
 
-from .tabelltrekk2023 import tabelltrekk2023 as tabelltrekk20xx
+from .tabelltrekk2024 import tabelltrekk2024 as tabelltrekk20xx
 
-YEAR = 2023
+YEAR = 2024
 
 _logger = logging.getLogger(__name__)
 
