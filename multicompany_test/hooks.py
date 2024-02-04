@@ -1,7 +1,5 @@
 from odoo.api import SUPERUSER_ID, Environment
 
-from odoo.addons.base.models.base_test import update_xmlids
-
 
 def post_init_hook(cr, registry):
     """
@@ -22,4 +20,4 @@ def post_init_hook(cr, registry):
         ("base", "user_admin", test_admin_user.id),
         ("base", "partner_admin", test_admin_partner.id),
     ]
-    update_xmlids(env.cr, xmlids)
+    env["ir.model"]._update_xmlids(env.cr, xmlids)

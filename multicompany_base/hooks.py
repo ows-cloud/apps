@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from odoo import SUPERUSER_ID, api
 
-import odoo.addons.base.models.base as base
+from odoo.addons.base.models.base import FIELD_NAME_TO_GET_COMPANY, _get_model_name_and_res_id
 from odoo.exceptions import UserError
 
 from .models.multicompany_security import SECURITY_DO_IF, NO_ACCESS_MODEL, NO_EDIT_MODEL
@@ -25,7 +25,7 @@ def pre_init_hook(cr):
             pass
         elif model_name in NO_ACCESS_MODEL or model_name in NO_EDIT_MODEL:
             pass
-        elif model_name in base.FIELD_NAME_TO_GET_COMPANY:
+        elif model_name in FIELD_NAME_TO_GET_COMPANY:
             pass
         else:
             model_without_field_name_to_get_company.append(model_name)
@@ -108,7 +108,7 @@ def _create_support_user(env):
 
 
 def _set_company_id_where_null(env):
-    self = env["base"].sudo_bypass_global_rules()
+    self = env["base"].sudo().bypass_company_rules()
     _logger.info("Starting _set_company_id_where_null")
 
     last_model_names = ["ir.property", "ir.model.data"]
@@ -135,7 +135,7 @@ def _set_company_id_where_null(env):
             .with_context(
                 active_test=False,
             )
-            .sudo_bypass_global_rules()
+            .sudo().bypass_company_rules()
             .search([("company_id", "=", False)])
         )
         if not records_with_no_company:
@@ -183,10 +183,10 @@ def _set_company_id_where_null(env):
 
         # C) Another way to loop
 
-        related_field_name = base.FIELD_NAME_TO_GET_COMPANY.get(model.model)
+        related_field_name = FIELD_NAME_TO_GET_COMPANY.get(model.model)
         if not related_field_name:
             if model_name in NO_ACCESS_MODEL or model_name in NO_EDIT_MODEL:
-                records_with_no_company.sudo_bypass_global_rules().write(
+                records_with_no_company.sudo().bypass_company_rules().write(
                     {"company_id": self.env.company.id}
                 )
             else:
@@ -199,7 +199,7 @@ def _set_company_id_where_null(env):
         for record in records_with_no_company:
             [
                 (related_model_name, related_record_id)
-            ] = base._get_model_name_and_res_id(record, related_field, record)
+            ] = _get_model_name_and_res_id(record, related_field, record)
             if related_model_name and related_record_id:
                 related_models_and_record_ids[related_model_name].append(
                     (record.id, related_record_id)
@@ -211,7 +211,7 @@ def _set_company_id_where_null(env):
             # Related records may not exist. Search for existing related records.
             related_records = (
                 self.env[related_model_name]
-                .sudo_bypass_global_rules()
+                .sudo().bypass_company_rules()
                 .search([("id", "in", related_record_ids)])
             )
             related_companies = related_records.mapped("company_id")
@@ -229,7 +229,7 @@ def _set_company_id_where_null(env):
                 #   lambda r: id in update_record_ids
                 # ).sudo().write({'company_id': related_company.id})
                 # Option 2
-                self.env[model.model].sudo_bypass_global_rules().browse(
+                self.env[model.model].sudo().bypass_company_rules().browse(
                     update_record_ids
                 ).write({"company_id": related_company.id})
 
@@ -241,6 +241,6 @@ def _set_company_id_where_null(env):
             #   lambda r: id in record_ids_with_no_related_record
             # ).sudo().write({'company_id': self.env.company.id})
             # Option 2
-            self.env[model.model].sudo_bypass_global_rules().browse(
+            self.env[model.model].sudo().bypass_company_rules().browse(
                 record_ids_with_no_related_record
             ).write({"company_id": self.env.company.id})

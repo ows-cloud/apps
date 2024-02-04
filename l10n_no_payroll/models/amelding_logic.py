@@ -3,6 +3,7 @@ from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 from lxml import etree
+from odoo.exceptions import UserError
 
 from . import amelding_v2_2 as a
 
@@ -128,7 +129,10 @@ class AmeldingLogikk:
         }
 
     def melding_xml(self):
-        m = self.melding()
+        m = self.melding2()
+        # raise UserError(m)
+        # Melding(leveranse=None)
+
         myxml = m.toxml("utf-8")
         myetree = etree.fromstring(myxml)
 
@@ -139,6 +143,11 @@ class AmeldingLogikk:
 
         mypretty = etree.tostring(myetree, pretty_print=True)
         return mypretty
+
+    def melding2(self):
+        m = a.Melding()
+        m.Leveranse = a.Leveranse()
+        return m
 
     def melding(self):
         m = a.melding()

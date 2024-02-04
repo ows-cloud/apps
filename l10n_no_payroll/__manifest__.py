@@ -7,7 +7,7 @@
     "author": "Ows, Odoo Community Association (OCA)",
     "category": "Localization",
     "data": [
-        # "security/ir.model.access.csv",
+        "security/ir.model.access.csv",
         "views/hr_contract_views.xml",
         "views/hr_employee_views.xml",
         "views/hr_job_views.xml",

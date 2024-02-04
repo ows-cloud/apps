@@ -4,8 +4,6 @@ from collections import defaultdict
 
 from odoo import models
 
-import odoo.addons.base.models.base as base
-
 _logger = logging.getLogger(__name__)
 
 # Module name for external IDs made with python.

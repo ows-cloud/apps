@@ -15,4 +15,5 @@
     "post_init_hook": "post_init_hook",
     "version": "15.0.1.0.0",
     "website": "https://github.com",
+    "installable": False,
 }
