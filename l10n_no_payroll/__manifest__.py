@@ -20,17 +20,10 @@
         "views/l10n_no_amelding_wizard_views.xml",
         "views/res_company_views.xml",
         "views/menus.xml",
-<<<<<<< found
     ],
     "demo": [
         # "demo/hr_contribution_register_data.xml",
         "demo/hr_salary_rule_category_data.xml",
-||||||| expected
-        "data_old/res.field.csv",  # remove after manual migration
-        "data_old/res.field.selection_value.csv",  # remove after manual migration
-        # "views/res_field_views.xml",  # remove after manual migration
-=======
->>>>>>> replacement
         "demo/hr_salary_rule_data.xml",
         "demo/hr_payroll_structure_data.xml",
     ],
