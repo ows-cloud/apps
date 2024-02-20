@@ -34,7 +34,7 @@
         "payroll_account_analytic",
         "payroll_custom_info",
     ],
-    "external_dependencies": {"python": ["pyxb"]},
+    "external_dependencies": {"python": ["xsdata-pydantic"]},
     "license": "AGPL-3",
     "maintainers": ["ows-cloud"],
     "post_init_hook": "post_init_hook",

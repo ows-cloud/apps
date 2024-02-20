@@ -4,3 +4,9 @@ To see all the menus, make sure:
   "Technical Settings / Show Full Accounting Features"
 
 * The page is running in debug mode
+To see all the menus, make sure:
+
+* Your user is member of the group
+  "Technical Settings / Show Full Accounting Features"
+
+* The page is running in debug mode
