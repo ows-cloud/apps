@@ -11,9 +11,9 @@
     <field name="model">account.account</field>
     <field name="inherit_id" ref="account.view_account_form" />
     <field name="arch" type="xml">
-        <group name="security_group" position="inside">
+        <field name="allowed_journal_ids" position="after">
             <field name="partner_policy" />
-        </group>
+        </field>
     </field>
 </record>
 

@@ -15,7 +15,7 @@
     "author": "ACSONE SA/NV,Akretion,Odoo Community Association (OCA)",
     "website": "https://github.com/appstogrow/apps",
     "depends": [
-        "account_menu",
+        "account_usability",
     ],
     "data": [
         "views/account_account.xml",
