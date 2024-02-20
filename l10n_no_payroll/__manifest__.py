@@ -28,6 +28,7 @@
         "demo/hr_payroll_structure_data.xml",
     ],
     "depends": [
+        "base_import",  # l10n_no_job_code
         "base_sparse_field",
         "hr_contract_leave",
         "l10n_no_oca",
