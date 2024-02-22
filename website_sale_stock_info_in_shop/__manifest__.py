@@ -16,6 +16,6 @@
     ],
     "license": "AGPL-3",
     "maintainers": ["ows-cloud"],
-    "version": "14.0.1.0.0",
+    "version": "16.0.1.0.0",
     "website": "https://github.com/OCA",
 }

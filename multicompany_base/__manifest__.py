@@ -24,6 +24,6 @@
     "license": "AGPL-3",
     "maintainers": ["ows-cloud"],
     "uninstall_hook": "WARNING_DELETE_RULES_uninstall_hook",
-    "version": "15.0.1.0.0",
+    "version": "16.0.1.0.0",
     "website": "https://github.com",
 }

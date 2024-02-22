@@ -4,7 +4,7 @@
 {
     "name": "Norway - SAF-T",
     "summary": "",
-    "version": "15.0.1.0.0",
+    "version": "16.0.1.0.0",
     "author": "Ows, Odoo Community Association (OCA)",
     "category": "Localization",
     "data": [
