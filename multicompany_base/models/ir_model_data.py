@@ -8,8 +8,9 @@ class IrModelData(models.Model):
     # ... exporting records (__ensure_xml_id not running, use patch instead)
     # ... installing modules
     # TODO: test
-    def create(self, values):
-        if "company_id" not in values:
-            record = self.env[values["model"]].browse(values["res_id"])
-            values["company_id"] = record.company_id.id
-        super(IrModelData, self).create(values)
+    def create(self, vals_list):
+        for values in vals_list:
+            if "company_id" not in values:
+                record = self.env[values["model"]].browse(values["res_id"])
+                values["company_id"] = record.company_id.id
+        super(IrModelData, self).create(vals_list)

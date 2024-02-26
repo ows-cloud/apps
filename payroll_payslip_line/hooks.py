@@ -22,5 +22,5 @@ sql_to_update_fields = """
 
 def pre_init_hook(cr):
     env = api.Environment(cr, SUPERUSER_ID, {})
-    openupgrade.add_fields(env, fields_to_add)
-    openupgrade.logged_query(cr, sql_to_update_fields)
+    # openupgrade.add_fields(env, fields_to_add)
+    # openupgrade.logged_query(cr, sql_to_update_fields)

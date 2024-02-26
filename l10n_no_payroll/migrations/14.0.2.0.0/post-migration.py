@@ -8,4 +8,3 @@ def migrate(env, version):
 
     """ Manually migrate away from res.field - open record in form view, Action: Migrate"""
     # env["res.field"].set_standard_info_in_fields()
-    # env["res.field"].create_custom_info()

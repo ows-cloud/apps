@@ -39,7 +39,6 @@ COMPANY_READ_SYSTEM_MODEL = [
     "ir.mail.server",
     "ir.model.data",
     "ir.module.module",
-    "ir.translation",  # temporarily disabled, see hardcoding below
     "ir.ui.menu",
     "ir.ui.view",
     "mail.template",
@@ -379,7 +378,7 @@ class MulticompanySecurity(models.AbstractModel):
         # Takes a long time if there are many records without company_id
         self._set_company_id_to_1_where_null()
         self._update_rule_domains_to_1_where_false_except_partner()
-        self._set_global_security_rules_on_all_models_except_ir_rule_and_ir_translation()
+        self._set_global_security_rules_on_all_models_except_ir_rule()
         self._update_code_to_comply_with_safe_eval()
         self._update_system_records()
         param = "multicompany_base.force_security_company_manager"
@@ -404,14 +403,14 @@ class MulticompanySecurity(models.AbstractModel):
             self.env.cr.execute(sql)
 
 
-    def _set_global_security_rules_on_all_models_except_ir_rule_and_ir_translation(
+    def _set_global_security_rules_on_all_models_except_ir_rule(
         self,
     ):
         _logger.info(
             """Starting _set_global_security_rules_on_all_models_except_ir_rule_..."""
         )
         models = self.env["ir.model"].search(
-            [("model", "!=", "ir.rule"), ("model", "!=", "ir.translation")]
+            [("model", "!=", "ir.rule")]
         )
         for model in models:
             SECURITY_TYPE = _get_security_type(model.model)

@@ -48,7 +48,7 @@ class Tabelltrekk(models.Model):
                     sql = sql_base
             if sql != sql_base:
                 self.env.cr.execute(sql[:-1])
-            self.invalidate_cache()
+            self.invalidate_model()
 
 
 class HrEmployee(models.Model):

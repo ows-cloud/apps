@@ -26,10 +26,11 @@ class FleetVehicleOdometer(models.Model):
         self._recompute_distance_before_unlink()
         return super().unlink()
 
-    @api.model
-    def create(self, values):
-        self._recompute_distance_before_create(values)
-        return super().create(values)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for values in vals_list:
+            self._recompute_distance_before_create(values)
+        return super().create(vals_list)
 
     def write(self, values):
         recompute_distance = False

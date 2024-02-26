@@ -9,11 +9,10 @@
             <field name="model">event.event</field>
             <field name="inherit_id" ref="event.view_event_form" />
             <field name="priority" eval="20" />
-            <field name="groups_id" eval="[(4, ref('group_event_survey'))]" />
             <field name="arch" type="xml">
                 <data>
                     <page name="event_communication" position="before">
-                        <page name="registration_survey" string="Registration Survey">
+                        <page name="registration_survey" string="Registration Survey" groups="group_event_survey">
                             <p><br />Set <b
                                 >web?debug</b> in the URL and hover the fields to see details.
                                <br />Create <b
@@ -101,10 +100,9 @@
             <field name="model">event.registration</field>
             <field name="inherit_id" ref="event.view_event_registration_form" />
             <field name="priority" eval="20" />
-            <field name="groups_id" eval="[(4, ref('group_event_survey'))]" />
             <field name="arch" type="xml">
                 <group name="event" position="inside">
-                    <field name="survey_user_input_print_url" widget="url" />
+                    <field name="survey_user_input_print_url" widget="url" groups="group_event_survey" />
                 </group>
             </field>
         </record>
@@ -116,7 +114,6 @@
             <field name="model">event.event.ticket</field>
             <field name="inherit_id" ref="event.event_event_ticket_view_tree_from_event" />
             <field name="priority" eval="20" />
-            <field name="groups_id" eval="[(4, ref('group_event_survey'))]" />
             <field name="arch" type="xml">
                     <tree
                         position="inside"
@@ -126,6 +123,7 @@
                             name="survey_label_id"
                             domain="[('question_id','=',survey_question_id)]"
                             options="{'no_create_edit':True}"
+                            groups="group_event_survey"
                         />
                     </tree>
             </field>
@@ -137,16 +135,14 @@
             <field name="name">Form view for survey question with product</field>
             <field name="model">survey.question</field>
             <field name="inherit_id" ref="survey.survey_question_form" />
-            <field name="groups_id" eval="[(4, ref('group_event_survey'))]" />
             <field name="priority" eval="20" />
-            <field name="groups_id" eval="[(4, ref('group_event_survey'))]" />
             <field name="arch" type="xml">
                 <xpath
                     expr="//field[@name='suggested_answer_ids']/tree"
                     position="inside"
                 >
-                    <field name="product_id" />
-                    <field name="product_list_price" readonly="1" />
+                    <field name="product_id" groups="group_event_survey" />
+                    <field name="product_list_price" readonly="1" groups="group_event_survey" />
                 </xpath>
             </field>
         </record>
@@ -156,12 +152,11 @@
         <record model="ir.ui.view" id="view_survey_form_event_settings">
             <field name="name">Event Settings</field>
             <field name="model">survey.survey</field>
-            <field name="inherit_id" ref="survey.survey_form" />
-            <field name="groups_id" eval="[(4, ref('group_event_survey'))]" />
+            <field name="inherit_id" ref="survey.survey_survey_view_form" />
             <field name="priority" eval="20" />
             <field name="arch" type="xml">
                 <xpath expr="//notebook" position="inside">
-                    <page string="Event settings">
+                    <page string="Event settings" groups="group_event_survey">
                         <group>
                             <group>
                                 <field name="event_id" />
@@ -177,7 +172,7 @@
         <record model="ir.ui.view" id="view_survey_user_input_line_pivot">
             <field name="name">survey.user_input.line.pivot</field>
             <field name="model">survey.user_input.line</field>
-            <field name="groups_id" eval="[(4, ref('group_event_survey'))]" />
+            <field name="groups_id" eval="[(4, ref('event_survey.group_event_survey'))]" />
             <field name="mode">primary</field>
             <field name="priority" eval="20" />
             <field name="arch" type="xml">

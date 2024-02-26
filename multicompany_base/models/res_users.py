@@ -24,11 +24,12 @@ class Users(models.Model):
         )
     ]
 
-    @api.model
-    def create(self, vals):
-        vals = self._remove_admin_access(vals)
-        if "default_user" in vals and vals["default_user"] == False:
-            vals.pop("default_user")
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            vals = self._remove_admin_access(vals)
+            if "default_user" in vals and vals["default_user"] == False:
+                vals.pop("default_user")
         return super(Users, self).create(vals)
 
     def write(self, vals):

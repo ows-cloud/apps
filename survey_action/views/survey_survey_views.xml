@@ -3,7 +3,7 @@
     <record id="survey_survey_view_form_server_action" model="ir.ui.view">
         <field name="name">Survey Action</field>
         <field name="model">survey.survey</field>
-        <field name="inherit_id" ref="survey.survey_form" />
+        <field name="inherit_id" ref="survey.survey_survey_view_form" />
         <field name="priority" eval="20" />
         <field name="arch" type="xml">
             <data>

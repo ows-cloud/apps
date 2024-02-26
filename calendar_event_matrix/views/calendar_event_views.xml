@@ -14,9 +14,9 @@
                     <field name="parent_id" class="oe_inline" groups="calendar_event_matrix.calendar_event_matrix_group" />
                 </p>
             </h1>
-            <field name="partner_ids" position="attributes">
+            <!-- <field name="partner_ids" position="attributes">
                 <attribute name="domain">[('id', 'in', available_partner_ids)]</attribute>
-            </field>
+            </field> -->
             <field name="user_id" position="after">
                 <field name="allow_to_sign_up" groups="calendar_event_matrix.calendar_event_matrix_group" />
                 <field name="matrix_id" groups="calendar_event_matrix.calendar_event_matrix_group" />

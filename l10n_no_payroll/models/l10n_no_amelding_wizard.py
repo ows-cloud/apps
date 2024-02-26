@@ -1,8 +1,6 @@
 import logging
 from datetime import datetime
 
-import pyxb
-
 from odoo import _, fields, models
 from odoo.exceptions import UserError
 
@@ -14,8 +12,6 @@ from odoo.exceptions import UserError
 # Should be "collections.abc.MutableSequence"
 
 _logger = logging.getLogger(__name__)
-
-pyxb.RequireValidWhenGenerating(True)
 
 
 class AmeldingWizard(models.TransientModel):

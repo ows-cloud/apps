@@ -9,13 +9,11 @@ class Alias(models.Model):
         "res.company", string="Company", default=lambda self: self.env.company
     )
 
-    @api.model
+    @api.model_create_multi
     def create(self, vals_list):
-        if type(vals_list) is dict:
-            vals_list = [vals_list]
-        for vals_dict in vals_list:
-            vals_dict = self._set_alias_name_with_alias_company_name_if_required(
-                vals_dict, company_id=self.env.company.id
+        for values in vals_list:
+            values = self._set_alias_name_with_alias_company_name_if_required(
+                values, company_id=self.env.company.id
             )
         return super(Alias, self).create(vals_list)
 

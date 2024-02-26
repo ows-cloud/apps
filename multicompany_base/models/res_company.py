@@ -9,8 +9,10 @@ _logger = logging.getLogger(__name__)
 class Company(models.Model):
     _inherit = "res.company"
 
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
+        vals_list.ensure_one()
+        vals = vals_list[0]
         new_company = super(Company, self.sudo().bypass_company_rules()).create(vals)
         new_company.sudo().partner_id.write({"company_id": new_company.id})
 
@@ -21,7 +23,7 @@ class Company(models.Model):
         support_user.sudo().bypass_company_rules().write(
             {"company_ids": [(4, new_company.id)]}
         )
-        self.env["res.users"].flush(["company_ids"])
+        self.env["res.users"].flush_model(["company_ids"])
 
         # Auto-configure company
         config = (

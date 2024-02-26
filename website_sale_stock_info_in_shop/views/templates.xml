@@ -41,24 +41,26 @@
             </t>
         </t>
 
+        <!-- 16.0 TODO: CHECK FIELD MAPPING -->
+
         <!-- EMAIL -->
-        <xpath expr="//form/div/t[1]/div/label" position="attributes">
+        <xpath expr="//form/div/div[3]/label" position="attributes">
             <attribute name="class">col-form-label label-optional</attribute>
         </xpath>
-        <xpath expr="//form/div/t[1]/div/input" position="attributes">
+        <xpath expr="//form/div/div[3]/input" position="attributes">
             <attribute name="t-attf-clas">form-control</attribute>
         </xpath>
         <!-- ZIP CODE -->
-        <xpath expr="//form/div/t[5]/div/label" position="attributes">
+        <xpath expr="//form/div/div[5]/label" position="attributes">
             <attribute name="class">col-form-label label-optional</attribute>
         </xpath>
-        <xpath expr="//form/div/t[5]/div/input" position="attributes">
+        <xpath expr="//form/div/div[5]/input" position="attributes">
             <attribute name="t-attf-clas">form-control</attribute>
         </xpath>
-        <xpath expr="//form/div/t[4]/div/label" position="attributes">
+        <xpath expr="//form/div/div[4]/label" position="attributes">
             <attribute name="class">col-form-label label-optional</attribute>
         </xpath>
-        <xpath expr="//form/div/t[4]/div/input" position="attributes">
+        <xpath expr="//form/div/div[4]/input" position="attributes">
             <attribute name="t-attf-clas">form-control</attribute>
         </xpath>
 

@@ -1,12 +1,7 @@
 import base64
 import logging
 
-import pyxb
-
 from odoo import _, api, fields, models
-
-
-pyxb.RequireValidWhenGenerating(True)
 
 
 class Amelding(models.Model):

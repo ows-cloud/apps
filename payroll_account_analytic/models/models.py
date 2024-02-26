@@ -138,7 +138,7 @@ class HrPayslip(models.Model):
                         # group
                         # account_move_lines
                         new_amount = float_round(new_amount, precision_digits=precision)
-                        if new_account.user_type_id.include_initial_balance:
+                        if new_account.account_type.include_initial_balance:
                             new_analytic_account_id = None
                         else:
                             new_analytic_account_id = (
@@ -255,6 +255,6 @@ class HrPayslip(models.Model):
         for slip in self:
             slip.write({"state": "done"})
         return account_moves
-    
+
     def action_payslip_done(self):
         return self.confirm_payslip_accounting()

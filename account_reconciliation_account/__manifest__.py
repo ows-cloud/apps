@@ -11,7 +11,7 @@
         "views/account_reconcile_model_views.xml",
     ],
     "depends": [
-        "account_reconciliation_widget",
+        "account_reconcile_oca",
     ],
     "license": "AGPL-3",
     "maintainers": ["ows-cloud"],

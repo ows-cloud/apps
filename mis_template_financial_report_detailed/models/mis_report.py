@@ -101,7 +101,7 @@ class MisReport(models.Model):
         ])
         # Order the account types by the first account code
         for account_type in account_types:
-            first_account = self.env['account.account'].search([('user_type_id', '=', account_type.id)], order='code', limit=1)
+            first_account = self.env['account.account'].search([('account_type', '=', account_type.id)], order='code', limit=1)
             account_types_ordered[first_account.code] = account_type
         # Create KPIs
         for account_type in account_types_ordered.values():
@@ -127,7 +127,7 @@ class MisReport(models.Model):
         account_type_kpi_values = {
             'name': re.sub('[^0-9a-zA-Z_]+','_', account_type.name),
             'description': account_type.name,
-            'expression': expression + "[('user_type_id', '=', {id})][]".format(id=account_type.id),
+            'expression': expression + "[('account_type', '=', {id})][]".format(id=account_type.id),
             'auto_expand_accounts': True,
             'auto_expand_accounts_style_id': self.env.ref('mis_template_financial_report.style_details').id,
             'style_id': self.env.ref('mis_template_financial_report.style_header').id,

@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="hr_holidays.hr_leave_view_form" />
         <field name="priority" eval="20" />
         <field name="arch" type="xml">
-            <xpath expr="//sheet/group" position="inside">
+            <group name="col_left" position="inside">
                 <group name="norway" string="Norway">
                     <field
                         name="contract_id"
@@ -14,7 +14,7 @@
                     />
                     <field name="percent" />
                 </group>
-            </xpath>
+            </group>
         </field>
     </record>
 </odoo>

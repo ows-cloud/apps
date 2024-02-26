@@ -33,7 +33,6 @@
         "hr_contract_leave",
         "l10n_no_oca",
         "payroll_account_analytic",
-        "payroll_custom_info",
     ],
     "external_dependencies": {"python": ["xsdata-pydantic"]},
     "license": "AGPL-3",

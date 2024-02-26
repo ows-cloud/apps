@@ -76,9 +76,9 @@ class CalendarAttendeeReport(models.Model):
             """
         )
 
-    @api.model
-    def create(self, values):
-        return self.env["calendar.attendee"].create(values)
+    @api.model_create_multi
+    def create(self, vals_list):
+        return self.env["calendar.attendee"].create(vals_list)
 
     def write(self, values):
         return (

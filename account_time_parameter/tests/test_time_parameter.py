@@ -11,7 +11,7 @@ class TestTimeParameter(TransactionCase):
             {
                 "code": "123001",
                 "name": "Donations for ADRA",
-                "user_type_id": self.env.ref(
+                "account_type": self.env.ref(
                     "account.data_account_type_other_income"
                 ).id,
             }
@@ -20,7 +20,7 @@ class TestTimeParameter(TransactionCase):
             {
                 "code": "123002",
                 "name": "Donations for the local church",
-                "user_type_id": self.env.ref(
+                "account_type": self.env.ref(
                     "account.data_account_type_other_income"
                 ).id,
             }

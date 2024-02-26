@@ -107,7 +107,7 @@ class MulticompanyConfig(models.AbstractModel):
             {
                 "groups_id": [
                     (3, _id(_ref("base.group_user")), 0),
-                    (4, _id(_ref("website.group_website_publisher")), 0),
+                    (4, _id(_ref("website.group_website_designer")), 0),
                 ]
             },
         )

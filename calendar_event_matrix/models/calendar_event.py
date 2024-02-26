@@ -30,12 +30,6 @@ class CalendarEvent(models.Model):
             else:
                 record.start_date_str = str(record.start_date)
 
-    @api.model
-    def create(self, vals):
-        records = super().create(vals)
-
-        return records
-
     def write(self, values):
         # Don't allow matrix_row_id without the correct matrix_id.
         if "matrix_row_id" in values:
