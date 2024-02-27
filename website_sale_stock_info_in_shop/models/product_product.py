@@ -41,4 +41,3 @@ class ProductProduct(models.Model):
                 continue
             product.sales_count = float_round(r.get(product.id, 0), precision_rounding=product.uom_id.rounding)
         return r
-from odoo import _, api, fields, models, SUPERUSER_ID

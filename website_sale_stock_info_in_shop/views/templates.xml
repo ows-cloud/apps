@@ -41,63 +41,60 @@
             </t>
         </t>
 
-        <!-- 16.0 TODO: CHECK FIELD MAPPING -->
-
-        <!-- EMAIL -->
+        <!-- EMAIL 16.0 bold (missing label-optional) no matter what! -->
         <xpath expr="//form/div/div[3]/label" position="attributes">
             <attribute name="class">col-form-label label-optional</attribute>
         </xpath>
         <xpath expr="//form/div/div[3]/input" position="attributes">
-            <attribute name="t-attf-clas">form-control</attribute>
+            <attribute name="t-attf-class">form-control</attribute>
         </xpath>
-        <!-- ZIP CODE -->
-        <xpath expr="//form/div/div[5]/label" position="attributes">
-            <attribute name="class">col-form-label label-optional</attribute>
-        </xpath>
-        <xpath expr="//form/div/div[5]/input" position="attributes">
-            <attribute name="t-attf-clas">form-control</attribute>
-        </xpath>
+        <!-- PHONE -->
         <xpath expr="//form/div/div[4]/label" position="attributes">
             <attribute name="class">col-form-label label-optional</attribute>
         </xpath>
         <xpath expr="//form/div/div[4]/input" position="attributes">
-            <attribute name="t-attf-clas">form-control</attribute>
-        </xpath>
-
-        <!-- PHONE -->
-        <xpath expr="//form/div/div[3]/label" position="attributes">
-            <attribute name="class">col-form-label label-optional</attribute>
-        </xpath>
-        <xpath expr="//form/div/div[3]/input" position="attributes">
-            <attribute name="t-attf-clas">form-control</attribute>
+            <attribute name="t-attf-class">form-control</attribute>
         </xpath>
         <!-- STREET -->
         <xpath expr="//form/div/div[6]/label" position="attributes">
             <attribute name="class">col-form-label label-optional</attribute>
         </xpath>
         <xpath expr="//form/div/div[6]/input" position="attributes">
-            <attribute name="t-attf-clas">form-control</attribute>
+            <attribute name="t-attf-class">form-control</attribute>
+        </xpath>
+        <!-- ZIP CODE -->
+        <xpath expr="//form/div/t[3]/div/label" position="attributes">
+            <attribute name="class">col-form-label label-optional</attribute>
+        </xpath>
+        <xpath expr="//form/div/t[3]/div/input" position="attributes">
+            <attribute name="t-attf-class">form-control</attribute>
+        </xpath>
+        <xpath expr="//form/div/t[4]/div/label" position="attributes">
+            <attribute name="class">col-form-label label-optional</attribute>
+        </xpath>
+        <xpath expr="//form/div/t[4]/div/input" position="attributes">
+            <attribute name="t-attf-class">form-control</attribute>
         </xpath>
         <!-- CITY -->
         <xpath expr="//form/div/div[9]/label" position="attributes">
             <attribute name="class">col-form-label label-optional</attribute>
         </xpath>
         <xpath expr="//form/div/div[9]/input" position="attributes">
-            <attribute name="t-attf-clas">form-control</attribute>
+            <attribute name="t-attf-class">form-control</attribute>
         </xpath>
         <!-- COUNTRY -->
         <xpath expr="//form/div/div[11]/label" position="attributes">
             <attribute name="class">col-form-label label-optional</attribute>
         </xpath>
         <xpath expr="//form/div/div[11]/select" position="attributes">
-            <attribute name="t-attf-clas">form-control</attribute>
+            <attribute name="t-attf-class">form-control</attribute>
         </xpath>
         <!-- STATE -->
         <xpath expr="//form/div/div[12]/label" position="attributes">
             <attribute name="class">col-form-label label-optional</attribute>
         </xpath>
         <xpath expr="//form/div/div[12]/select" position="attributes">
-            <attribute name="t-attf-clas">form-control</attribute>
+            <attribute name="t-attf-class">form-control</attribute>
         </xpath>
 
         <!-- FIELD_REQUIRED -->

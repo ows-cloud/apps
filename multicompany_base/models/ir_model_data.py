@@ -1,4 +1,4 @@
-from odoo import models
+from odoo import api, models
 
 
 class IrModelData(models.Model):
@@ -8,6 +8,7 @@ class IrModelData(models.Model):
     # ... exporting records (__ensure_xml_id not running, use patch instead)
     # ... installing modules
     # TODO: test
+    @api.model_create_multi
     def create(self, vals_list):
         for values in vals_list:
             if "company_id" not in values:
