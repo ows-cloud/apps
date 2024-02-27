@@ -7,11 +7,12 @@
     "author": "Ows, " "Odoo Community Association (OCA)",
     "category": "account",
     "data": [
-        "views/account_bank_statement_views.xml",
-        "views/account_reconcile_model_views.xml",
+        # "views/account_bank_statement_views.xml",
+        # "views/account_reconcile_model_views.xml",
     ],
     "depends": [
-        "account_reconcile_oca",
+        "account",
+        # "account_reconcile_oca",
     ],
     "license": "AGPL-3",
     "maintainers": ["ows-cloud"],
