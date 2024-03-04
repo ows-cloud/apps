@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_partner_view_form" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field
+            name="groups_id"
+            eval="[(4, ref('donation.group_donation_manager'))]"
+        />
+        <field name="priority" eval="20" />
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="inside">
+                <group>
+                    <field name="donor_newsletter_delivery_method" />
+                    <field name="donor_magazine_delivery_method" />
+                    <field name="donor_magazine_amount" />
+                    <field name="donor_receipt_delivery_method" />
+                    <field name="donor_send_receipt" />
+                    <field name="donor_address_state" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="view_res_partner_search">
+        <field name="name">res.partner.search.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter" />
+        <field
+            name="groups_id"
+            eval="[(4, ref('donation.group_donation_manager'))]"
+        />
+        <field name="priority" eval="20" />
+        <field name="arch" type="xml">
+            <search position="inside">
+                <field name="lang" />
+                <field name="donor_send_receipt" />
+                <field name="donor_newsletter_delivery_method" />
+                <field name="donor_magazine_delivery_method" />
+                <field name="donor_magazine_amount" />
+                <field name="donor_receipt_delivery_method" />
+                <field name="donor_address_state" />
+            </search>
+        </field>
+    </record>
+</odoo>

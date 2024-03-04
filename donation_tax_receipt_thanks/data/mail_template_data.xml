@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mail_template_donation_tax_receipt_english" model="mail.template">
+        <field name="name">Donation Tax Receipt - English</field>
+        <field name="model_id" ref="model_donation_tax_receipt" />
+        <field name="partner_to">${object.partner_id.id}</field>
+        <field name="subject">Thank you!</field>
+        <field
+            name="body_html"
+        ><![CDATA[
+<div>
+    <p>Dear ${object.partner_id.name},</p>
+    <p>Thank you for supporting the work of the Granheim Foundation!</p>
+    <p>Please find attached the latest newsletter from Matteson. I hope you will enjoy it.</p>
+
+    % if object.partner_id.donor_newsletter_delivery_method=='N':
+    <p>We would like to continue sending you updates from Matteson Mission School. <b>Reply to this email</b> if you wish to continue receiving this newsletter.</p>
+    % endif
+
+    <p>Kind  regards,</p>
+</div>
+<div>
+    ${user.signature | safe}
+</div>]]></field>
+        <field
+            name="report_template"
+            ref="action_report_donation_tax_receipt"
+        />
+        <field name="report_name">Receipt to ${object.partner_id.name}.pdf</field>
+    </record>
+
+    <record id="mail_template_donation_tax_receipt_norwegian" model="mail.template">
+        <field name="name">Donation Tax Receipt - Norwegian</field>
+        <field name="model_id" ref="model_donation_tax_receipt" />
+        <field name="partner_to">${object.partner_id.id}</field>
+        <field name="subject">Tusen takk!</field>
+        <field
+            name="body_html"
+        ><![CDATA[
+<div>
+<p>Kjære ${object.partner_id.name}!</p>
+<p>Tusen takk for støtten til Granheimstiftelsen! Den verdsettes høyt!</p>
+<p>Her kommer Matteson Misjonsnytt som jeg håper du vil lese!</p>
+
+% if object.partner_id.donor_newsletter_delivery_method=='N':
+<p>Vi sender deg gjerne oppdateringer fra Matteson Misjonsskole. <b>Svar på denne eposten</b> hvis du ønsker å fortsette å motta dette nyhetsbrevet.</p>
+% endif
+
+<p>Vennlig hilsen, med ønske om Guds velsignelse,</p>
+</div>
+<div>
+${user.signature | safe}
+</div>]]></field>
+        <field
+            name="report_template"
+            ref="action_report_donation_tax_receipt"
+        />
+        <field
+            name="report_name"
+        >Kvittering til ${object.partner_id.name}.pdf</field>
+    </record>
+
+    <record id="action_donation_tax_receipt_english" model="ir.actions.act_window">
+        <field name="name">Send English Donation Receipts on Email</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">mail.compose.message</field>
+        <field name="target">new</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="mail.email_compose_message_wizard_form" />
+        <field
+            name="binding_model_id"
+            ref="donation_base.model_donation_tax_receipt"
+        />
+        <field
+            name="context"
+            eval="{'default_composition_mode': 'mass_mail', 'default_template_id': ref('mail_template_donation_tax_receipt_english'), 'default_use_template': True}"
+        />
+    </record>
+    <record
+        id="action_donation_tax_receipt_norwegian"
+        model="ir.actions.act_window"
+    >
+        <field name="name">Send Norwegian Donation Receipts on Email</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">mail.compose.message</field>
+        <field name="target">new</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="mail.email_compose_message_wizard_form" />
+        <field
+            name="binding_model_id"
+            ref="donation_base.model_donation_tax_receipt"
+        />
+        <field
+            name="context"
+            eval="{'default_composition_mode': 'mass_mail', 'default_template_id': ref('mail_template_donation_tax_receipt_norwegian'), 'default_use_template': True}"
+        />
+    </record>
+</odoo>

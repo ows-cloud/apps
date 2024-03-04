@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="donation_tax_receipt_view_form" model="ir.ui.view">
+        <field name="name">donation.tax.receipt.form.inherit</field>
+        <field name="model">donation.tax.receipt</field>
+        <field name="inherit_id" ref="donation_base.donation_tax_receipt_form" />
+        <field
+            name="groups_id"
+            eval="[(4, ref('donation.group_donation_manager'))]"
+        />
+        <field name="priority" eval="20" />
+        <field name="arch" type="xml">
+            <group name="main" position="inside">
+                <field name="thanks_template_id" />
+                <field name="donor_newsletter_delivery_method" />
+                <field name="donor_receipt_delivery_method" />
+                <field name="donor_address_state" />
+            </group>
+        </field>
+    </record>
+    <record id="donation_tax_receipt_view_tree" model="ir.ui.view">
+        <field name="name">donation.tax.receipt.tree.inherit</field>
+        <field name="model">donation.tax.receipt</field>
+        <field name="inherit_id" ref="donation_base.donation_tax_receipt_tree" />
+        <field
+            name="groups_id"
+            eval="[(4, ref('donation.group_donation_manager'))]"
+        />
+        <field name="priority" eval="20" />
+        <field name="arch" type="xml">
+            <field name="donation_date" position="after">
+                <field name="date" />
+                <field name="thanks_template_id" />
+                <field name="donor_newsletter_delivery_method" />
+                <field name="donor_receipt_delivery_method" />
+                <field name="donor_address_state" />
+            </field>
+        </field>
+    </record>
+    <record id="donation_tax_receipt_view_search" model="ir.ui.view">
+        <field name="name">donation.tax.receipt.search.inherit</field>
+        <field name="model">donation.tax.receipt</field>
+        <field name="inherit_id" ref="donation_base.donation_tax_receipt_search" />
+        <field
+            name="groups_id"
+            eval="[(4, ref('donation.group_donation_manager'))]"
+        />
+        <field name="priority" eval="20" />
+        <field name="arch" type="xml">
+            <search position="inside">
+                <field name="thanks_template_id" />
+                <field name="donor_newsletter_delivery_method" />
+                <field name="donor_receipt_delivery_method" />
+                <field name="donor_address_state" />
+            </search>
+        </field>
+    </record>
+</odoo>
