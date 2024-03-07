@@ -14,10 +14,6 @@
                     <field name="image_height" />
                     <field name="image_width" />
                     <field name="image_text" />
-                    <!-- <field name="image2" widget="image" />
-                    <field name="image2_height" />
-                    <field name="image2_width" />
-                    <field name="image2_text" /> -->
                     <field name="text1" />
                     <field name="text2" />
                 </group>

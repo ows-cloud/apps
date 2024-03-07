@@ -4,7 +4,7 @@
     <!-- A4 res.partner -->
     <template id="report_address_sheet_a4">
         <t t-set="envelope" t-value="0" />
-        <t t-call="donation_tax_receipt_thanks.report_address_main">
+        <t t-call="donation_thanks.report_address_main">
             <br />
             <br />
             <br />
@@ -15,13 +15,13 @@
     <!-- ENVELOPE res.partner -->
     <template id="report_address_envelope_dle">
         <t t-set="envelope" t-value="1" />
-        <t t-call="donation_tax_receipt_thanks.report_address_main">
+        <t t-call="donation_thanks.report_address_main">
             <br />
         </t>
     </template>
     <template id="report_address_envelope_c5">
         <t t-set="envelope" t-value="1" />
-        <t t-call="donation_tax_receipt_thanks.report_address_main">
+        <t t-call="donation_thanks.report_address_main">
             <br />
             <br />
             <br />
@@ -112,7 +112,7 @@
     <template id="report_donation_tax_receipt">
         <t t-call="web.html_container">
             <t t-foreach="docs.sorted(key=lambda x: x.partner_id.name)" t-as="o">
-                <t t-call="web.basic_layout">
+                <t t-call="web.basic_layout" t-lang="o.partner_id.lang">
                     <div class="page">
                         <table style="width:100%;">
                             <tr>
@@ -194,7 +194,7 @@
                                         </t>
                                     </td>
                                     <td style="width:30%;" align="center"><span
-                                            t-field="dl.description"
+                                            t-field="dl.analytic_account_id.with_context(lang=d.partner_id.lang).donation_description"
                                         /></td>
                                     <td style="width:35%;" align="left"><span
                                             t-field="dl.amount"

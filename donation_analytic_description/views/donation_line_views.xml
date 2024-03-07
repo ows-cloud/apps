@@ -11,7 +11,7 @@
         <field name="priority" eval="20" />
         <field name="arch" type="xml">
             <field name="amount" position="before">
-                <field name="description" />
+                <field name="analytic_description" />
             </field>
         </field>
     </record>

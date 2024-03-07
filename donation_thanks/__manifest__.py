@@ -2,23 +2,24 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "Donation Tax Receipt Thanks",
+    "name": "Donation Thanks",
     "summary": "",
     "author": "Henrik Norlin, Odoo Community Association (OCA)",
     "category": "Accounting & Finance",
     "data": [
-        "data/report_paperformat_data.xml",
+        "data/report_paperformat_data.xml", # before reports
         "data/ir_actions_report_data.xml",
+        "data/res_partner_category_data.xml", # before mail templates
         "data/mail_template_data.xml",
         "data/templates.xml",
-        "views/account_analytic_account_views.xml",
-        "views/donation_donation_views.xml",
-        "views/donation_line_views.xml",
-        "views/donation_tax_receipt_views.xml",
-        "views/donation_thanks_template.xml",
+        "views/donation_thanks_template_views.xml",
         "views/res_partner_views.xml",
     ],
-    "depends": ["donation"],
+    "depends": [
+        "base_partner_family",
+        "donation",
+        "donation_analytic_description",
+    ],
     "development_status": "Alpha",
     "license": "AGPL-3",
     "maintainers": ["norlinhenrik"],
