@@ -1,4 +1,4 @@
-# Copyright 2022 AppsToGROW - Henrik Norlin
+# Copyright 2022-2024 Henrik Norlin
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
@@ -16,7 +16,7 @@
         "views/res_partner_views.xml",
     ],
     "depends": [
-        "base_partner_family",
+        # "base_partner_family",
         "donation",
         "donation_analytic_description",
     ],
