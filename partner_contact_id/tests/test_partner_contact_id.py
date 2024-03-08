@@ -7,8 +7,8 @@ class TestPartnerContactId(TransactionCase):
     def setUp(self):
         super().setUp()
         self.testpartner = self.env["res.partner"].create(
-            {"name": "test", "personal_id": "1234567890"}
+            {"name": "test", "person_id": "1234567890"}
         )
 
-    def test_partner_contact_gender(self):
-        self.assertEqual(self.testpartner.personal_id, "1234567890")
+    def test_partner_contact_id(self):
+        self.assertEqual(self.testpartner.person_id, "1234567890")
