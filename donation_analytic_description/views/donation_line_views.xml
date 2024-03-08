@@ -10,8 +10,8 @@
         />
         <field name="priority" eval="20" />
         <field name="arch" type="xml">
-            <field name="amount" position="before">
-                <field name="analytic_description" />
+            <field name="analytic_account_id" position="after">
+                <field name="description" />
             </field>
         </field>
     </record>

@@ -1,6 +1,6 @@
 import logging
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -8,13 +8,16 @@ _logger = logging.getLogger(__name__)
 class DonationLine(models.Model):
     _inherit = "donation.line"
 
-    def _compute_analytic_description(self):
-        for line in self:
-            line.analytic_description = line.analytic_account_id.with_context(
-                lang=line.donation_id.partner_id.lang
+    @api.onchange("analytic_account_id")
+    def _default_description(self):
+        if self.analytic_account_id:
+            self.description = self.analytic_account_id.with_context(
+                lang=self.donation_id.partner_id.lang
             ).donation_description
+        else:
+            self.description = ""
 
-    analytic_description = fields.Char(
+    description = fields.Char(
         string="Description",
-        compute="_compute_analytic_description",
+        default=lambda self: self._default_description(),
     )
