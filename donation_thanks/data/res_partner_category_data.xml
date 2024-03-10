@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<odoo>
+<odoo noupdate="1">
     <record id="res_partner_category_newsletter" model="res.partner.category">
         <field name="name">Newsletter</field>
         <field name="parent_id" ref="" />

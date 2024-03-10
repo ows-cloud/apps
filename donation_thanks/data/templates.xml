@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<odoo>
+<odoo noupdate="1">
 
     <!-- A4 res.partner -->
     <template id="report_address_sheet_a4">

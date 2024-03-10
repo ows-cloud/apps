@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<odoo>
+<odoo noupdate="1">
     <record id="paperformat_a5" model="report.paperformat">
         <field name="name">A5</field>
         <field name="default" eval="False" />
