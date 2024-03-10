@@ -9,13 +9,7 @@ class Base(models.AbstractModel):
     import_last_name = fields.Char(string="Import Last Name", sparse="json")
     import_message = fields.Char(string="Import Message", sparse="json")
 
-    def excel_post_import_set_partner_force(self):
-        self.excel_post_import_set_partner(force=True)
-
-    def excel_post_import_set_partner_soft(self):
-        self.excel_post_import_set_partner(force=False)
-
-    def excel_post_import_set_partner(self, force=True):
+    def excel_post_import_set_partner(self, force=False):
         Partner = self.env["res.partner"]
         for line in self:
             if not line.partner_name:

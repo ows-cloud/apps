@@ -21,7 +21,7 @@
             }
         }
     },
-    # '__POST_IMPORT__': '${object.excel_post_import("line_ids", ["time_parameter", "set_text", "set_partner_force"])}',
+    # '__POST_IMPORT__': '${object.excel_post_import("line_ids", ["time_parameter", "set_text", "set_partner"])}',
 }
         </field>
     </record>
