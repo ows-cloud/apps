@@ -24,13 +24,16 @@ class Base(models.AbstractModel):
                     line.import_last_name or "",
                 ).strip()
             if line.partner_name and not line.partner_id:
-                partner = Partner.search([("name", "=", line.partner_name)])
-                if force and not partner:
-                    partner = Partner.create(
-                        {
-                            "name": line.partner_name,
-                        }
-                    )
+                partner = Partner.search([("name", "=ilike", line.partner_name)])
+                if not partner:
+                    if force:
+                        partner = Partner.create(
+                            {
+                                "name": line.partner_name,
+                            }
+                        )
+                    else:
+                        line.payment_ref += ", {}".format(line.partner_name)
                 if len(partner) == 1:
                     line.partner_id = partner.id
 
