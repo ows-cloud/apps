@@ -22,3 +22,9 @@ class DonationThanksTemplate(models.Model):
         sanitize=False, # Gives the best UI for translation
         translate=True,
     )
+    attachment_ids = fields.One2many(
+        string="Attachments",
+        comodel_name="ir.attachment",
+        inverse_name="res_id",
+        context={"default_res_model": "donation.thanks.template"},
+    )
