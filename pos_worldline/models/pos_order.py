@@ -27,11 +27,18 @@ class PosOrder(models.Model):
                     request = requests.post(
                         "{}/pay".format(payment_method.worldline_host), json=json, # headers=headers
                     )
+                    # IKKE GODKKJENT, VENNLIGST GJØR DAGSAVSTEMMING
+                    # MENU - 2020 OK - Dagsoppgjør
                     if request.status_code == 200:
                         json = request.json()
-                        # Store print message
-                        if True:
+                        # json["terminalResponse"]["description"] # Successful
+                        # json["transactionOutcome"] # Approved
+                        # json["customer"]["escpos"]
+                        # json["customer"]["plain"]
+                        if json["transactionOutcome"] == "Approved":
                             return super().create_from_ui(orders, draft)
+                        else:
+                            raise UserError(str(json))
                     else:
                         raise Exception(
                             "Worldline payment failed to run by returning code of {}.".format(
